@@ -29,8 +29,7 @@ namespace Tutorials.Jobs.Step2
                 Vector2 dir = Random.insideUnitCircle;
                 seeker.Direction = new Vector3(dir.x, 0, dir.y);
                 SeekerTransforms[i] = go.transform;
-                go.transform.localPosition = new Vector3(
-                    Random.Range(0, Bounds.x), 0, Random.Range(0, Bounds.y));
+                go.transform.localPosition = new Vector3(Random.Range(0, Bounds.x), 0, Random.Range(0, Bounds.y));
             }
 
             TargetTransforms = new Transform[NumTargets];
@@ -41,8 +40,7 @@ namespace Tutorials.Jobs.Step2
                 Vector2 dir = Random.insideUnitCircle;
                 target.Direction = new Vector3(dir.x, 0, dir.y);
                 TargetTransforms[i] = go.transform;
-                go.transform.localPosition = new Vector3(
-                    Random.Range(0, Bounds.x), 0, Random.Range(0, Bounds.y));
+                go.transform.localPosition = new Vector3(Random.Range(0, Bounds.x), 0, Random.Range(0, Bounds.y));
             }
         }
     }

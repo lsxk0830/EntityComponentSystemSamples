@@ -145,14 +145,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -430,8 +430,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SeekerPrefab: {fileID: 6799008890615508230, guid: 265799596ba044b83b3aefb9605005b1, type: 3}
   TargetPrefab: {fileID: 6799008890615508230, guid: 442de73e07b96454581bb5f8a98825ab, type: 3}
-  NumSeekers: 1000
-  NumTargets: 1000
+  NumSeekers: 10000
+  NumTargets: 10000
   Bounds: {x: 500, y: 500}
 --- !u!114 &1691666531
 MonoBehaviour:
