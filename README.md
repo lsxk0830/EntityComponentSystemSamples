@@ -15,14 +15,14 @@ For those new to DOTS, we recommend starting with the DOTS 101 sample projects a
 
 ## The Job System 101
 
-- [Document: Unity Job System 101](https://docs.google.com/document/d/1gtXwUwsuQTfpBUmdFd5ieZaL7v3UdYTKq9H5P0M57Mg/edit?usp=sharing)
+- [Document: Unity Job System 101](./UnityJobSystem101.md)
 - [Sample project: Unity Job System 101](./Dots101/Jobs101/)
 - [Video: The C# Job system](https://youtu.be/jdW66hA-Qu8) (11 minutes)
 - [Video: Walkthrough of the jobs sample](https://youtu.be/oOgNg2gL2yw) (17 minutes)
 
 ## Entities 101
 
-- [Document: Unity Entities 101](https://docs.google.com/document/d/1R6E4IDpfLatwHITlCND0i5TuMVG0CMGsentFL-3RQT0/edit?usp=sharing)
+- [Document: Unity Entities 101](./UnityEntities101.md)
 - [Sample project: Unity Entities 101](./Dots101/Entities101/)
 - [Video: ECS Entities and components](https://youtu.be/jzCEzNoztzM) (10 minutes)
 - [Video: ECS Systems](https://youtu.be/k07I-DpCcvE) (7 minutes)
@@ -38,13 +38,13 @@ Additional Entities material on Unity Learn:
 
 ## Physics 101
 
-- [Document: Unity Physics 101](https://docs.google.com/document/d/1nHJoDBetbrmvO-KsOJ2S_p0tJI2UzRrp6T3oZSPoyg8/edit?usp=sharing)
+- [Document: Unity Physics 101](./UnityPhysics101.md)
 - [Sample project: Unity Physics 101](./Dots101/Physics101/)
 - [Video: Physics 101](https://youtu.be/EGcHDZeDTtA)
 
 ## Netcode 101
 
-- [Document: Unity Netcode for Entities 101](https://docs.google.com/document/d/17AYh_Lc7Phgtg66sX9TrSrtCS7PZn0y-XuVL2A6cXCw/edit?usp=sharing)
+- [Document: Unity Netcode for Entities 101](./UnityNetcodeforEntities101.md)
 - [Sample project: Unity Netcode for Entities 101](./Dots101/Netcode101/)
 - [Video: Netcode 101](https://youtu.be/f-4NR30ieWg)
 
