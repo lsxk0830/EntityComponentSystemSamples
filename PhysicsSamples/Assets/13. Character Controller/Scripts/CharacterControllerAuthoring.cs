@@ -25,7 +25,7 @@ public struct CharacterControllerComponentData : IComponentData
     public float MaxMovementSpeed;
     public float RotationSpeed;
     public float JumpUpwardsSpeed;
-    public float MaxSlope; // radians
+    public float MaxSlope; // 弧度
     public int MaxIterations;
     public float CharacterMass;
     public float SkinWidth;
@@ -58,45 +58,45 @@ public struct CharacterControllerInternalData : IComponentData
 [Serializable]
 public class CharacterControllerAuthoring : MonoBehaviour
 {
-    // Gravity force applied to the character controller body
+    // 施加到角色控制器主体的重力
     public float3 Gravity = Default.Gravity;
 
-    // Speed of movement initiated by user input
+    // 由用户输入启动的移动速度
     public float MovementSpeed = 2.5f;
 
-    // Maximum speed of movement at any given time
+    // 任何给定时间的最大移动速度
     public float MaxMovementSpeed = 10.0f;
 
-    // Speed of rotation initiated by user input
+    // 由用户输入启动的旋转速度
     public float RotationSpeed = 2.5f;
 
-    // Speed of upwards jump initiated by user input
+    // 用户输入启动的向上跳跃的速度
     public float JumpUpwardsSpeed = 5.0f;
 
-    // Maximum slope angle character can overcome (in degrees)
+    // 字符可以克服的最大倾斜角度（以度为单位）
     public float MaxSlope = 60.0f;
 
-    // Maximum number of character controller solver iterations
+    // 角色控制器求解器迭代的最大次数
     public int MaxIterations = 10;
 
-    // Mass of the character (used for affecting other rigid bodies)
+    // 角色的 Mass（用于影响其他刚体）
     public float CharacterMass = 1.0f;
 
-    // Keep the character at this distance to planes (used for numerical stability)
+    // 使角色与平面保持此距离（用于数值稳定性）
     public float SkinWidth = 0.02f;
 
-    // Anything in this distance to the character will be considered a potential contact
-    // when checking support
+    // 与角色的距离内的任何物体都将被视为潜在的接触
+    // 检查支持时
     public float ContactTolerance = 0.1f;
 
-    // Whether to affect other rigid bodies
+    // 是否影响其他刚体
     public bool AffectsPhysicsBodies = true;
 
-    // Whether to raise collision events
-    // Note: collision events raised by character controller will always have details calculated
+    // 是否引发碰撞事件
+    // Note: 角色控制器引发的碰撞事件将始终计算详细信息
     public bool RaiseCollisionEvents = false;
 
-    // Whether to raise trigger events
+    // 是否引发 trigger 事件
     public bool RaiseTriggerEvents = false;
 
     void OnEnable() {}
@@ -146,7 +146,7 @@ class CharacterControllerBaker : Baker<CharacterControllerAuthoring>
     }
 }
 
-// override the behavior of BufferInterpolatedRigidBodiesMotion
+// 覆盖 BufferInterpolatedRigidBodiesMotion 的行为
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
 [UpdateAfter(typeof(PhysicsInitializeGroup)), UpdateBefore(typeof(ExportPhysicsWorld))]
 [UpdateAfter(typeof(BufferInterpolatedRigidBodiesMotion))]
@@ -254,9 +254,9 @@ public partial struct CharacterControllerSystem : ISystem
         [ReadOnly] public ComponentTypeHandle<CharacterControllerComponentData> CharacterControllerComponentType;
         [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
 
-        // Stores impulses we wish to apply to dynamic bodies the character is interacting with.
-        // This is needed to avoid race conditions when 2 characters are interacting with the
-        // same body at the same time.
+        // 存储我们希望应用于与​​角色交互的动态物体的脉冲。
+        // 当 2 个角色与角色交互时，这是为了避免竞争条件所必需的
+        // 同一个身体在同一时间。
         [NativeDisableParallelForRestriction] public NativeStream.Writer DeferredImpulseWriter;
 
         public unsafe void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -306,14 +306,14 @@ public partial struct CharacterControllerSystem : ISystem
                     triggerEventBuffer = triggerEventBuffers[i];
                 }
 
-                // Collision filter must be valid
+                // 碰撞过滤器必须有效
                 if (!collider.IsValid || collider.Value.Value.GetCollisionFilter().IsEmpty)
                     continue;
 
                 var up = math.select(math.up(), -math.normalize(ccComponentData.Gravity),
                     math.lengthsq(ccComponentData.Gravity) > 0f);
 
-                // Character step input
+                // 字符步进输入
                 CharacterControllerStepInput stepInput = new CharacterControllerStepInput
                 {
                     PhysicsWorldSingleton = PhysicsWorldSingleton,
@@ -331,7 +331,7 @@ public partial struct CharacterControllerSystem : ISystem
                     MaxMovementSpeed = ccComponentData.MaxMovementSpeed
                 };
 
-                // Character transform
+                // 字符变换
                 RigidTransform transform = new RigidTransform
                 {
                     pos = localTransform.Position,
@@ -351,16 +351,16 @@ public partial struct CharacterControllerSystem : ISystem
                     currentFrameTriggerEvents = new NativeList<StatefulTriggerEvent>(Allocator.Temp);
                 }
 
-                // Check support
+                // 检查支持
                 CheckSupport(in PhysicsWorldSingleton, ref collider, stepInput, transform,
                     out ccInternalData.SupportedState, out float3 surfaceNormal, out float3 surfaceVelocity,
                     currentFrameCollisionEvents);
 
-                // User input
+                // 用户输入
                 float3 desiredVelocity = ccInternalData.Velocity.Linear;
                 HandleUserInput(ccComponentData, stepInput.Up, surfaceVelocity, ref ccInternalData, ref desiredVelocity);
 
-                // Calculate actual velocity with respect to surface
+                // 计算相对于表面的实际速度
                 if (ccInternalData.SupportedState == CharacterSupportState.Supported)
                 {
                     CalculateMovement(ccInternalData.CurrentRotationAngle, stepInput.Up, ccInternalData.IsJumping,
@@ -371,12 +371,12 @@ public partial struct CharacterControllerSystem : ISystem
                     ccInternalData.Velocity.Linear = desiredVelocity;
                 }
 
-                // World collision + integrate
+                // World 碰撞+整合
                 CollideAndIntegrate(stepInput, ccComponentData.CharacterMass, ccComponentData.AffectsPhysicsBodies != 0,
                     ref collider, ref transform, ref ccInternalData.Velocity.Linear, ref DeferredImpulseWriter,
                     currentFrameCollisionEvents, currentFrameTriggerEvents);
 
-                // Update collision event status
+                // 更新碰撞事件状态
                 if (currentFrameCollisionEvents.IsCreated)
                 {
                     UpdateCollisionEvents(currentFrameCollisionEvents, collisionEventBuffer);
@@ -387,13 +387,13 @@ public partial struct CharacterControllerSystem : ISystem
                     UpdateTriggerEvents(currentFrameTriggerEvents, triggerEventBuffer);
                 }
 
-                // Write back and orientation integration
+                // 回写和定向集成
 
                 localTransform.Position = transform.pos;
                 localTransform.Rotation = quaternion.AxisAngle(up, ccInternalData.CurrentRotationAngle);
 
 
-                // Write back to chunk data
+                // 写回 chunk 数据
                 {
                     chunkCCInternalData[i] = ccInternalData;
 
@@ -407,14 +407,14 @@ public partial struct CharacterControllerSystem : ISystem
         private void HandleUserInput(CharacterControllerComponentData ccComponentData, float3 up, float3 surfaceVelocity,
             ref CharacterControllerInternalData ccInternalData, ref float3 linearVelocity)
         {
-            // Reset jumping state and unsupported velocity
+            // 重置跳跃状态和不受支持的速度
             if (ccInternalData.SupportedState == CharacterSupportState.Supported)
             {
                 ccInternalData.IsJumping = false;
                 ccInternalData.UnsupportedVelocity = float3.zero;
             }
 
-            // Movement and jumping
+            // 移动和跳跃
             bool shouldJump = false;
             float3 requestedMovementDirection = float3.zero;
             {
@@ -424,7 +424,7 @@ public partial struct CharacterControllerSystem : ISystem
                 float horizontal = ccInternalData.Input.Movement.x;
                 float vertical = ccInternalData.Input.Movement.y;
                 bool jumpRequested = ccInternalData.Input.Jumped != 0;
-                ccInternalData.Input.Jumped = 0; // "consume" the event
+                ccInternalData.Input.Jumped = 0; // “消费”事件
                 bool haveInput = (math.abs(horizontal) > float.Epsilon) || (math.abs(vertical) > float.Epsilon);
                 if (haveInput)
                 {
@@ -435,7 +435,7 @@ public partial struct CharacterControllerSystem : ISystem
                 shouldJump = jumpRequested && ccInternalData.SupportedState == CharacterSupportState.Supported;
             }
 
-            // Turning
+            // 车削
             {
                 float horizontal = ccInternalData.Input.Looking.x;
                 bool haveInput = (math.abs(horizontal) > float.Epsilon);
@@ -451,21 +451,21 @@ public partial struct CharacterControllerSystem : ISystem
                 }
             }
 
-            // Apply input velocities
+            // 应用输入速度
             {
                 if (shouldJump)
                 {
-                    // Add jump speed to surface velocity and make character unsupported
+                    // 将跳跃速度添加到表面速度并使角色不受支撑
                     ccInternalData.IsJumping = true;
                     ccInternalData.SupportedState = CharacterSupportState.Unsupported;
                     ccInternalData.UnsupportedVelocity = surfaceVelocity + ccComponentData.JumpUpwardsSpeed * up;
                 }
                 else if (ccInternalData.SupportedState != CharacterSupportState.Supported)
                 {
-                    // Apply gravity
+                    // 施加重力
                     ccInternalData.UnsupportedVelocity += ccComponentData.Gravity * DeltaTime;
                 }
-                // If unsupported then keep jump and surface momentum
+                // 如果没有支撑，则保持跳跃和表面动量
                 linearVelocity = requestedMovementDirection * ccComponentData.MovementSpeed +
                     (ccInternalData.SupportedState != CharacterSupportState.Supported ? ccInternalData.UnsupportedVelocity : float3.zero);
             }
@@ -568,7 +568,7 @@ public partial struct CharacterControllerSystem : ISystem
     [BurstCompile]
     struct ApplyDefferedPhysicsUpdatesJob : IJob
     {
-        // Chunks can be deallocated at this point
+        // 此时可以释放 Chunks
         [DeallocateOnJobCompletion] public NativeArray<ArchetypeChunk> Chunks;
 
         public NativeStream.Reader DeferredImpulseReader;
@@ -590,7 +590,7 @@ public partial struct CharacterControllerSystem : ISystem
 
             while (DeferredImpulseReader.RemainingItemCount > 0)
             {
-                // Read the data
+                // 读取数据
                 var impulse = DeferredImpulseReader.Read<DeferredCharacterControllerImpulse>();
                 while (DeferredImpulseReader.RemainingItemCount == 0 && index < maxIndex)
                 {
@@ -603,21 +603,21 @@ public partial struct CharacterControllerSystem : ISystem
                 LocalTransform t = LocalTransformData[impulse.Entity];
 
 
-                // Don't apply on kinematic bodies
+                // 不适用于运动体
                 if (pm.InverseMass > 0.0f)
                 {
-                    // Apply impulse
+                    // 施加脉冲
 
                     pv.ApplyImpulse(pm, t.Position, t.Rotation, impulse.Impulse, impulse.Point);
 
-                    // Write back
+                    // 回信
                     PhysicsVelocityData[impulse.Entity] = pv;
                 }
             }
         }
     }
 
-    // override the behavior of CopyPhysicsVelocityToSmoothing
+    // 覆盖 CopyPhysicsVelocityToSmoothing 的行为
     [BurstCompile]
     partial struct CopyVelocityToGraphicalSmoothingJob : IJobEntity
     {
@@ -673,7 +673,7 @@ public partial struct CharacterControllerSystem : ISystem
             CollisionEventBufferType = m_Handles.CollisionEventBufferType,
             TriggerEventBufferType = m_Handles.TriggerEventBufferType,
 
-            // Input
+            // 输入
             DeltaTime = dt,
             PhysicsWorldSingleton = physicsWorldSingleton,
             DeferredImpulseWriter = deferredImpulses.AsWriter()

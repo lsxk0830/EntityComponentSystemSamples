@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Base class of authoring components that create scene from code, using SceneCreationSystem
+// authoring components 的基类，使用 SceneCreationSystem 从代码创建 scene
 public abstract class SceneCreationAuthoring<T> : MonoBehaviour
     where T : SceneCreationSettings, new()
 {

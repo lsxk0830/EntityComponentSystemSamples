@@ -20,17 +20,17 @@ public struct ClientReady : IRpcCommand
     public int LevelIndex;
 }
 
-// Add to network connections when level load sync starts, clients without this when loading is done are new connections
+// 当关卡加载同步开始时添加到网络连接，clients 加载完成时没有此连接是新连接
 public struct LevelLoadingInProgress : IComponentData { }
 
-// Add when connection/client is done loading so in progress count should equal done count when server can start
+// 当连接/client 完成加载时添加，因此当 server 可以启动时，进行中计数应等于完成计数
 public struct LevelLoadingDone : IComponentData { }
 
 public struct LevelSyncStateComponent : IComponentData
 {
     public LevelSyncState State;
     public int CurrentLevel;
-    // When client state is LevelLoadInProgress this level should be loaded
+    // 当 client 状态为 LevelLoadInProgress 时应加载此级别
     public int NextLevel;
 }
 
@@ -47,13 +47,13 @@ public partial class NetcodeClientLevelSync : SystemBase
 
     protected override void OnUpdate()
     {
-        var connectionEntity = SystemAPI.GetSingletonEntity<LocalConnection>(); // getting by NetworkId still works for binary world, but for single world host, now you have multiple network IDs when other players connect
+        var connectionEntity = SystemAPI.GetSingletonEntity<LocalConnection>(); // 通过 NetworkId 仍然适用于二进制 world，但对于单个 world 主机，现在当其他玩家连接时您有多个网络 IDs
         var levelState = SystemAPI.GetSingleton<LevelSyncStateComponent>();
         if (!SystemAPI.QueryBuilder().WithAll<ClientLoadLevel, ReceiveRpcCommandRequest>().Build().IsEmptyIgnoreFilter)
         {
             FixedString64Bytes worldName = World.Name;
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            // When load level command arrives, disable ghost sync, unload current level and load specified level
+            // 当加载级别命令到达时，禁用 ghost 同步，卸载当前级别并加载指定级别
             foreach (var (level, entity) in SystemAPI.Query<RefRO<ClientLoadLevel>>().WithEntityAccess()
                          .WithAll<ReceiveRpcCommandRequest>())
             {
@@ -107,7 +107,7 @@ public partial class NetcodeServerLevelSync : SystemBase
         var ecb = new EntityCommandBuffer(Allocator.Temp);
         var connections = GetComponentLookup<NetworkId>();
         var loadingInProgress = GetComponentLookup<LevelLoadingInProgress>();
-        // TODO: Level number not being used for anything atm
+        // TODO: 等级号未用于任何 atm
         foreach (var (level, req, entity) in SystemAPI.Query<ClientReady, ReceiveRpcCommandRequest>().WithEntityAccess())
         {
             UnityEngine.Debug.Log($"Client {connections[req.SourceConnection].Value} finished loading {level.LevelIndex}.");
@@ -121,7 +121,7 @@ public partial class NetcodeServerLevelSync : SystemBase
         var readyCount = m_ClientsReadyQuery.CalculateEntityCount();
         var loadingCount = m_ClientsLoadingQuery.CalculateEntityCount();
 
-        // All scenes finished loading and clients are ready
+        // 所有 scenes 已加载完毕，clients 已准备就绪
         var levelState = SystemAPI.GetSingleton<LevelSyncStateComponent>();
         if (levelState.State == LevelSyncState.LevelLoaded && loadingCount == readyCount)
         {
@@ -157,12 +157,12 @@ public static class NetcodeLevelSync
 {
     public static void TriggerClientLoadLevel(int level, World serverWorld)
     {
-        // Trigger level load on all clients
+        // 所有 clients 上的 Trigger 级别负载
         var rpcCmd = serverWorld.EntityManager.CreateEntity();
         serverWorld.EntityManager.AddComponentData(rpcCmd, new ClientLoadLevel(){LevelIndex = level});
         serverWorld.EntityManager.AddComponent<SendRpcCommandRequest>(rpcCmd);
 
-        // Mark each connection as being in progress of loading
+        // 将每个连接标记为正在加载
         var connectionsQuery =
             serverWorld.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<NetworkId>());
         var connectionEntities = connectionsQuery.ToEntityArray(Allocator.Temp);

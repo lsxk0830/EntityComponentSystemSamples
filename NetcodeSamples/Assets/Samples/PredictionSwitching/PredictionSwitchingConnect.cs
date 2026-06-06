@@ -43,7 +43,7 @@ public partial class PredictionSwitchingConnectServerSystem : SystemBase
             target.ValueRW.targetEntity = EntityManager.Instantiate(settings.Player);
             EntityManager.SetComponentData(target.ValueRW.targetEntity, new GhostOwner{NetworkId = netId.ValueRO.Value});
 
-            // Spawn at the edge of the field, in a line.
+            // 出现在场地边缘，排成一行。
             var isEven = (netId.ValueRO.Value & 1) == 0;
             const float halfCharacterSpawnSeparation = 1.3f;
             const float spawnStaggeredOffset = 0.65f;
@@ -56,7 +56,7 @@ public partial class PredictionSwitchingConnectServerSystem : SystemBase
                 transform.WithPosition(new float3(staggeredXPos, halfCapsuleHeight, nearMapWall)));
 
             commandBuffer.AddComponent(entity, default(NetworkStreamInGame));
-            // Add the player to the linked entity group so it is destroyed automatically on disconnect
+            // 将播放器添加到链接的 entity 组中，以便在断开连接时自动销毁
             EntityManager.GetBuffer<LinkedEntityGroup>(entity).Add(new LinkedEntityGroup{Value = target.ValueRW.targetEntity});
         }
         commandBuffer.Playback(EntityManager);

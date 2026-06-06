@@ -51,8 +51,8 @@ public class CharacterGunAuthoring : MonoBehaviour
 
 #region System
 
-// Update before physics gets going so that we don't have hazard warnings.
-// This assumes that all gun are being controlled from the same single input system
+// 在物理开始之前进行更新，这样我们就不会收到危险警告。
+// 假设所有喷枪均由同一单输入 system 控制
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(CharacterControllerSystem))]
@@ -67,7 +67,7 @@ public partial struct CharacterGunOneToManyInputSystem : ISystem
 
         private void Execute([ChunkIndexInQuery] int chunkIndexInQuery, ref LocalTransform gunLocalTransform, ref CharacterGun gun, in LocalToWorld gunTransform)
         {
-            // Handle input
+            // 处理输入
             {
                 float a = -Input.Looking.y;
 

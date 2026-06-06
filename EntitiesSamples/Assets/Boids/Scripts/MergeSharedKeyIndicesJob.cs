@@ -8,20 +8,20 @@ using Unity.Mathematics;
 
 namespace Boids
 {
-    // IJobNativeParallelMultiHashMapMergedSharedKeyIndices: custom job type, following its own defined custom safety rules:
-    // A) because we know how hashmap safety works, B) we can iterate safely in parallel
-    // Notable Features:
-    // 1) The hash map must be a NativeParallelMultiHashMap<int,int>, where the key is a hash of some data, and the index is
-    // a unique index (generally to the relevant data in some other collection).
-    // 2) Each bucket is processed concurrently with other buckets.
-    // 3) All key/value pairs in each bucket are processed individually (in sequential order) by a single thread.
+    // IJobNativeParallelMultiHashMapMergedSharedKeyIndices：自定义 job 类型，遵循自己定义的自定义安全规则：
+    // A）因为我们知道哈希图安全性如何工作，B）我们可以安全地并行迭代
+    // 显着特点：
+    // 1）哈希图必须是 NativeParallelMultiHashMap<int,int>，其中键是一些数据的哈希，索引是
+    // 唯一索引（通常是其他集合中的相关数据）。
+    // 2) 每个桶与其他桶同时处理。
+    // 3) 每个存储桶中的所有键/值对都由单个线程单独处理（按顺序）。
     [JobProducerType(typeof(JobNativeParallelMultiHashMapUniqueHashExtensions.JobNativeParallelMultiHashMapMergedSharedKeyIndicesProducer<>))]
     public interface IJobNativeParallelMultiHashMapMergedSharedKeyIndices
     {
-        // The first time each key (=hash) is encountered, ExecuteFirst() is invoked with corresponding value (=index).
+        // 第一次遇到每个键（=哈希）时，将使用相应的值（=索引）调用 ExecuteFirst()。
         void ExecuteFirst(int index);
 
-        // For each subsequent instance of the same key in the bucket, ExecuteNext() is invoked with the corresponding
+        // 对于存储桶中相同键的每个后续实例，使用相应的调用 ExecuteNext()
         // value (=index) for that key, as well as the value passed to ExecuteFirst() the first time this key
         // was encountered (=firstIndex).
         void ExecuteNext(int firstIndex, int index);
@@ -37,13 +37,13 @@ namespace Boids
         }
 
         /// <summary>
-        /// Gathers and caches reflection data for the internal job system's managed bindings. Unity is responsible for calling this method - don't call it yourself.
+        /// 收集并缓存内部 job system 的托管绑定的反射数据。Unity 负责调用此方法 - 不要自己调用它。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// ZXQ 红笔 WZXUZXQ
         /// <remarks>
-        /// When the Jobs package is included in the project, Unity generates code to call EarlyJobInit at startup. This allows Burst compiled code to schedule jobs because the reflection part of initialization, which is not compatible with burst compiler constraints, has already happened in EarlyJobInit.
+        /// 当项目中包含 Jobs package 时，Unity 会生成在启动时调用 EarlyJobInit 的代码。这允许 Burst 将代码编译为 schedule jobs，因为与突发编译器约束不兼容的初始化反射部分已经发生在 EarlyJobInit 中。
         ///
-        /// __Note__: While the Jobs package code generator handles this automatically for all closed job types, you must register those with generic arguments (like IJobChunk&amp;lt;MyJobType&amp;lt;T&amp;gt;&amp;gt;) manually for each specialization with [[Unity.Jobs.RegisterGenericJobTypeAttribute]].
+        /// __Note__：虽然 Jobs package 代码生成器会自动为所有封闭的 job 类型处理此问题，但您必须为每个专业化手动注册那些通用参数（例如 IJobChunk<MyJobType<T>>） [[Unity.Jobs.RegisterGenericJobTypeAttribute]]。
         /// </remarks>
         public static void EarlyJobInit<T>()
             where T : struct, IJobNativeParallelMultiHashMapMergedSharedKeyIndices
@@ -119,7 +119,7 @@ namespace Boids
                             jobWrapper.HashMap.TryGetFirstValue(key, out int firstValue, out NativeParallelMultiHashMapIterator<int> it);
 
                             // [macton] Didn't expect a usecase for this with multiple same values
-                            // (since it's intended use was for unique indices.)
+                            // （因为它的预期用途是用于唯一索引。）
                             // https://forum.unity.com/threads/ijobnativemultihashmapmergedsharedkeyindices-unexpected-behavior.569107/#post-3788170
                             if (entryIndex == it.GetEntryIndex())
                             {

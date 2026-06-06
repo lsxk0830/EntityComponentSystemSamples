@@ -12,10 +12,10 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 
 /*
- * Issues:
- *  - setting up constraints if not using GameObjects
- *  - providing utility functions for Component and Direct data manipulation
- *  - assigning multiple Components of the same type to a single Entity
+ * 问题：
+ *  - 如果不使用 GameObjects，则设置约束
+ *  - 为 Component 和直接数据操作提供实用功能
+ *  - 将多个相同类型的 Components 分配给单个 Entity
  */
 
 public struct LinearDashpot : IComponentData
@@ -49,8 +49,8 @@ class LinearDashpotBaker : Baker<LinearDashpotBehaviour>
     {
         if (authoring.enabled)
         {
-            // Note: GetPrimaryEntity currently creates a new Entity
-            //       if the parentBody is not a child in the scene hierarchy
+            // Note: GetPrimaryEntity 当前创建了一个新的 Entity
+            //       如果 parentBody 不是 scene 层次结构中的子级
             var componentData = new LinearDashpot
             {
                 localEntity = GetEntity(TransformUsageFlags.Dynamic),
@@ -130,7 +130,7 @@ public partial struct LinearDashpotSystem : ISystem
 
             if (!hasChunkLinearDashpotType)
             {
-                // should never happen
+                // 永远不应该发生
                 return;
             }
 
@@ -186,7 +186,7 @@ public partial struct LinearDashpotSystem : ISystem
 
                 if (LocalToWorlds.HasComponent(eB))
                 {
-                    // parent could be static and not have a Translation or Rotation
+                    // 父级可以是静态的并且没有平移或旋转
                     var worldFromBody = Math.DecomposeRigidBodyTransform(LocalToWorlds[eB].Value);
 
                     localTransformB.Position = worldFromBody.pos;

@@ -8,8 +8,8 @@ using UnityEngine;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Manages the <see cref="PlayerListEntry" /> component and RPCs,
-    ///     which allows clients to view the names and connection statuses of other clients.
+    ///     管理 <see cref="PlayerListEntry" /> component 和 RPCs，
+    ///     允许 clients 查看其他 clients 的名称和连接状态。
     /// </summary>
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
@@ -66,8 +66,8 @@ namespace Unity.NetCode.Samples.PlayerList
 
             if (!m_ClientRegisterUsernameRpcQuery.IsEmptyIgnoreFilter)
             {
-                // We only add new players IF they send us a username.
-                // This ensures that they will always have a valid username from the start.
+                // 我们只添加新玩家 IF 他们向我们发送用户名。
+                // 这确保他们从一开始就始终拥有有效的用户名。
                 m_PlayerListEntryFromEntity.Update(ref state);
                 m_NetworkIdFromEntity.Update(ref state);
                 var playerListEntries = m_PlayerListQuery.ToComponentDataListAsync<PlayerListEntry>(state.WorldUpdateAllocator, state.Dependency, out var gatherPlayerListsHandle);
@@ -106,17 +106,17 @@ namespace Unity.NetCode.Samples.PlayerList
                     return;
                 }
 
-                // Auto-patch here rather than kicking the player, as players don't pick their default names.
+                // 在这里自动修补而不是踢玩家，因为玩家不会选择他们的默认名称。
                 var originalUsername = rpc.Value;
                 rpc.Value = UsernameSanitizer.SanitizeUsername(rpc.Value, networkId.Value, out var usernameWasSanitized);
 
                 if (usernameWasSanitized)
                     netDbg.LogError($"Server received a PlayerListEntry.ClientRegisterUsernameRpc with an invalid username '{originalUsername}', sanitized to '{rpc.Value}'!");
 
-                // Note that a ClientRegisterUsernameRpc can mean either:
+                // Note ClientRegisterUsernameRpc 可以表示：
                 if (!playerListEntries.TryGetComponent(req.SourceConnection, out var entry))
                 {
-                    // A NEW JOINER:
+                    // NEW JOINER：
                     entry.State = new PlayerListEntry.ChangedRpc
                     {
                         ChangeType = PlayerListEntry.ChangedRpc.UpdateType.NewJoiner,
@@ -130,7 +130,7 @@ namespace Unity.NetCode.Samples.PlayerList
                 }
                 else
                 {
-                    // AN EXISTING PLAYER with a new username:
+                    // AN EXISTING PLAYER 使用新用户名：
                     if (entry.State.Username.Value == rpc.Value)
                     {
                         netDbg.LogWarning($"Server received a PlayerListEntry.ChangedRpc from existing player {entry.State.NetworkId} but username '{rpc.Value}' is identical to cached value. Ignoring.");
@@ -142,20 +142,20 @@ namespace Unity.NetCode.Samples.PlayerList
                     entry.State.ChangeType = PlayerListEntry.ChangedRpc.UpdateType.UsernameChange;
                     entry.State.Username = rpc;
 
-                    // Update the Servers cached entry.
+                    // 更新 Servers 缓存条目。
                     ecb.SetComponent(req.SourceConnection, entry);
                 }
 
-                // Broadcast notify of username by re-purposing the RPC.
-                // We only need to broadcast if it's pertinent to other clients:
-                // Otherwise we just send back to sender.
+                // 通过重新利用 RPC 来广播用户名通知。
+                // 我们只需要在与其他 clients 相关时进行广播：
+                // 否则我们只会发回给发件人。
                 ecb.RemoveComponent<PlayerListEntry.ClientRegisterUsernameRpc>(rpcEntity);
                 ecb.RemoveComponent<ReceiveRpcCommandRequest>(rpcEntity);
 
                 ecb.AddComponent(rpcEntity, entry.State);
                 ecb.AddComponent<SendRpcCommandRequest>(rpcEntity);
 
-                // Notify the sender that their original became this new, sanitized input, so that they can accept the servers value.
+                // 通知发送者他们的原始输入变成了这个新的、经过净化的输入，以便他们可以接受 servers 值。
                 if (usernameWasSanitized)
                 {
                     var clientInvalidUsernameRpc = ecb.CreateEntity(invalidUsernameRpcArchetype);
@@ -185,7 +185,7 @@ namespace Unity.NetCode.Samples.PlayerList
                 {
                     if (evt.State == ConnectionState.State.Disconnected)
                     {
-                        // Ignore if it has not had a PlayerListEntry added to it.
+                        // 如果尚未添加 PlayerListEntry，请忽略。
                         if (!playerListEntryLookup.TryGetRefRW(evt.ConnectionEntity, out var entryRef)) { continue; }
                         ref var entry = ref entryRef.ValueRW;
 
@@ -194,11 +194,11 @@ namespace Unity.NetCode.Samples.PlayerList
                         entry.State.Reason = evt.DisconnectReason;
                         entry.State.ChangeType = PlayerListEntry.ChangedRpc.UpdateType.PlayerDisconnect;
 
-                        // Broadcast notify of state:
+                        // 广播状态通知：
                         var rpcEntity = ecb.CreateEntity(rpcArchetype);
                         ecb.SetComponent(rpcEntity, entry.State);
 
-                        // Cleanup the cleanup component (which will also trigger entity deletion).
+                        // 清理清理 component（同时也会将 trigger entity 删除）。
                         ecb.RemoveComponent<PlayerListEntry>(evt.ConnectionEntity);
                     }
                 }

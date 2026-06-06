@@ -7,10 +7,10 @@ using Unity.NetCode.LowLevel.Unsafe;
 namespace Unity.NetCode.Samples
 {
     /// <summary>
-    /// Singleton that contains all the registered client-only component types and prefab metadata.
+    /// 包含所有已注册的仅 client 的 component 类型和 prefab 元数据的单例。
     /// <para>
-    /// The client-only backup systems only backup the state of the component that are registered to the
-    /// <see cref="ClientOnlyCollection"/>. The components <b>must</b> be registered before 'going' in game.
+    /// client 仅备份 systems 仅备份注册到 component 的状态
+    /// <see cref="ClientOnlyCollection"/>。components <b>must</b> 在“进入”游戏之前注册。
     /// </para>
     /// </summary>
     public struct ClientOnlyCollection : IComponentData
@@ -20,16 +20,16 @@ namespace Unity.NetCode.Samples
         internal NativeHashMap<GhostType, ClientOnlyBackupMetadata> GhostTypeToPrefabMetadata;
         internal int ProcessedPrefabs;
         /// <summary>
-        /// Flag used to check if a component can be registered. Once the first ghost prefabs has been processed,
-        /// it is not possible to add other component to the collection.
+        /// 用于检查 component 是否可以注册的标志。第一个 ghost prefab处理完毕后，
+        /// 无法将其他 component 添加到集合中。
         /// </summary>
         internal bool CanRegisterComponents => ProcessedPrefabs == 0;
 
         /// <summary>
-        /// Call this method to register the component as client-only and make it part of the backup.
-        /// The registration must be done before the game start (connection goes in game).
-        /// A good practice is to create a system that is create <see cref="CreateAfterAttribute"/> after the
-        /// <see cref="ClientOnlyComponentBackupSystem"/> (so tha can access the singleton) and register the component once.
+        /// 调用此方法将 component 注册为仅 client 并使其成为备份的一部分。
+        /// 注册必须在游戏开始前完成（连接进入游戏）。
+        /// 一个好的做法是创建一个 system，即在创建 <see cref="CreateAfterAttribute"/> 之后
+        /// <see cref="ClientOnlyComponentBackupSystem"/>（以便可以访问单例）并注册一次 component。
         /// </summary>
         /// <param name="componentType"></param>
         public void RegisterClientOnlyComponentType(in ComponentType componentType)
@@ -56,8 +56,8 @@ namespace Unity.NetCode.Samples
             }
             if (BackupInfoCollection.Length != first)
             {
-                //add tick and enable bitmask array to the backup size. Buffer size are re-calculated dynamically based on the buffer
-                //contents by the job
+                //添加勾选并启用位掩码数组到备份大小。缓冲区大小根据缓冲区动态重新计算
+                //内容由 job 提供
                 var enableBitsSize = ClientOnlyBackup.EnableBitByteSize(BackupInfoCollection.Length - first);
                 var compDataStartOffset = GhostComponentSerializer.SnapshotSizeAligned(sizeof(int) + enableBitsSize);
                 componentBackupSize = GhostComponentSerializer.SnapshotSizeAligned(componentBackupSize + compDataStartOffset);
@@ -80,7 +80,7 @@ namespace Unity.NetCode.Samples
                 if(index < 0)
                     continue;
 
-                //This introduce a little bit redundancy but at least do not requires two memory fetches to get this data
+                //这引入了一点冗余，但至少不需要两次内存读取来获取该数据
                 var info = new ClientOnlyBackupInfo
                 {
                     ComponentType = componentType,

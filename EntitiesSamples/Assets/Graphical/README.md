@@ -1,27 +1,27 @@
-# Graphical samples
+# 图形示例
 
-*Samples demonstrating how to work with certain graphical elements.*
+*演示如何使用某些图形元素的示例。*
 
-## AnimateGameObject sample
+## AnimateGameObject 示例
 
-This sample demonstrates an entity that logically controls an animated GameObject.
+此示例演示了从逻辑上控制动画 GameObject 的 entity。
 
-## RenderSwap sample
+## RenderSwap 示例
 
-Change the material of rendered entities at runtime.
+在运行时更改渲染的 entities 的材质。
 
-## ShaderGraph sample
+## ShaderGraph 示例
 
-This sample defines material override components, which allow you to control shader parameters by setting the override component values.
+此示例定义材质覆盖 components，它允许您通过设置覆盖 component 值来控制着色器参数。
 
-## Splines sample
+## 样条曲线示例
 
-This sample uses baking to define a spline. At runtime, boxes move along the spline paths. 
+此示例使用 baking 定义样条线。在运行时，盒子沿着样条线路径移动。
 
-## TextureUpdate sample
+## TextureUpdate 示例
 
-This sample uses Burst-compiled jobs to efficiently generate a texture.
+此示例使用 Burst 编译的 jobs 来高效生成纹理。
 
-## WireframeBlob sample
+## WireframeBlob 示例
 
-This sample constructs a blob wireframe for a complex mesh. Enable Gizmos to see the wireframe. In game, click on the ground to spawn additional instances.
+此示例为复杂网格构建斑点线框。启用 Gizmos 以查看线框。在游戏中，点击地面即可生成额外的实例。

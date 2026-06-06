@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Tutorials.Kickball.Step5
 {
-    // UpdateBefore BallMovementSystem so that the ball movement is affected by a kick in the same frame.
+    // UpdateBefore BallMovementSystem 使得球的运动受到同一帧中踢球的影响。
     [UpdateBefore(typeof(BallMovementSystem))]
     [UpdateBefore(typeof(TransformSystemGroup))]
     public partial struct BallKickingSystem : ISystem
@@ -32,7 +32,7 @@ namespace Tutorials.Kickball.Step5
                 return;
             }
 
-            // For every player, add an impact velocity to every ball in kicking range.
+            // 对于每个球员，为踢球范围内的每个球添加撞击速度。
             foreach (var playerTransform in
                      SystemAPI.Query<RefRO<LocalTransform>>()
                          .WithAll<Player>())
@@ -47,7 +47,7 @@ namespace Tutorials.Kickball.Step5
                     {
                         var playerToBall = ballTransform.ValueRO.Position.xz - playerTransform.ValueRO.Position.xz;
                         // Use normalizesafe() in case the ball and player are exactly on top of each other
-                        // (which isn't very likely but not impossible).
+                        // （这不太可能，但并非不可能）。
                         velocity.ValueRW.Value += math.normalizesafe(playerToBall) * config.BallKickForce;
                     }
                 }

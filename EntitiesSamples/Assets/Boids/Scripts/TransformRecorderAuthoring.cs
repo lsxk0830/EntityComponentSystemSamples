@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace Boids
 {
-    // Demonstrate taking some data available in editor about GameObjects and save in
-    // a runtime format suitable for Component system updates.
-    // - Playback first attached animation clip (only expect one)
-    // - Record positions and rotations at specified rate
-    // - Store samples into DynamicBuffer
+    // 演示获取编辑器中有关 GameObjects 的一些可用数据并保存在
+    // 适合 Component system 更新的运行时格式。
+    // - 播放第一个附加的动画剪辑（仅期望一个）
+    // - 以指定速率记录位置和旋转
+    // - 将示例存储到 DynamicBuffer 中
     public class TransformRecorderAuthoring : MonoBehaviour
     {
         [Range(2, 120)] public int SamplesPerSecond = 60;
@@ -25,7 +25,7 @@ namespace Boids
                 var lengthSeconds = animationClip.length;
                 var sampleRate = 1.0f / authoring.SamplesPerSecond;
                 var frameCount = (int)(lengthSeconds / sampleRate);
-                if (frameCount < 2) // Minimum two frames of animation to capture.
+                if (frameCount < 2) // 至少要捕获两帧动画。
                 {
                     return;
                 }

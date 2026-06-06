@@ -4,9 +4,9 @@ using Unity.Entities;
 namespace Unity.NetCode.Samples.Common
 {
     /// <summary>
-    ///     We use a dynamic assembly list so we can build a server with a subset of the assemblies
-    ///     (only including one of the samples instead of all).
-    ///     If you only have a single game in the project you generally do not need to enable DynamicAssemblyList.
+    ///     我们使用动态程序集列表，因此我们可以使用程序集的子集构建 server
+    ///     （仅包括其中一个示例，而不是全部）。
+    ///     如果项目中只有一个游戏，通常不需要启用 DynamicAssemblyList。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
     [UpdateInGroup(typeof(InitializationSystemGroup))]

@@ -4,14 +4,14 @@ using Unity.Entities.Serialization;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // This system will store the LOD distances meta data for the sections
+    // 此 system 将存储各部分的 LOD 距离元数据
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     partial struct TileLODBakingSystem : ISystem
     {
-        // Cannot be Burst-compiled because it calls SerializeUtility.GetSceneSectionEntity
+        // 无法进行 Burst 编译，因为它调用 SerializeUtility.GetSceneSectionEntity
         public void OnUpdate(ref SystemState state)
         {
-            // Remove all the previously stored data, for incremental baking
+            // 删除之前存储的所有数据，为增量 baking
             var cleaningQuery =  SystemAPI.QueryBuilder().WithAll<TileLODRange, SectionMetadataSetup>().Build();
             state.EntityManager.RemoveComponent<TileLODBaking>(cleaningQuery);
 
@@ -21,11 +21,11 @@ namespace Streaming.SceneManagement.CompleteSample
             EntityQuery sectionEntityQuery = default;
             for (int index = 0; index < sectionLODs.Length; ++index)
             {
-                // Get the section entity during baking
+                // 在 baking 期间获取 entity 部分
                 var sectionEntity = SerializeUtility.GetSceneSectionEntity(sectionLODs[index].Section,
                     state.EntityManager, ref sectionEntityQuery, true);
 
-                // Add the meta information to the sections
+                // 将元信息添加到部分
                 var lowerRadius = sectionLODs[index].LowerRadius;
                 var higherRadius = sectionLODs[index].HigherRadius;
                 state.EntityManager.AddComponentData(sectionEntity, new TileLODRange

@@ -49,7 +49,7 @@ public partial struct TriggerVolumeForceFieldSystem : ISystem
         if (forceField.Strength == 0)
             return;
 
-        // Don't do anything if in eye
+        // 如果进入眼睛，请勿做任何事情
         float3 dir = float3.zero;
 
         dir = (forceField.Center - localTransform.Position);
@@ -57,7 +57,7 @@ public partial struct TriggerVolumeForceFieldSystem : ISystem
         if (!math.any(dir))
             return;
 
-        // If force field around axis then project dir onto axis
+        // 如果力场围绕轴，则将 dir 投影到轴上
         float3 axis = float3.zero;
         if (forceField.Axis != -1)
         {
@@ -68,23 +68,23 @@ public partial struct TriggerVolumeForceFieldSystem : ISystem
         float strength = forceField.Strength;
         float dist2 = math.lengthsq(dir);
 
-        // Kill strength if in deadzone
+        // 如果处于死区，就会失去力量
         float dz2 = forceField.DeadZone * forceField.DeadZone;
         if (dz2 > dist2)
             strength = 0;
 
-        // If out of center and proportional divide by distance squared
+        // 如果偏离中心并按比例除以距离平方
         if (forceField.Proportional != 0)
             strength = (dist2 > 1e-4f) ? strength / dist2 : 0;
 
-        // Multiple through mass if want all objects moving equally
+        // 如果希望所有物体均匀移动，则多重通过质量
         dir = math.normalizesafe(dir);
         float mass = math.rcp(bodyMass.InverseMass);
         if (forceField.MassInvariant != 0) mass = 1f;
         strength *= mass * dt;
         bodyVelocity.Linear += strength * dir;
 
-        // If want a rotational force field add extra twist deltas
+        // 如果想要旋转力场，请添加额外的扭曲增量
         if ((forceField.Axis != -1) && (forceField.Rotation != 0))
         {
             bodyVelocity.Linear += forceField.Rotation * strength * dir;
@@ -114,7 +114,7 @@ public partial struct TriggerVolumeForceFieldSystem : ISystem
 
                 var otherEntity = triggerEvent.GetOtherEntity(e);
 
-                // exclude static bodies, other triggers and enter/exit events
+                // 排除静态物体、其他触发器和进入/退出事件
                 if (triggerEvent.State != StatefulEventState.Stay || !NonTriggerDynamicBodyMask.MatchesIgnoreFilter(otherEntity))
                 {
                     continue;
@@ -128,10 +128,10 @@ public partial struct TriggerVolumeForceFieldSystem : ISystem
 
                 ApplyForceField(DeltaTime, ref physicsVelocity, pos, physicsMass, forceField);
 
-                // counter-act gravity
+                // 反作用重力
                 physicsVelocity.Linear += -1.25f * StepComponent.Gravity * DeltaTime;
 
-                // write back
+                // 回写
                 Velocities[otherEntity] = physicsVelocity;
             }
         }

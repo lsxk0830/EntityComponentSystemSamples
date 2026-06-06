@@ -1,99 +1,99 @@
-# Entities Tutorial: Kickball
+# Entities 教程：踢球
 
-[Video: Entities "Kickball" Tutorial walkthrough](https://youtu.be/P6_3L7RTcm0) (55 minutes)
+[视频：Entities“踢球”教程演练](https://youtu.be/P6_3L7RTcm0)（55 分钟）
 
-This tutorial project demonstrates basic *Unity.Entities* usage.
+本教程项目演示了基本的 *Unity.Entities* 用法。
 
-![](Common/Images/end_result.gif)
+![](常用/图片/end_result.gif)
 
-- Obstacles (grey cylinders) and players (orange capsules) are spawned on a field.
-- Directional input moves the players, but players cannot walk through the obstacles.
-- Hitting enter spawns a yellow ball at each player capsule's location.
-- Hitting space kicks the balls that are near a player.
-- The balls bounce off the obstacles and lose momentum over time.
+- 障碍物（灰色圆柱体）和玩家（橙色胶囊）在场地上生成。
+- 方向输入使玩家移动，但玩家无法穿过障碍物。
+- 按回车键会在每个玩家胶囊的位置生成一个黄色球。
+- 击球空间会踢出靠近球员的球。
+- 随着时间的推移，球会从障碍物上弹起并失去动量。
 
-The text below describes the general idea of each step, but you're strongly encouraged to study the code and read the comments.
+下面的文本描述了每个步骤的总体思路，但强烈建议您研究代码并阅读注释。
 
 <br>
 
-## **Step 1:** Obstacle spawning.
+## **第 1 步：** 障碍物生成。
 
 - [`ConfigAuthoring.cs `](./Step%201/ConfigAuthoring.cs)
 - [`ObstacleAuthoring.cs `](./Step%201/ObstacleAuthoring.cs)
 - [`ObstacleSpawnerSystem.cs `](./Step%201/ObstacleSpawnerSystem.cs)
 
-In Step 1, the main scene contains an embedded 'sub scene', meaning a separate scene asset which is referenced by a `SubScene` MonoBehaviour in the main scene. 
+在步骤 1 中，主 scene 包含嵌入的“子 scene”，表示主 scene 中的 `SubScene` MonoBehaviour 引用的单独的 scene 资产。
 
-- At build time, the GameObjects in a sub scene are [baked](../../Docs/baking.md) into entities that are serialized.
-- When the main scene is loaded at runtime, the serialized entities are loaded along with the GameObjects of the main scene.
-- **The GameObjects of the sub scene are NOT loaded at runtime!**
+- 在构建时，子 scene 中的 GameObjects 被 [烘焙](../../Docs/baking.md) 到序列化的 entities 中。
+- 当主 scene 在运行时加载时，序列化的 entities 会与主 scene 的 GameObjects 一起加载。
+- **子 scene 的 GameObjects 是运行时加载的 NOT！**
 
-In the Step 1 scene, the sub scene contains a rendered plane GameObject for the ground "Plane" and an un-rendered GameObject called "Config" which has the `ConfigAuthoring` MonoBehaviour. Again, be clear that the GameObjects of the sub scene will *not* be loaded at runtime: the plane you see rendered in play mode is an entity, not a GameObject.
+在步骤 1 scene 中，子 scene 包含用于地面“Plane”的渲染平面 GameObject 和名为“Config”的未渲染 GameObject，其具有 `ConfigAuthoring` MonoBehaviour。再次强调，子 scene 的 GameObjects 将不会在运行时加载：您在播放模式下看到的渲染平面是 entity，而不是 GameObject。
 
-![](Common/Images/initial_scene.png)
+![](常用/图片/initial_scene.png)
 
-In baking, `ConfigAuthoring` adds a `Config` component to the baked entity. This `Config` component stores an assortment of game parameters, such as how many obstacles and players to spawn, plus the entity prefabs that we'll instantiate at runtime.
+在 baking 中，`ConfigAuthoring` 在烘焙后的 entity 中添加了一个 `Config` component。这个 `Config` component 存储各种游戏参数，例如生成的障碍物和玩家数量，以及我们将在运行时实例化的 entity prefab。
 
-At the start of play mode, the `ObstacleSpawnerSystem` creates instances of the obstacle prefab. Because spawning should only happen once, the system disables itself to stop subsequent updates.
+在游戏模式开始时，`ObstacleSpawnerSystem` 创建障碍物 prefab 的实例。由于生成只应发生一次，因此 system 会禁用自身以停止后续更新。
 
-![](Common/Images/step1_result.png)
+![](常用/图片/step1_result.png)
 
 <br>
 
-## **Step 2:** Player spawning and movement.
+## **第 2 步：** 玩家生成和移动。
 
 - [`PlayerAuthoring.cs `](./Step%202/PlayerAuthoring.cs)
 - [`PlayerSpawnerSystem.cs `](./Step%202/PlayerSpawnerSystem.cs)
 - [`PlayerMovementSystem.cs `](./Step%202/PlayerMovementSystem.cs)
 
-After the obstacles are spawned, the `PlayerSpawnerSystem` creates instances of the player prefab, one next to each obstacle.
+障碍物生成后，`PlayerSpawnerSystem` 会创建玩家 prefab 的实例，每个障碍物旁边都有一个实例。
 
-Each frame, the `PlayerMovementSystem` reads the player's directional input and moves all of the players accordingly. Using a simple radius collision check, players are prevented from penetrating into the obstacles.
+每一帧，`PlayerMovementSystem` 都会读取玩家的方向输入并相应地移动所有玩家。使用简单的半径碰撞检查，可以防止玩家穿透障碍物。
 
-![](Common/Images/step2_result.png)
+![](常用/图片/step2_result.png)
 
 <br>
 
-## **Step 3:** Ball spawning, movement, and kicking.
+## **第 3 步：** 球的生成、移动和踢球。
 
 - [`BallAuthoring.cs `](./Step%203/BallAuthoring.cs)
 - [`BallSpawnerSystem.cs `](./Step%203/BallSpawnerSystem.cs)
 - [`BallMovementSystem.cs `](./Step%203/BallMovementSystem.cs)
 - [`BallKickingSystem.cs `](./Step%203/BallMovementSystem.cs)
 
-When the user hits the enter key, the `BallSpawnerSystem` spawns a ball at the location of each player with an initial velocity. 
+当用户按下 Enter 键时，`BallSpawnerSystem` 在每个玩家的位置生成一个具有初始速度的球。
 
-Every frame, the `BallMovementSystem` moves each ball based on its current velocity, deflects the velocity if the ball hits an obstacle, and diminishes the velocity over time.
+每一帧，`BallMovementSystem` 都会根据每个球的当前速度移动每个球，如果球撞到障碍物则使速度偏转，并随着时间的推移减小速度。
 
-When the user hits the space key, the `BallKickingSystem` applies an impact velocity to all balls within a short distance from a player.
+当用户按下空格键时，`BallKickingSystem` 会对距玩家短距离内的所有球应用冲击速度。
 
-![](Common/Images/step3_result.png)
+![](常用/图片/step3_result.png)
 
 <br>
 
-## **Step 4:** Improving performance by moving the work into parallel jobs.
+## **步骤 4：** 通过将工作移至并行 jobs 来提高性能。
 
 - [`NewPlayerMovementSystem.cs `](./Step%204/NewPLayerMovementSystem.cs)
 - [`NewBallKickingSystem.cs `](./Step%204/NewBallKickingSystem.cs)
 - [`NewBallMovementSystem.cs `](./Step%204/NewBallMovementSystem.cs)
 
-These new systems duplicate the functionality of the originals, but they do the heavy lifting in jobs rather than on the main thread.
+这些新的 systems 复制了原始的功能，但它们在 jobs 中而不是在主线程上完成繁重的工作。
 
-Note that the `BallMovementJob` and `BallKickingJob` both have the same query, so it *might* be more optimal if they were combined into one job, but this is just speculation. In practice, you should profile carefully to see whether consolidating them is actually faster!
+请注意，`BallMovementJob` 和 `BallKickingJob` 都具有相同的 query，因此如果将它们组合成一个 job 可能会更优化，但这只是猜测。在实践中，您应该仔细分析，看看合并它们是否实际上更快！
 
-Also note that when we schedule the `IJobEntity` jobs, we write:
+另请注意，当我们 schedule `IJobEntity` jobs 时，我们写：
 
 ```csharp
-myJob.ScheduleParallel(); 
+myJob.ScheduleParallel();
 ```
 
-...but these schedule calls are modified by source-gen to pass and return a job handle:
+...但是这些 schedule 调用由 source-gen 修改以传递并返回 job 句柄：
 
 ```csharp
 state.Dependency = myJob.ScheduleParallel(state.Dependency);   // result of source-gen
 ```
 
-This is necessary to correctly handle entity job dependencies, as explained [here](../../../Docs/entities-jobs.md#systemstatedependency).
+这是正确处理 entity job 依赖项所必需的，如[此处](../../../Docs/entities-jobs.md#systemstatedependency) 所述。
 
 <br>
 <hr>

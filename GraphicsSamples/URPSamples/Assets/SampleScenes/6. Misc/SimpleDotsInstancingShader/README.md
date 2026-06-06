@@ -1,22 +1,22 @@
 # SimpleDotsInstancingShader
 
-This sample demonstrates a simple unlit shader which renders using DOTS instancing.
+此示例演示了一个简单的无光照着色器，它使用 DOTS 实例进行渲染。
 
 <img src="../../../../READMEimages/SimpleDotsInstancingShader.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene demonstrates how to write a custom HLSL shader that supports BatchRendererGroup and Entities Graphics. The
-example shader can be found in the `CustomDotsInstancingShader.shader` asset. The scene contains two sets of Entities
-whose colors are either from their own materials (top row), or from the MaterialColor component attached to the
-MeshRenderers (bottom row). All of the entities use the same CustomDotsInstancingShader, thus all the eight objects
-render in one SRP batch with DOTS_INSTANCING_ON.
+scene 演示了如何编写支持 BatchRendererGroup 和 Entities Graphics 的自定义 HLSL 着色器。这
+示例着色器可以在 `CustomDotsInstancingShader.shader` 资源中找到。scene 包含两套 Entities
+其颜色要么来自其自己的材料（顶行），要么来自附加到的 MaterialColor component
+MeshRenderers（底行）。所有的 entities 使用相同的 CustomDotsInstancingShader，因此所有八个对象
+使用 DOTS_INSTANCING_ON 在一批 SRP 中进行渲染。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, make sure the Subscene is closed
-2. Enter Play mode
-3. Go to: **Window > Analysis > Frame Debugger**
-4. In the Frame Debugger, click Enable
-5. Select the **DrawOpaqueObjects** event and expand it 
-6. Observe there is only one SRP Batch, and the number of draw calls is eight. The keywords show DOTS_INSTANCING_ON
+1. 在 Hierarchy 中，确保子场景已关闭
+2. 进入播放模式
+3. 转到：**窗口 > 分析 > 帧调试器**
+4. 在帧调试器中，单击启用
+5. 选择 **DrawOpaqueObjects** 事件并将其展开
+6. 观察到只有一个 SRP Batch，并且绘制调用的数量为 8。关键字显示 DOTS_INSTANCING_ON

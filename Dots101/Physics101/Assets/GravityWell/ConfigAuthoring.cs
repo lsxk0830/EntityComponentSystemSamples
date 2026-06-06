@@ -8,7 +8,7 @@ namespace GravityWell
         public GameObject BallPrefab;
         public int BallCount = 20;
         public float WellOrbitRadius = 6;
-        public float WellOrbitSpeed = 1; // radians per second
+        public float WellOrbitSpeed = 1; // 弧度每秒
         public float WellStrength = 100;
 
         public class Baker : Baker<ConfigAuthoring>
@@ -33,7 +33,7 @@ namespace GravityWell
         public Entity BallPrefab;
         public int BallCount;
         public float WellOrbitRadius;
-        public float WellOrbitSpeed; // radians per second
+        public float WellOrbitSpeed; // 弧度每秒
         public float WellStrength;
     }
 }

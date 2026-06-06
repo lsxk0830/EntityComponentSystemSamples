@@ -10,7 +10,7 @@ public partial struct SetPhysicsMassBehaviourSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        // Fill in the MassProperties based on the potential calculated value by BuildCompoundColliderBakingSystem
+        // 根据 BuildCompoundColliderBakingSystem 潜在计算值填写 MassProperties
         foreach (var(mass, setPhysicsMass)
                  in SystemAPI.Query<RefRW<PhysicsMass>, RefRO<PhysicsMassBehaviourAuthoring.SetPhysicsMassBaking>>()
                      .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))

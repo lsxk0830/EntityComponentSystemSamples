@@ -20,7 +20,7 @@ namespace Samples.HelloNetcode
             public float deltaTime;
             void Execute(ref GhostInstance ghost, ref LocalTransform transform, ref PrespawnData data)
             {
-                // After 2 seconds make the barrels slide between -2 and 2 on the x axis
+                // 2 秒后使桶在 x 轴上在-2 和 2 之间滑动
                 if (time > 2)
                 {
                     data.Value++;

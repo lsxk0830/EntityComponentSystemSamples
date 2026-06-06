@@ -7,7 +7,7 @@ namespace Unity.Physics.Authoring
 {
     public class LimitedHingeJoint : FreeHingeJoint
     {
-        // Editor only settings
+        // 仅 Editor 设置
         [HideInInspector]
         public bool EditLimits;
 

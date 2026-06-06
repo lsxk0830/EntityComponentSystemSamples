@@ -10,8 +10,8 @@ namespace Samples.HelloNetcode
         {
             public override void Bake(EnableImportanceScalingOnThisGhost authoring)
             {
-                // Note: This relies on setting `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionShared` to false.
-                // Note2: This should ideally be a runtime thing, as we don't need this component on the client.
+                // Note: 这依赖于将 `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionShared` 设置为 false。
+                // 注 2：理想情况下，这应该是运行时的事情，因为我们在 client 上不需要这个 component。
                 AddSharedComponent(GetEntity(TransformUsageFlags.Dynamic), default(GhostDistancePartitionShared));
             }
         }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Component added to the attacker, replicating server-confirmed shot results (thus, a max of one hit per frame).
+    /// Component 添加到攻击者，复制 server 确认的射击结果（因此，每帧最多一次命中）。
     /// </summary>
     public struct ServerHitMarker : IComponentData
     {
@@ -17,8 +17,8 @@ namespace Samples.HelloNetcode
     }
 
     /// <summary>
-    /// Similar to <see cref="ServerHitMarker"/>, but storing client predicted shot results.
-    /// Thus, not replicated via <see cref="GhostFieldAttribute"/>.
+    /// 与<see cref="ServerHitMarker"/>类似，但存储 client predicted 射击结果。
+    /// 因此，不通过 <see cref="GhostFieldAttribute"/> 复制。
     /// </summary>
     public struct ClientHitMarker : IComponentData
     {

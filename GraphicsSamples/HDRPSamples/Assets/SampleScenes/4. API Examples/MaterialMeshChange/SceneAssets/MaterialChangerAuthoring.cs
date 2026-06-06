@@ -48,7 +48,7 @@ public partial class MaterialChangerSystem : SystemBase
 
     private void RegisterMaterial(EntitiesGraphicsSystem hybridRendererSystem, Material material)
     {
-        // Only register each mesh once, so we can also unregister each mesh just once
+        // 每个网格只注册一次，所以我们也可以只注销每个网格一次
         if (!m_MaterialMapping.ContainsKey(material))
             m_MaterialMapping[material] = hybridRendererSystem.RegisterMaterial(material);
     }

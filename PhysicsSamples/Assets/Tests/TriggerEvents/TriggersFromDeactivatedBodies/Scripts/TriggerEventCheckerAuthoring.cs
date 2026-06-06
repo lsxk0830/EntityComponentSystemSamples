@@ -78,8 +78,8 @@ public partial struct TriggerEventCheckerSystem : ISystem
                 return;
             }
 
-            // Even if component.NumExpectedEvents is > 1, we still take one trigger event, and not all, because the only
-            // difference will be in ColliderKeys which we're not checking here
+            // 即使 component.NumExpectedEvents > 1，我们仍然采用一个 trigger 事件，而不是全部，因为唯一的
+            // 差异将在 ColliderKeys 中，我们不在这里检查
             int nonTriggerBodyIndex = triggerEvent.EntityA == entity ? triggerEvent.BodyIndexA : triggerEvent.BodyIndexB;
             int triggerBodyIndex = triggerEvent.EntityA == entity ? triggerEvent.BodyIndexB : triggerEvent.BodyIndexA;
 
@@ -107,7 +107,7 @@ public partial struct TriggerEventCheckerSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        //Complete the simulation
+        //完成模拟
         state.Dependency.Complete();
 
         NativeList<TriggerEvent> triggerEvents = new NativeList<TriggerEvent>(Allocator.TempJob);
@@ -117,7 +117,7 @@ public partial struct TriggerEventCheckerSystem : ISystem
             m_TriggerEvents = triggerEvents
         };
 
-        // Collect all events
+        // 收集所有事件
         var handle = collectTriggerEventsJob.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
         handle.Complete();
 

@@ -53,7 +53,7 @@ namespace Unity.Physics.Tests
 
             public void Execute(ref ModifiableJacobianHeader header, ref ModifiableContactJacobian jacobian)
             {
-                // Header verification
+                // 标头验证
                 Assert.IsFalse(header.AngularChanged);
                 Assert.AreNotEqual(header.BodyIndexA, header.BodyIndexB);
                 Assert.AreEqual(header.EntityA, Bodies[header.BodyIndexA].Entity);
@@ -64,7 +64,7 @@ namespace Unity.Physics.Tests
                 Assert.IsFalse(header.ModifiersChanged);
                 Assert.AreEqual(header.Type, JacobianType.Contact);
 
-                // Jacobian verification
+                // Jacobian 验证
                 Assert.AreApproximatelyEqual(jacobian.CoefficientOfFriction, 0.5f, 0.01f);
                 Assert.IsFalse(jacobian.Modified);
                 Assert.AreEqual(jacobian.NumContacts, 4);

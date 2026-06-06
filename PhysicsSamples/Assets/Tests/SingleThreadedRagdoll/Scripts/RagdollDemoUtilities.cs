@@ -110,8 +110,8 @@ public static class RagdollDemoUtilities
         var pointConPWorld = bodyPBounds.ClosestPoint(bodyCBounds.center);
         var pointPonCWorld = bodyCBounds.ClosestPoint(bodyPBounds.center);
 
-        var bodyPTransform = new RigidTransform(parentBody.transform.rotation, parentBody.transform.position);// was torso
-        var bodyCTransform = new RigidTransform(childBody.transform.rotation, childBody.transform.position);// was head
+        var bodyPTransform = new RigidTransform(parentBody.transform.rotation, parentBody.transform.position);// 是躯干
+        var bodyCTransform = new RigidTransform(childBody.transform.rotation, childBody.transform.position);// 是头
 
         PhysicsJoint jointData = default;
         switch (jointType)
@@ -135,7 +135,7 @@ public static class RagdollDemoUtilities
             {
                 var commonPivotPointWorld = math.lerp(pointConPWorld, pointPonCWorld, 0.5f);
 
-                // assume a vertical hinge joint
+                // 假设垂直铰链 joint
                 var axisP = math.rotate(math.inverse(bodyPTransform.rot), math.up());
                 var axisC = math.rotate(math.inverse(bodyCTransform.rot), math.up());
 

@@ -15,7 +15,7 @@ namespace Unity.Physics.Tests.Collision.Colliders
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            // Execute dummy job just to get Burst compilation out of the way.
+            // 执行虚拟 job 只是为了让 Burst 编译不受影响。
             using (var dummyVertices = new NativeArray<float3>(1, Allocator.TempJob))
             using (var dummyTriangles = new NativeArray<int3>(1, Allocator.TempJob))
             {
@@ -27,7 +27,7 @@ namespace Unity.Physics.Tests.Collision.Colliders
                 }.Run();
             }
 
-            // collect the inputs to use from a dense mesh asset
+            // 从密集网格资产收集要使用的输入
             var mesh = Resources.Load<UnityEngine.Mesh>("VolcanicTerrain_80000");
 
             m_Vertices = new NativeArray<Vector3>(mesh.vertices, Allocator.Persistent).Reinterpret<float3>();
@@ -56,7 +56,7 @@ namespace Unity.Physics.Tests.Collision.Colliders
         NativeArray<int3> m_TriangleIndices;
 
         /// <summary>
-        /// Measure performance of creation of <see cref="MeshCollider"/>.
+        /// 测量 <see cref="MeshCollider"/> 创建的性能。
         /// </summary>
         [Test, Performance]
         [TestCase(TestName = "MeshBuilderPerfTest")]

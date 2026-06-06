@@ -98,22 +98,22 @@ public partial struct ChangeMotionTypeSystem : ISystem
 
         foreach (var(renderMeshArray, modifier, materials, entity) in SystemAPI.Query<RenderMeshArray, RefRW<ChangeMotionType>, ChangeMotionMaterials>().WithEntityAccess())
         {
-            // tick timer
+            // 滴答计时器
             modifier.ValueRW.Timer -= deltaTime;
 
             if (modifier.ValueRW.Timer > 0f)
                 continue;
 
-            // reset timer
+            // 重置定时器
             modifier.ValueRW.Timer = modifier.ValueRW.TimeLimit;
 
             var setVelocityToZero = (byte)(modifier.ValueRW.SetVelocityToZero ? 1 : 0);
-            // make modifications based on new motion type
+            // 根据新的运动类型进行修改
             UnityEngine.Material material = renderMeshArray.MaterialReferences[0];
             switch (modifier.ValueRW.NewMotionType)
             {
                 case BodyMotionType.Dynamic:
-                    // a dynamic body has PhysicsVelocity and PhysicsMassOverride is disabled if it exists
+                    // 动态主体具有 PhysicsVelocity 和 PhysicsMassOverride（如果存在）被禁用
                     if (!SystemAPI.HasComponent<PhysicsVelocity>(entity))
                         commandBuffer.AddComponent(entity, modifier.ValueRW.DynamicInitialVelocity);
                     if (SystemAPI.HasComponent<PhysicsMassOverride>(entity))
@@ -122,9 +122,9 @@ public partial struct ChangeMotionTypeSystem : ISystem
                     material = materials.DynamicMaterial;
                     break;
                 case BodyMotionType.Kinematic:
-                    // a static body has PhysicsVelocity and PhysicsMassOverride is enabled if it exists
-                    // note that a 'kinematic' body is really just a dynamic body with infinite mass properties
-                    // hence you can create a persistently kinematic body by setting properties via PhysicsMass.CreateKinematic()
+                    // 静态主体具有 PhysicsVelocity 且 PhysicsMassOverride 已启用（如果存在）
+                    // note “运动”物体实际上只是一个具有无限质量属性的动态物体
+                    // 因此，您可以通过 PhysicsMass.CreateKinematic() 设置属性来创建持久运动体
                     if (!SystemAPI.HasComponent<PhysicsVelocity>(entity))
                         commandBuffer.AddComponent(entity, modifier.ValueRW.DynamicInitialVelocity);
                     if (SystemAPI.HasComponent<PhysicsMassOverride>(entity))
@@ -133,7 +133,7 @@ public partial struct ChangeMotionTypeSystem : ISystem
                     material = materials.KinematicMaterial;
                     break;
                 case BodyMotionType.Static:
-                    // a static body is one with a PhysicsCollider but no PhysicsVelocity
+                    // 静态主体是具有 PhysicsCollider 但没有 PhysicsVelocity 的主体
                     if (SystemAPI.HasComponent<PhysicsVelocity>(entity))
                         commandBuffer.RemoveComponent<PhysicsVelocity>(entity);
 
@@ -141,13 +141,13 @@ public partial struct ChangeMotionTypeSystem : ISystem
                     break;
             }
 
-            // assign the new render mesh material
+            // 指定新的渲染网格材质
             var materialArray = new[] { (UnityObjectRef<Material>)material };
             var newRenderMeshArray = new RenderMeshArray(materialArray, renderMeshArray.MeshReferences);
             renderMeshArraysToAdd.Add(newRenderMeshArray);
             entitiesToAdd.Add(entity);
 
-            // move to next motion type
+            // 移至下一个动作类型
             modifier.ValueRW.NewMotionType = (BodyMotionType)(((int)modifier.ValueRW.NewMotionType + 1) % 3);
         }
 

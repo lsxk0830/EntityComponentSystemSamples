@@ -24,11 +24,11 @@ public class UserWorldCreator : MonoBehaviour
     }
 }
 
-// We are checking here that the events from the non-default index worlds are:
-// 1. Raised properly
-// 2. Don't interfere with default world events (and vice versa)
-// This is done to make sure that the simulation is saved and restored properly when using CustomPhysicsSystemGroup API
-// Note: we are using trigger events only, as CollisionEvents don't get raised from deactivated bodies on Havok, so it would be impossible to test.
+// 我们在这里检查非默认索引 worlds 中的事件是：
+// 1. 适当举起
+// 2.不干扰默认的 world 事件（反之亦然）
+// 这样做是为了确保在使用 CustomPhysicsSystemGroup API 时正确保存和恢复模拟
+// Note: 我们仅使用 trigger 事件，因为 CollisionEvents 不会从 Havok 上停用的机构中引发，因此无法进行测试。
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
 public partial class UserPhysicsGroup : CustomPhysicsSystemGroup
@@ -47,7 +47,7 @@ public partial class UserPhysicsGroup : CustomPhysicsSystemGroup
     }
 }
 
-// An enum representing update orders of systems that we are trying to check in this scene. Used for debug purposes in cases something goes wrong.
+// 代表 systems 更新顺序的枚举，我们试图在此 scene 中检查它。用于出现问题时的调试目的。
 public enum SystemUpdateOrderEnum
 {
     BeforePhysicsGroup,
@@ -64,8 +64,8 @@ public partial struct CheckEventCountJob : IJob
 
     public void Execute()
     {
-        // There are zero events until the body falls on ground.
-        // 6 and 12 represent number of dynamic bodies per world in the scene, and we expect one event per body.
+        // 在尸体落地之前，事件为零。
+        // 6 和 12 表示 scene 中每个 world 动态主体的数量，我们预计每个主体一个事件。
         if (WorldIndex == 0)
         {
             Assert.IsTrue(EventCount.Value == 6 || EventCount.Value == 0, $"In {UpdateOrder} the event count is not matching! Expected 0 or 6, but got {EventCount.Value}. World Index 0.");

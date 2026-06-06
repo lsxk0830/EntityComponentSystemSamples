@@ -1,7 +1,7 @@
-﻿// Simplified SDF shader:
-// - No Shading Option (bevel / bump / env map)
-// - No Glow Option
-// - Softness is applied on both side of the outline
+﻿// 简化的 SDF 着色器：
+// - 无着色选项（斜角/凹凸/环境贴图）
+// - 无发光选项
+// - 轮廓两侧均应用柔和度
 
 Shader "TextMeshPro/Mobile/Distance Field SSD" {
 

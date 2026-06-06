@@ -12,7 +12,7 @@ namespace ActivationPlates
         public Color InactiveColor;
         public Color ActiveColor;
         public float PlayerMoveSpeed = 2;
-        
+
         class Baker : Baker<ConfigAuthoring>
         {
             public override void Bake(ConfigAuthoring authoring)
@@ -32,7 +32,7 @@ namespace ActivationPlates
             }
         }
     }
-    
+
     public struct Config : IComponentData
     {
         public Entity SpawnPrefab;

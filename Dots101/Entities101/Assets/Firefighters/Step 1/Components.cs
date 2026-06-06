@@ -10,13 +10,13 @@ namespace Tutorials.Firefighters
         public int NumFiresDoused;
     }
 
-    // all bots in the team (including the Filler and Douser) in order of passing, starting with the Filler
+    // 团队中的所有机器人（包括填充者和遮光者）按传递顺序，从填充者开始
     public struct TeamMember : IBufferElementData
     {
         public Entity Bot;
     }
 
-    // used as a flag to signal that the team needs to be repositioned
+    // 用作旗帜，表明团队需要重新定位
     public struct RepositionLine : IComponentData, IEnableableComponent { }
 
     public struct Heat : IBufferElementData
@@ -26,6 +26,6 @@ namespace Tutorials.Firefighters
 
     public class BotAnimation : IComponentData
     {
-        public GameObject AnimatedGO; // the GO that is rendered and animated
+        public GameObject AnimatedGO; // 渲染和动画的 GO
     }
 }

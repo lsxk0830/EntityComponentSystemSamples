@@ -31,13 +31,13 @@ namespace Unity.Physics.Tests.PerformanceTests
             }
         }
 
-        /// <summary>   Computes a list of position. </summary>
+        /// <summary> 计算位置列表。</summary>
         ///
-        /// <param name="count"> The number of desired positions
-        /// <param name="paddingRadius"> The space between each position
-        /// <param name="centerPosition"> Anchor around which the positions will be computed.
+        /// <param name="count"> 所需位置数量
+        /// <param name="paddingRadius"> 各位置之间的间距
+        /// <param name="centerPosition"> 将围绕其计算位置的锚点。
         ///
-        /// <returns>   A list of positions (float3). </returns>
+        /// <returns> 持仓列表 (float3)。</returns>
         internal static List<float3> ComputePositionsArray(int count, float paddingRadius, Vector3 centerPosition)
         {
             var arrayPositions = new List<float3>();

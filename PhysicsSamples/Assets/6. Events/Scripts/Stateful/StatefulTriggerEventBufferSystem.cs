@@ -6,13 +6,13 @@ using Unity.Burst;
 
 namespace Unity.Physics.Stateful
 {
-    // This system converts stream of TriggerEvents to StatefulTriggerEvents that can be stored in a Dynamic Buffer.
-    // In order for this conversion, it is required to:
-    //    1) Use the 'Raise Trigger Events' option of the 'Collision Response' property on a PhysicsShapeAuthoring component, and
-    //    2) Add a StatefulTriggerEventBufferAuthoring component to that entity
-    // or, if this is desired on a Character Controller:
-    //    1) Tick the 'Raise Trigger Events' flag on the CharacterControllerAuthoring component.
-    //       Note: the Character Controller will not become a trigger, it will raise events when overlapping with one
+    // 此 system 将 TriggerEvents 流转换为可存储在动态缓冲区中的 StatefulTriggerEvents。
+    // 为了进行此转换，需要：
+    //    1) 在 PhysicsShapeAuthoring component 上使用“碰撞响应”属性的“引发 Trigger 事件”选项，并且
+    //    2) 将 StatefulTriggerEventBufferAuthoring component 添加到该 entity
+    // 或者，如果角色控制器需要这样做：
+    //    1) 勾选 CharacterControllerAuthoring component 上的“引发 Trigger 事件”标志。
+    //       Note: 角色控制器不会变成 trigger，它与一个控制器重叠时会引发事件
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateAfter(typeof(PhysicsSimulationGroup))]
     public partial struct StatefulTriggerEventBufferSystem : ISystem

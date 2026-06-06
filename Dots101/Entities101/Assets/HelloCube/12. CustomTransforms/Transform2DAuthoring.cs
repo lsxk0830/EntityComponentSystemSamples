@@ -12,7 +12,7 @@ namespace HelloCube.CustomTransforms
         {
             public override void Bake(Transform2DAuthoring authoring)
             {
-                // Ensure that no standard transform components are added.
+                // 确保未添加标准转换 components。
                 var entity = GetEntity(TransformUsageFlags.ManualOverride);
                 AddComponent(entity, new LocalTransform2D
                 {
@@ -35,8 +35,8 @@ namespace HelloCube.CustomTransforms
         }
     }
 
-    // By including LocalTransform2D in the LocalToWorld write group, entities with LocalTransform2D
-    // are not processed by the standard transform system.
+    // 通过将 LocalTransform2D 包含在 LocalToWorld 写入组中，entities 和 LocalTransform2D
+    // 不经过标准变换 system 处理。
     [WriteGroup(typeof(LocalToWorld))]
     public struct LocalTransform2D : IComponentData
     {

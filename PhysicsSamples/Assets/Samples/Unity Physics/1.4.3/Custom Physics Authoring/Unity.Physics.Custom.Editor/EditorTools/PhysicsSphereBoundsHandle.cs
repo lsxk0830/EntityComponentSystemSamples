@@ -40,16 +40,16 @@ namespace Unity.Physics.Editor
                     Vector3.forward
                 };
 
-                // Since the geometry is transformed by Handles.matrix during rendering, we transform the camera position
-                // by the inverse matrix so that the two-shaded wireframe will have the proper orientation.
+                // 由于在渲染过程中几何图形被 Handles.matrix 变换，因此我们变换相机位置
+                // 通过逆矩阵，以便两个阴影线框将具有正确的方向。
                 var invMatrix               = Handles.inverseMatrix;
 
                 var cameraCenter            = Camera.current == null ? Vector3.zero : Camera.current.transform.position;
-                var cameraToCenter          = center - invMatrix.MultiplyPoint(cameraCenter); // vector from camera to center
+                var cameraToCenter          = center - invMatrix.MultiplyPoint(cameraCenter); // 从相机到中心的向量
                 var sqrDistCameraToCenter   = cameraToCenter.sqrMagnitude;
-                var sqrRadius               = radius * radius;                  // squared radius
+                var sqrRadius               = radius * radius;                  // 半径平方
                 var isCameraOrthographic    = Camera.current == null || Camera.current.orthographic;
-                var sqrOffset               = isCameraOrthographic ? 0 : (sqrRadius * sqrRadius / sqrDistCameraToCenter);   // squared distance from actual center to drawn disc center
+                var sqrOffset               = isCameraOrthographic ? 0 : (sqrRadius * sqrRadius / sqrDistCameraToCenter);   // 实际中心到绘制圆盘中心的平方距离
                 var insideAmount            = sqrOffset / sqrRadius;
                 if (insideAmount < 1)
                 {

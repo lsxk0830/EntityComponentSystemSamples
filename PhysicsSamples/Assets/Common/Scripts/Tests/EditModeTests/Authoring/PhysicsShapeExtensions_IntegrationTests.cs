@@ -43,7 +43,7 @@ namespace Unity.Physics.Tests.Authoring
         )
         {
             CreateHierarchy(new[] { rootBodyType }, new[] { parentBodyType }, new[] { typeof(PhysicsBodyAuthoring) });
-            // if root is PhysicsBodyAuthoring, test assumes it is enabled; Rigidbody is Component and cannot be disabled
+            // 如果 root 是 PhysicsBodyAuthoring，测试假设它已启用；刚体为 Component 且无法禁用
             Assume.That(Root.GetComponent<PhysicsBodyAuthoring>()?.enabled ?? true, Is.True);
             Child.GetComponent<PhysicsBodyAuthoring>().enabled = false;
 

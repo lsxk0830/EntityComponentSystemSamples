@@ -38,28 +38,28 @@ partial class CalculateSkinMatrixSystemBase : SystemBase
         void Execute(ref DynamicBuffer<SkinMatrix> skinMatrices, in DynamicBuffer<BindPose> bindPoses,
                 in DynamicBuffer<BoneEntity> bones, in RootEntity root)
         {
-            // Loop over each bone
+            // 遍历每个骨头
             for (int i = 0; i < skinMatrices.Length; ++i)
             {
-                // Grab localToWorld matrix of bone
+                // 抓取 localToWorld 骨骼矩阵
                 var boneEntity = bones[i].Value;
                 var rootEntity = root.Value;
 
-                // #TODO: this is necessary for LiveLink?
+                // #TODO：这对于 LiveLink 有必要吗？
                 if (!bonesLocalToWorld.ContainsKey(boneEntity) || !rootWorldToLocal.ContainsKey(rootEntity))
                     return;
 
                 var matrix = bonesLocalToWorld[boneEntity];
 
-                // Convert matrix relative to root
+                // 转换矩阵相对于根
                 var rootMatrixInv = rootWorldToLocal[rootEntity];
                 matrix = math.mul(rootMatrixInv, matrix);
 
-                // Compute to skin matrix
+                // 计算皮肤矩阵
                 var bindPose = bindPoses[i].Value;
                 matrix = math.mul(matrix, bindPose);
 
-                // Assign SkinMatrix
+                // 分配 SkinMatrix
                 skinMatrices[i] = new SkinMatrix
                 {
                     Value = new float3x4(matrix.c0.xyz, matrix.c1.xyz, matrix.c2.xyz, matrix.c3.xyz)

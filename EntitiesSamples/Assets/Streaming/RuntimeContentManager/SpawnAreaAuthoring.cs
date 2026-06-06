@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Streaming.RuntimeContentManager
 {
-    // This will create a number of entities within the bounds of the BoxCollider using random
-    // meshes and materials from the properties. The number of entities is determined by the spacing value.
+    // 这将使用随机数在 BoxCollider 的范围内创建多个 entities
+    // 来自属性的网格和材料。entities 的数量由间距值决定。
     [RequireComponent(typeof(BoxCollider))]
     public class SpawnAreaAuthoring : MonoBehaviour
     {
@@ -65,7 +65,7 @@ namespace Streaming.RuntimeContentManager
         }
     }
 
-    // contains the loading and visibility state as well as the mesh and material
+    // 包含加载和可见性状态以及网格和材质
     public struct DecorationVisualComponentData : IComponentData
     {
         public bool withinLoadRange;

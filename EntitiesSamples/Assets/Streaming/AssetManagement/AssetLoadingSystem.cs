@@ -17,10 +17,10 @@ namespace Streaming.AssetManagement
             var noLoadingQuery = SystemAPI.QueryBuilder().WithAll<References>()
                 .WithNone<Loading, RequestUnload>().Build();
 
-            // This uncommented line would add the Loading components, but they would all be null:
+            // 此未注释的行将添加加载 components，但它们都将为空：
             //      state.EntityManager.AddComponent<Loading>(noLoadingQuery);
 
-            // Instead we must add a new Loading to each entity individually:
+            // 相反，我们必须分别向每个 entity 添加新的 Loading：
             foreach (var entity in noLoadingQuery.ToEntityArray(Allocator.Temp))
             {
                 state.EntityManager.AddComponentData(entity, new Loading());
@@ -31,21 +31,21 @@ namespace Streaming.AssetManagement
             var referencesArray = query.ToComponentDataArray<References>(Allocator.Temp);
             var loadingArray = query.ToComponentArray<Loading>();
 
-            // We cannot use SystemAPI.Query for this loop because we need to
-            // call methods that make structural changes in the loop.
+            // 我们不能将 SystemAPI.Query 用于此循环，因为我们需要
+            // 调用在循环中进行结构更改的方法。
             for (int index = 0; index < referencesArray.Length; ++index)
             {
                 var refs = referencesArray[index];
                 var loading = loadingArray[index];
 
-                // Load Entity Scene
+                // 加载 Entity Scene
                 if (loading.EntityScene == Entity.Null && refs.EntitySceneReference.IsReferenceValid)
                 {
                     loading.EntityScene =
                         SceneSystem.LoadSceneAsync(state.WorldUnmanaged, refs.EntitySceneReference);
                 }
 
-                // Load Entity Prefab
+                // 加载 Entity Prefab
                 if (refs.EntityPrefabReference.IsReferenceValid)
                 {
                     if (loading.EntityPrefab == Entity.Null)
@@ -62,7 +62,7 @@ namespace Streaming.AssetManagement
                     }
                 }
 
-                // Load GameObject Scene
+                // 加载 GameObject Scene
                 if (!loading.GameObjectScene.IsValid() && refs.GameObjectSceneReference.IsReferenceValid)
                 {
                     loading.GameObjectScene = refs.GameObjectSceneReference.LoadAsync(new ContentSceneParameters
@@ -72,7 +72,7 @@ namespace Streaming.AssetManagement
                     });
                 }
 
-                // Load GameObject Prefab
+                // 加载 GameObject Prefab
                 if (loading.GameObjectPrefabInstance == null &&
                     refs.GameObjectPrefabReference.IsReferenceValid)
                 {
@@ -88,7 +88,7 @@ namespace Streaming.AssetManagement
                     }
                 }
 
-                // Load Shader
+                // 加载着色器
                 if (loading.ShaderInstance == null && refs.ShaderReference.IsReferenceValid)
                 {
                     if (refs.ShaderReference.LoadingStatus == ObjectLoadingStatus.None)
@@ -97,12 +97,12 @@ namespace Streaming.AssetManagement
                     }
                     else if (refs.ShaderReference.LoadingStatus == ObjectLoadingStatus.Completed)
                     {
-                        // Create an object to display the loaded Texture
+                        // 创建一个对象来显示加载的纹理
                         loading.ShaderInstance = refs.ShaderReference.Result;
                     }
                 }
 
-                // Load Mesh
+                // 加载网格
                 float instancesXOffset = 2.5f;
                 if (loading.MeshGameObjectInstance == null && refs.MeshReference.IsReferenceValid)
                 {
@@ -113,7 +113,7 @@ namespace Streaming.AssetManagement
                     else if (refs.MeshReference.LoadingStatus == ObjectLoadingStatus.Completed &&
                              loading.ShaderInstance)
                     {
-                        // Create an object to display the loaded Mesh
+                        // 创建一个对象来显示加载的网格
                         loading.MeshGameObjectInstance = CreateObjectWithMesh(
                             refs.MeshReference.Result,
                             loading.ShaderInstance,
@@ -124,7 +124,7 @@ namespace Streaming.AssetManagement
                     }
                 }
 
-                // Load Material
+                // 装载材料
                 if (loading.MaterialGameObjectInstance == null &&
                     refs.MaterialReference.IsReferenceValid)
                 {
@@ -132,7 +132,7 @@ namespace Streaming.AssetManagement
                         refs.MaterialReference.LoadAsync();
                     else if (refs.MaterialReference.LoadingStatus == ObjectLoadingStatus.Completed)
                     {
-                        // Create an object to display the loaded Material
+                        // 创建一个对象来显示加载的材质
                         loading.MaterialGameObjectInstance = CreateObjectWithMaterial(
                             refs.MaterialReference.Result,
                             "MaterialGameObjectInstance",
@@ -141,7 +141,7 @@ namespace Streaming.AssetManagement
                     }
                 }
 
-                // Load Texture
+                // 加载纹理
                 if (loading.TextureGameObjectInstance == null && refs.TextureReference.IsReferenceValid)
                 {
                     if (refs.TextureReference.LoadingStatus == ObjectLoadingStatus.None)
@@ -151,7 +151,7 @@ namespace Streaming.AssetManagement
                     else if (refs.TextureReference.LoadingStatus == ObjectLoadingStatus.Completed &&
                              loading.ShaderInstance)
                     {
-                        // Create an object to display the loaded Texture
+                        // 创建一个对象来显示加载的纹理
                         loading.TextureGameObjectInstance = CreateObjectWithTexture(
                             refs.TextureReference.Result,
                             loading.ShaderInstance,
@@ -166,7 +166,7 @@ namespace Streaming.AssetManagement
         public GameObject CreateObjectWithMesh(Mesh mesh, Shader shader, string name, float3 position,
             quaternion rotation)
         {
-            // Create an object to display the mesh
+            // 创建一个对象来显示网格
             GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             obj.name = name;
             var transform = obj.transform;
@@ -181,7 +181,7 @@ namespace Streaming.AssetManagement
 
         public GameObject CreateObjectWithMaterial(Material material, string name, float3 position)
         {
-            // Create an object to display the material
+            // 创建一个对象来显示材质
             GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             obj.name = name;
             var transform = obj.transform;
@@ -193,7 +193,7 @@ namespace Streaming.AssetManagement
 
         public GameObject CreateObjectWithTexture(Texture texture, Shader shader, string name, float3 position)
         {
-            // Create an object to display the texture
+            // 创建一个对象来显示纹理
             GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             obj.name = name;
             var transform = obj.transform;

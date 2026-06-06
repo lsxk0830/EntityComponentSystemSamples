@@ -22,7 +22,7 @@ namespace Asteroids.Client
 
             RequireForUpdate(GetEntityQuery(ComponentType.ReadOnly<LevelLoadRequest>(), ComponentType.ReadOnly<ReceiveRpcCommandRequest>()));
 
-            // This is just here to make sure the subscen is streamed in before the client sets up the level data
+            // 这只是为了确保在 client 设置关卡数据之前子场景已流入
             RequireForUpdate<AsteroidsSpawner>();
         }
 
@@ -30,11 +30,11 @@ namespace Asteroids.Client
         {
             if (!SystemAPI.HasSingleton<LevelComponent>())
             {
-                // The level always exist, "loading" just resizes it
+                // 关卡始终存在，“加载”只是调整其大小
                 m_LevelSingleton = EntityManager.CreateEntity();
                 EntityManager.AddComponentData(m_LevelSingleton, new LevelComponent {levelWidth = 0, levelHeight = 0});
             }
-            else if (m_LevelSingleton == default) // in single world host mode, LevelComponent is created by the server system
+            else if (m_LevelSingleton == default) // 在单 world 主机模式下，LevelComponent 由 server system 创建
             {
                 m_LevelSingleton = SystemAPI.GetSingletonEntity<LevelComponent>();
             }
@@ -75,11 +75,11 @@ namespace Asteroids.Client
         {
             commandBuffer.DestroyEntity(entityIndexInChunk, entity);
 
-            // Check for disconnects
+            // 检查是否有断开连接
             if (!rpcFromEntity.HasBuffer(requestSource.SourceConnection))
                 return;
 
-            // set the level size - fake loading of level
+            // 设置关卡大小 - 假加载关卡
             levelFromEntity[levelSingleton] = request.levelData;
 
             commandBuffer.AddComponent(entityIndexInChunk, requestSource.SourceConnection, new PlayerStateComponentData());

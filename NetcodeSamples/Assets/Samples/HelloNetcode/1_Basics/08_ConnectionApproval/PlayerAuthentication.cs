@@ -15,7 +15,7 @@ namespace Samples.HelloNetcode
             if (!ConnectionApprovalData.PlayerAuthenticationEnabled.Data)
                 return;
 
-            // We'll only reach here on client worlds with auth enabled so this will never be done on servers
+            // 我们只会在启用了身份验证的情况下通过 client worlds 到达此处，因此永远不会在 servers 上完成此操作
             SignIn();
         }
 
@@ -80,9 +80,9 @@ namespace Samples.HelloNetcode
 
         void Update()
         {
-            // NOTE: This will fetch all queued player approval requests but will only work for up to 15 players at a time as then
-            // this particular service rate limit will be reached. Would need to fetch the rest in batches after limit is cleared.
-            // See https://services.docs.unity.com/player-auth/v1/ for more information.
+            // NOTE: 这将获取所有排队的玩家批准请求，但一次最多仅适用于 15 名玩家
+            // 将达到此特定服务速率限制。清除限制后需要批量获取其余部分。
+            // 有关详细信息，请参阅 https://services.docs.unity.com/player-auth/v1/。
             while (ConnectionApprovalData.PendingApprovals.Data.IsCreated && ConnectionApprovalData.PendingApprovals.Data.TryDequeue(out var pendingApproval))
             {
                 StartCoroutine(GetPlayerInfo(pendingApproval));

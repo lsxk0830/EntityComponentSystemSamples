@@ -23,7 +23,7 @@ namespace KickBall
     {
     }
 
-    // this attribute means the value will be passed to _BaseColor of the shader
+    // 该属性意味着该值将传递给着色器的 _BaseColor
     [MaterialProperty("_BaseColor")]
     public struct Color : IComponentData
     {

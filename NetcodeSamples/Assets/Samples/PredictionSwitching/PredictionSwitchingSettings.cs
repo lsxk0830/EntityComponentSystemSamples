@@ -7,7 +7,7 @@ public struct PredictionSwitchingSettings : IComponentData
 
     public float TransitionDurationSeconds;
     public float PredictionSwitchingRadius;
-    /// <summary>The margin must be large enough that moving from predicted time to interpolated time does not move the ghost back into the prediction sphere.</summary>
+    /// <summary>The 余量必须足够大，以便从 predicted 时间移动到 interpolated 时间不会将 ghost 移回到 prediction sphere.</summary>
     public float PredictionSwitchingMargin;
 
     public byte BallColorChangingEnabled;

@@ -4,9 +4,9 @@ namespace Tutorials.Jobs.Step1
 {
     public class Spawner : MonoBehaviour
     {
-        // The set of targets is fixed, so rather than 
-        // retrieve the targets every frame, we'll cache 
-        // their transforms in this field.
+        // 目标集是固定的，所以而不是
+        // 每帧检索目标，我们将缓存
+        // 他们在这个领域的转变。
         public static Transform[] TargetTransforms;
 
         public GameObject SeekerPrefab;

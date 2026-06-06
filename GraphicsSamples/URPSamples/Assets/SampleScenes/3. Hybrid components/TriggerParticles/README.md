@@ -1,19 +1,19 @@
 # TriggerParticles
 
-This sample demonstrates how to play a ParticleSystem from an ECS System. Enter Play mode to see the animation.
+此示例演示如何从 ECS System 播放 ParticleSystem。进入播放模式即可观看动画。
 
 <img src="../../../../READMEimages/TriggerParticles.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains a Subscene and in the Subscene there is a sphere and a ParticleSystem. The JumpingSpherePSSystem script animates the jumping sphere and plays the ParticleSystem when the sphere hits the ground.
+scene 包含一个子场景，子场景中有一个球体和一个 ParticleSystem。JumpingSpherePSSystem 脚本制作跳跃球体的动画，并在球体撞击地面时播放 ParticleSystem。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select the Subscene
-2. In the Inspector, click Open
-3. Note that the ParticleSystem is in the Subscene and baked to be a companion component that you can access from the ECS System script.
+1. 在 Hierarchy 中，选择子场景
+2. 在 Inspector 中，单击“打开”
+3. 请注意，ParticleSystem 位于子场景中，并烘焙为配套 component，您可以从 ECS System 脚本访问它。
 
-## More information
+## 更多信息
 
-For more information about companion components, see the [documentation](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/companion-components.html).
+有关同伴 components 的更多信息，请参阅[文档](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/companion-components.html)。

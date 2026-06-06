@@ -1,15 +1,15 @@
-// This system uses the TreeFlag value TriggerWholeTreeToDynamic on the entities with TreeTopTag and TreeTrunkTag
-// components to signal that the root tree TreeComponent is in the LifeCycleStates.TransitionToDead state. When a tree
-// transitions to dead, all children entities of the prefab with a collider will:
-// - change from static to dynamic and
-// - the collision filter is modified
-// - the TreeFlag value is changed from TriggerWholeTreeToDynamic to TriggerChangeTreeColor.
-// Note: what the collision filter is changed to makes a difference to the performance of the test:
-// - Best performance: don't modify the collision filter at all
-// - Good performance: modify the collision filter to collide only with other dead trees (bitshift 8) [Recommended]
-// - Poor performance: modify the collision filter to collide with all trees (bitshift 7)
-// While changing the collision filter does test the BVH building, the resulting collisions for high tree density on a
-// large map have a large impact on simulation and the frame rate
+// 此 system 使用 entities 上的 TreeFlag 值 TriggerWholeTreeToDynamic 以及 TreeTopTag 和 TreeTrunkTag
+// components 用于指示根树 TreeComponent 处于 LifeCycleStates.TransitionToDead 状态。当一棵树
+// 转换为死亡状态时，具有 collider 的 prefab 的所有子 entities 将：
+// - 由静态变为动态
+// - 修改了碰撞过滤器
+// - TreeFlag 值从 TriggerWholeTreeToDynamic 更改为 TriggerChangeTreeColor。
+// Note: 碰撞过滤器的更改会对测试的性能产生影响：
+// - 最佳性能：根本不修改碰撞过滤器
+// - 良好的性能：修改碰撞过滤器以仅与其他死树碰撞（bitshift 8）[推荐]
+// - 性能差：修改碰撞过滤器以与所有树碰撞（bitshift 7）
+// 虽然更改碰撞过滤器确实测试了 BVH 建筑物，但在高树木密度下产生的碰撞
+// 大地图对模拟和帧速率有很大影响
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -33,13 +33,13 @@ namespace Unity.Physics
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            ProfilerMarker pm = new ProfilerMarker("Profile: TreeDeathSystem.OnUpdate"); //PROFILE
-            pm.Begin(); //PROFILE
+            ProfilerMarker pm = new ProfilerMarker("Profile: TreeDeathSystem.OnUpdate"); //ZXQXLQRM 摩托车 ZHCZXQ
+            pm.Begin(); //ZXQXLQRM 摩托车 ZHCZXQ
 
             var spawner = SystemAPI.GetSingleton<TreeSpawnerComponent>();
             if (spawner.MaxDeadTime > 0)
             {
-                // Make both the tree top and tree trunk dynamic
+                // 让树顶和树干都充满活力
                 using var ecb = new EntityCommandBuffer(Allocator.TempJob);
                 var makeTreesDynamicJob = new MakeWholeTreeDynamicJob
                 {
@@ -50,7 +50,7 @@ namespace Unity.Physics
                 ecb.Playback(state.EntityManager);
             }
 
-            pm.End(); //PROFILE
+            pm.End(); //ZXQXLQRM 摩托车 ZHCZXQ
         }
 
         [BurstCompile]
@@ -58,7 +58,7 @@ namespace Unity.Physics
         {
         }
 
-        // Make both TreeTop and TreeTrunk bodies dynamic and update the collision filter
+        // 使 TreeTop 和 TreeTrunk 主体动态化并更新碰撞过滤器
         [BurstCompile]
         internal partial struct MakeWholeTreeDynamicJob : IJobEntity
         {
@@ -67,10 +67,10 @@ namespace Unity.Physics
             public void Execute([ChunkIndexInQuery] int chunkInQueryIndex, Entity entity, ref TreeState treeState,
                 PhysicsCollider collider, EnableTreeDeath enableTreeDeath)
             {
-                // Note: treeState.Value MUST equal TreeState.States.TriggerWholeTreeToDynamic for EnableTreeDeath to be
-                // present, so we aren't checking for it here.
+                // Note: treeState.Value MUST 等于 TreeState.States.TriggerWholeTreeToDynamic，因为 EnableTreeDeath 为
+                // 存在，所以我们不在这里检查它。
 
-                // Make the body dynamic
+                // 让身体充满活力
                 var velocity = new PhysicsVelocity
                 {
                     Linear = float3.zero,
@@ -88,12 +88,12 @@ namespace Unity.Physics
                 var mass = PhysicsMass.CreateDynamic(collider.MassProperties, 1.0f);
                 ECB.AddComponent(chunkInQueryIndex, entity, mass);
 
-                // Update the collision filter to collide with other dead trees
+                // 更新碰撞过滤器以与其他死树碰撞
                 var filter = collider.Value.Value.GetCollisionFilter();
-                filter.CollidesWith ^= (1 << 7);  //toggle bit so it collides with everything
+                filter.CollidesWith ^= (1 << 7);  //切换位，使其与所有物体发生碰撞
                 var newFilter = new CollisionFilter
                 {
-                    BelongsTo = 256, // now belongs to DeadTrees layer
+                    BelongsTo = 256, // 现在属于 DeadTrees 层
                     CollidesWith = filter.CollidesWith,
                     GroupIndex = filter.GroupIndex
                 };
@@ -103,7 +103,7 @@ namespace Unity.Physics
                 treeState.Value = TreeState.States.TriggerChangeTreeColor;
                 ECB.SetComponent(chunkInQueryIndex, entity, treeState);
 
-                // Component should only be enabled on entities that are timed to die, so disable once death done
+                // Component 只能在定时死亡的 entities 上启用，因此一旦死亡完成就禁用
                 ECB.SetComponentEnabled<EnableTreeDeath>(chunkInQueryIndex, entity, false);
             }
         }

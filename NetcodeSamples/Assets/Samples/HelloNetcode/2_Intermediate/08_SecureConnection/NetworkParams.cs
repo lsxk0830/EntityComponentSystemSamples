@@ -1,24 +1,24 @@
-//#define ENABLE_NETCODE_SAMPLE_SECURE
+//#定义 ENABLE_NETCODE_SAMPLE_SECURE
 using Unity.Collections;
 
 namespace Samples.HelloNetcode
 {
 #if ENABLE_NETCODE_SAMPLE_SECURE
     /// <summary>
-    /// DO NOT SHIP GENERATED PRIVATE KEYS AS PART OF YOUR GAME!
+    /// DO NOT SHIP GENERATED PRIVATE KEYS AS PART OF YOUR GAME！
     ///
-    /// Generated SSL certificates.
-    /// Follow this guide to generate new certificates: https://docs-multiplayer.unity3d.com/transport/current/secure-connection#generating-the-required-keys-and-certificates-with-openssl
+    /// 生成 SSL 证书。
+    /// 按照此指南生成新证书：https://docs-multiplayer.unity3d.com/transport/current/secure-connection#generating-the-required-keys-and-certificates-with-openssl
     /// </summary>
     public static class SecureParameters
     {
         /// <summary>
-        /// The common name used to define the server certificate
+        /// 用于定义 server 证书的通用名称
         /// </summary>
         public static FixedString512Bytes ServerCommonName = new FixedString512Bytes("hello_netcode_secure");
 
         /// <summary>
-        /// Game client certificate
+        /// 游戏 client 证书
         /// </summary>
         public static FixedString4096Bytes GameClientCA = new FixedString4096Bytes(
 @"-----BEGIN CERTIFICATE-----
@@ -40,7 +40,7 @@ k3lUTmFuSP28wc9J8HGp7K7rAY7fZ+X2bNUyys2x
 -----END CERTIFICATE-----");
 
         /// <summary>
-        /// Server certificate
+        /// Server 证书
         /// </summary>
         public static FixedString4096Bytes GameServerCertificate = new FixedString4096Bytes(
 @"-----BEGIN CERTIFICATE-----
@@ -62,7 +62,7 @@ JuNQ8OLhdJVoOVYYyfCdZYyUNXGfLDXF25KESoJa
 -----END CERTIFICATE-----");
 
         /// <summary>
-        /// Server private key
+        /// Server 私钥
         /// </summary>
         public static FixedString4096Bytes GameServerPrivate = new FixedString4096Bytes(
 @"-----BEGIN RSA PRIVATE KEY-----

@@ -6,7 +6,7 @@ using Unity.Services.Relay.Models;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Necessary wrappers around unsafe functions to convert raw data to various relay structs.
+    /// 围绕不安全函数的必要包装器，用于将原始数据转换为各种中继结构。
     /// </summary>
     public static class RelayUtilities
     {

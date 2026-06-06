@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Streaming.SceneManagement.SectionMetadata
 {
-    // Loads and unloads each sections as the relevant entities enter and leave the circles.
+    // 当相关 entities 进入和离开圆圈时加载和卸载每个部分。
     partial struct SectionSystem : ISystem
     {
         [BurstCompile]
@@ -27,7 +27,7 @@ namespace Streaming.SceneManagement.SectionMetadata
             var sectionEntities = sectionQuery.ToEntityArray(Allocator.Temp);
             var circles = sectionQuery.ToComponentDataArray<Circle>(Allocator.Temp);
 
-            // Find all the sections that should be loaded based on the distances to the sphere
+            // 根据到球体的距离查找应加载的所有部分
             foreach (var transform in
                      SystemAPI.Query<RefRO<LocalTransform>>()
                          .WithAll<Relevant>())
@@ -56,7 +56,7 @@ namespace Streaming.SceneManagement.SectionMetadata
                 {
                     if (sectionState == SceneSystem.SectionStreamingState.Unloaded)
                     {
-                        // Load the section
+                        // 加载该部分
                         state.EntityManager.AddComponent<RequestSceneLoaded>(sectionEntity);
                     }
                 }
@@ -64,7 +64,7 @@ namespace Streaming.SceneManagement.SectionMetadata
                 {
                     if (sectionState != SceneSystem.SectionStreamingState.Unloaded)
                     {
-                        // Unload the section
+                        // 卸载该部分
                         state.EntityManager.RemoveComponent<RequestSceneLoaded>(sectionEntity);
                     }
                 }

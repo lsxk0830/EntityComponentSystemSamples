@@ -50,8 +50,8 @@ namespace Unity.Physics.Tests
 
             public void Execute(TriggerEvent triggerEvent)
             {
-                // Trigger event is between a static and dynamic box.
-                // Verify all data in the provided event struct.
+                // Trigger 事件介于静态和动态框之间。
+                // 验证提供的事件结构中的所有数据。
                 Assert.AreNotEqual(triggerEvent.BodyIndexA, triggerEvent.BodyIndexB);
                 Assert.AreEqual(triggerEvent.ColliderKeyA.Value, ColliderKey.Empty.Value);
                 Assert.AreEqual(triggerEvent.ColliderKeyB.Value, ColliderKey.Empty.Value);

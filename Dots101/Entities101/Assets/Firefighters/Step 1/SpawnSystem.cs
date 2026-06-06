@@ -25,12 +25,12 @@ namespace Tutorials.Firefighters
             var rand = new Random(123);
 
             var bucketEntities = new NativeArray<Entity>(config.NumBuckets, Allocator.Temp);
-            
-            // spawn buckets
+
+            // 产卵桶
             {
-                // struct components are returned and passed by value (as copies)!
+                // struct components 返回并按值传递（作为副本）！
                 var bucketTransform = state.EntityManager.GetComponentData<LocalTransform>(config.BucketPrefab);
-                bucketTransform.Position.y = (bucketTransform.Scale / 2); // will be same for every bucket
+                bucketTransform.Position.y = (bucketTransform.Scale / 2); // 每个桶都相同
 
                 for (int i = 0; i < config.NumBuckets; i++)
                 {
@@ -45,7 +45,7 @@ namespace Tutorials.Firefighters
                 }
             }
 
-            // spawn teams
+            // 产卵队
             {
                 int numBotsPerTeam = config.NumPassersPerTeam + 1;
                 int douserIdx = (config.NumPassersPerTeam / 2);
@@ -61,7 +61,7 @@ namespace Tutorials.Firefighters
                     memberBuffer.Capacity = numBotsPerTeam;
                     var teamColor = new float4(rand.NextFloat3(), 1);
 
-                    // spawn bots
+                    // 生成机器人
                     for (int botIdx = 0; botIdx < numBotsPerTeam; botIdx++)
                     {
                         var botEntity = state.EntityManager.Instantiate(config.BotPrefab);
@@ -75,7 +75,7 @@ namespace Tutorials.Firefighters
                             Value = teamColor
                         });
 
-                        // designate the filler
+                        // 指定填充物
                         if (botIdx == 0)
                         {
                             team.Filler = botEntity;
@@ -84,13 +84,13 @@ namespace Tutorials.Firefighters
                         memberBuffer.Add(new TeamMember { Bot = botEntity });
                     }
 
-                    // connect each bot to the next in line, forming a passing ring
+                    // 将每个机器人与队列中的下一个机器人连接起来，形成一个传递环
                     for (int botIdx = 0; botIdx < memberBuffer.Length; botIdx++)
                     {
                         Entity nextBot;
                         if (botIdx == memberBuffer.Length - 1)
                         {
-                            nextBot = memberBuffer[0].Bot;   // next is filler
+                            nextBot = memberBuffer[0].Bot;   // 接下来是填充物
                         }
                         else
                         {
@@ -110,21 +110,21 @@ namespace Tutorials.Firefighters
                 }
             }
 
-            // spawn ponds
+            // 产卵池
             {
                 var bounds = new NativeArray<float4>(4, Allocator.Temp);
 
-                const float innerMargin = 2; // margin between ground edge and pond area
+                const float innerMargin = 2; // 地面边缘和池塘区域之间的边缘
                 const float outerMargin = innerMargin + 3;
                 float width = config.GroundNumColumns;
                 float height = config.GroundNumRows;
 
-                // 4 sides around the field of ground cells
-                // x, y is bottom-left corner; z, w is top-right corner
-                bounds[0] = new float4(0.5f, -outerMargin, width - 0.5f, -innerMargin); // bottom
-                bounds[1] = new float4(0.5f, height + innerMargin, width - 0.5f, height + outerMargin); // top
-                bounds[2] = new float4(-outerMargin, 0.5f, -innerMargin, height - 0.5f); // left
-                bounds[3] = new float4(width + innerMargin, 0.5f, width + outerMargin, height - 0.5f); // right
+                // 地面细胞区域周围的 4 个侧面
+                // x、y 为左下角；z,w 是右上角
+                bounds[0] = new float4(0.5f, -outerMargin, width - 0.5f, -innerMargin); // 底部
+                bounds[1] = new float4(0.5f, height + innerMargin, width - 0.5f, height + outerMargin); // 顶部
+                bounds[2] = new float4(-outerMargin, 0.5f, -innerMargin, height - 0.5f); // 左边
+                bounds[3] = new float4(width + innerMargin, 0.5f, width + outerMargin, height - 0.5f); // 正确的
 
                 var pondTransform = state.EntityManager.GetComponentData<LocalTransform>(config.PondPrefab);
                 for (int i = 0; i < 4; i++)
@@ -143,7 +143,7 @@ namespace Tutorials.Firefighters
                 }
             }
 
-            // spawn field
+            // 产卵场
             {
                 var groundCellTransform = state.EntityManager.GetComponentData<LocalTransform>(config.GroundCellPrefab);
                 groundCellTransform.Position.y = -(config.GroundCellYScale / 2);
@@ -164,22 +164,22 @@ namespace Tutorials.Firefighters
                 }
             }
 
-            // spawn heat map
+            // 生成热图
             {
                 var entity = state.EntityManager.CreateEntity();
                 var heatBuffer = state.EntityManager.AddBuffer<Heat>(entity);
 
-                // init the heat buffer
+                // 初始化热缓冲区
                 {
                     heatBuffer.Length = config.GroundNumColumns * config.GroundNumRows;
-                    // set every cell to zero
+                    // 将每个单元格设置为零
                     for (int i = 0; i < heatBuffer.Length; i++)
                     {
                         heatBuffer[i] = new Heat { Value = 0f };
                     }
                 }
 
-                // set some random cells on fire
+                // 随机点燃一些细胞
                 {
                     for (int i = 0; i < config.NumInitialCellsOnFire; i++)
                     {
@@ -188,9 +188,9 @@ namespace Tutorials.Firefighters
                     }
                 }
 
-                // Move the ground cells so that their query iteration order corresponds to indexes of the heat buffer.
-                // (As long as the set of entities matched by the query stays the same, the query iteration order will remain the same.
-                // So, this will make it easy/fast to update the color and height of the ground cells from the heat data.)
+                // 移动地面单元，使其 query 迭代顺序对应于热缓冲区的索引。
+                // （只要 query 匹配的 entities 集合保持不变，则 query 迭代顺序将保持不变。
+                // 因此，这将使根据热量数据更新地面单元的颜色和高度变得容易/快速。）
                 {
                     var x = 0;
                     var z = 0;

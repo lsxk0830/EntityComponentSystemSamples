@@ -1,22 +1,22 @@
-# HelloNetcode RPC sample
+# HelloNetcode RPC 示例
 
-Remote Procedure Calls (RPC) means executing a function on a remote endpoint. In the netcode package this involves setting up a payload component and sending that as a message to client/server connections where they can be processed/handled.
+远程过程调用（RPC）意味着在远程端点上执行函数。在Netcode package 中，这涉及设置有效负载 component 并将其作为消息发送到 client/server 连接，在那里它们可以被处理/处理。
 
-See
+看
 
 * [RPCs](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/rpcs.html)
 
-## Requirements
+## 要求
 
-Only needs an established connection to send to.
+只需要建立一个连接即可发送。
 
-* Connection
+* 联系
 
-## Sample description
+## 示例描述
 
-This sample is meant to show each type of RPC message you can send with the netcode package on clients and servers. It has a GameObject based UI which presents a simple chat window to demonstrate simple RPC routines as chat and user messages are sent:
+此示例旨在显示您可以在 clients 和 servers 上使用Netcode package 发送的每种类型的 RPC 消息。它有一个基于 GameObject 的 UI，它呈现一个简单的聊天窗口，以在发送聊天和用户消息时演示简单的 RPC 例程：
 
-* When a client connects the server RPC broadcasts that client as a new user to existing connections (including the new clients connection).
-* The existing user list is also sent to just that new connection only (target RPC).
-* Clients sends chat messages just to the server (uses broadcast type as target can only be the server).
-* When the server receives chat messages he RPC broadcasts it to all connections, including the sender which will then show his own message in the chat window.
+* 当 client 连接 server 时，RPC 会将 client 作为新用户广播到现有连接（包括新的 clients 连接）。
+* 现有用户列表也仅发送到该新连接（目标 RPC）。
+* Clients 仅向 server 发送聊天消息（使用广播类型作为目标只能是 server）。
+* 当 server 收到聊天消息时，他 RPC 会将其广播到所有连接，包括发送者，然后发送者将在聊天窗口中显示自己的消息。

@@ -1,19 +1,19 @@
 # AmbientAndBlendProbes
 
-This sample demonstrates how ambient and blend probes work in a subscene.
+此示例演示了环境和混合探头如何在 subscene 中工作。
 
 <img src="../../../../READMEimages/AmbientAndBlendProbes.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The AmbientAndBlendProbes scene shows how to use `Light Probes`. There is 2 gameobjects paired up next to 2 entities with the same settings in the `MeshRenderer.Probes.LightProbes` component configuration.
+AmbientAndBlendProbes scene 显示如何使用 `Light Probes`。有 2 个游戏对象与 2 个 entities 配对，在 `MeshRenderer.Probes.LightProbes` component 配置中具有相同的设置。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, notice there are 2 **SphereAmbient** and 2 **SphereBlend** objects. 2 outside the subscene and 2 inside
-2. Select one and go to the inspector
-3. Under **Mesh Renderer - Probes - Light Probes** notice that the settings is either set to off or Blend Probes depending on the object selected
+1. 在 Hierarchy 中，请注意有 2 个 **SphereAmbient** 和 2 个 **SphereBlend** 对象。subscene 外部 2 个，内部 2 个
+2. 选择一个并转到检查员
+3. 在“网格渲染器 - 探针 - 光探针”下，请注意，根据所选对象，设置设置为“关闭”或“混合探针”
 
-## More information
+## 更多信息
 
-For more information about Blend Probes, see the [Using Reflection Probes](https://docs.unity3d.com/Manual/UsingReflectionProbes.html) documentation.
+有关混合探针的更多信息，请参阅[使用反射探针](https://docs.unity3d.com/Manual/UsingReflectionProbes.html) 文档。

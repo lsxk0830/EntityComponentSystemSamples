@@ -37,7 +37,7 @@ namespace Baking.BlobAssetBakingSystem
 
             var pos = t.Position;
 
-            // Draw a bounding box
+            // 绘制边界框
             Debug.DrawLine(pos + new float3(min.x, min.y, min.z), pos + new float3(max.x, min.y, min.z));
             Debug.DrawLine(pos + new float3(min.x, max.y, min.z), pos + new float3(max.x, max.y, min.z));
             Debug.DrawLine(pos + new float3(min.x, min.y, min.z), pos + new float3(min.x, max.y, min.z));

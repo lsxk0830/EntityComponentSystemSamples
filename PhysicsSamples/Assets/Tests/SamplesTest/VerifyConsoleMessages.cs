@@ -33,43 +33,43 @@ namespace Unity.Physics.Tests
         }
 
         /// <summary>
-        /// This is taken directly from unity/unity Runtime\Logging\LogAssert.h. There is no C# equivalent in the editor
-        /// so when the native enum changes, this should be updated as well.
+        /// 这直接取自 unity/unity Runtime\Logging\LogAssert.h。编辑器中没有 C# 等效项
+        /// 因此，当本机枚举发生变化时，它也应该更新。
         /// </summary>
         [Flags]
         enum LogMessageFlags : int
         {
             kNoLogMessageFlags = 0,
-            kError = 1 << 0, // Message describes an error.
-            kAssert = 1 << 1, // Message describes an assertion failure.
-            kLog = 1 << 2, // Message is a general log message.
-            kFatal = 1 << 4, // Message describes a fatal error, and that the program should now exit.
-            kAssetImportError = 1 << 6, // Message describes an error generated during asset importing.
-            kAssetImportWarning = 1 << 7, // Message describes a warning generated during asset importing.
-            kScriptingError = 1 << 8, // Message describes an error produced by script code.
-            kScriptingWarning = 1 << 9, // Message describes a warning produced by script code.
-            kScriptingLog = 1 << 10, // Message describes a general log message produced by script code.
-            kScriptCompileError = 1 << 11, // Message describes an error produced by the script compiler.
-            kScriptCompileWarning = 1 << 12, // Message describes a warning produced by the script compiler.
+            kError = 1 << 0, // 消息描述了一个错误。
+            kAssert = 1 << 1, // 消息描述断言失败。
+            kLog = 1 << 2, // 消息是一般日志消息。
+            kFatal = 1 << 4, // 消息描述了一个致命错误，程序现在应该退出。
+            kAssetImportError = 1 << 6, // 消息描述了资产导入期间生成的错误。
+            kAssetImportWarning = 1 << 7, // 消息描述资产导入期间生成的警告。
+            kScriptingError = 1 << 8, // 消息描述了脚本代码产生的错误。
+            kScriptingWarning = 1 << 9, // 消息描述了脚本代码产生的警告。
+            kScriptingLog = 1 << 10, // 消息描述由脚本代码生成的一般日志消息。
+            kScriptCompileError = 1 << 11, // 消息描述了脚本编译器产生的错误。
+            kScriptCompileWarning = 1 << 12, // 消息描述了脚本编译器产生的警告。
 
             kStickyLog =
-                1 << 13, // Message is 'sticky' and should not be removed when the user manually clears the console window.
+                1 << 13, // 消息是“粘性的”，当用户手动清除控制台窗口时不应将其删除。
 
             kMayIgnoreLineNumber =
-                1 << 14, // The scripting runtime should skip annotating the log callstack with file and line information.
+                1 << 14, // 脚本运行时应跳过使用文件和行信息注释日志调用堆栈。
 
             kReportBug =
-                1 << 15, // When used with kFatal, indicates that the log system should launch the bug reporter.
+                1 << 15, // 与 kFatal 一起使用时，指示日志 system 应启动错误报告器。
 
             kDisplayPreviousErrorInStatusBar =
-                1 << 16, // The message before this one should be displayed at the bottom of Unity's main window, unless there are no messages before this one.
-            kScriptingException = 1 << 17, // Message describes an exception produced by script code.
-            kDontExtractStacktrace = 1 << 18, // Stacktrace extraction should be skipped for this message.
-            kScriptingAssertion = 1 << 21, // The message describes an assertion failure in script code.
+                1 << 16, // 除非此消息之前没有任何消息，否则此消息之前的消息应显示在 Unity 主窗口的底部。
+            kScriptingException = 1 << 17, // 消息描述脚本代码产生的异常。
+            kDontExtractStacktrace = 1 << 18, // 对于此消息，应跳过堆栈跟踪提取。
+            kScriptingAssertion = 1 << 21, // 该消息描述了脚本代码中的断言失败。
 
             kStacktraceIsPostprocessed =
-                1 << 22, // The stacktrace has already been postprocessed and does not need further processing.
-            kIsCalledFromManaged = 1 << 23, // The message is being called from managed code.
+                1 << 22, // 堆栈跟踪已经过后处理，不需要进一步处理。
+            kIsCalledFromManaged = 1 << 23, // 正在从托管代码调用该消息。
 
             FromEditor = kDontExtractStacktrace | kMayIgnoreLineNumber | kIsCalledFromManaged,
 
@@ -103,9 +103,9 @@ namespace Unity.Physics.Tests
         }
 
         /// <summary>
-        /// This is to avoid a potential instability.
-        /// Ex.: Worker0 prints a message in most cases and sometimes worker1 prints the same message.
-        /// We avoid this by removing [Workerx] from the message
+        /// 这是为了避免潜在的不稳定。
+        /// 例如：大多数情况下，Worker0 会打印一条消息，有时，Worker1 也会打印相同的消息。
+        /// 我们通过从消息中删除 [Workerx] 来避免这种情况
         /// </summary>
         static readonly Regex WorkerMessage = new Regex("\\[Worker[0-9]\\] ", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -131,14 +131,14 @@ namespace Unity.Physics.Tests
         }
 
         /// <summary>
-        /// Iterate through console entries and verify that warnings and errors have been allowListed.
-        /// If a message is not allowListed the test fails immediately.
+        /// 迭代控制台条目并验证警告和错误是否为 allowListed。
+        /// 如果消息不是 allowListed，则测试立即失败。
         ///
-        /// We do not have access through public APIs to get the specific Console log entries.
-        /// We use reflection (I'm sorry) to access the proper APIs. This may be prone to break.
+        /// 我们无法通过公共 APIs 来获取特定的控制台日志条目。
+        /// 我们使用反射（抱歉）来访问正确的 APIs。这可能容易破裂。
         /// </summary>
-        /// <param name="scenePath">Which sample scene the messages originate from.</param>
-        /// <exception cref="NotImplementedException">If the message originates from an unknown mode.</exception>
+        /// <param name="scenePath">Which 示例 scene 消息源自 from.</param>
+        /// <exception cref="NotImplementedException">If 该消息源自未知 mode.</exception>
         [Conditional("UNITY_EDITOR")]
         public static void VerifyPrintedMessages(string scenePath)
         {
@@ -165,7 +165,7 @@ namespace Unity.Physics.Tests
                     {
                         if (LogMessageFlagsExtensions.IsInfo(mode))
                         {
-                            // skip info messages
+                            // 跳过信息消息
                         }
                         else if (LogMessageFlagsExtensions.IsWarning(mode))
                         {

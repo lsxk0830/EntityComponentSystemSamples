@@ -18,8 +18,8 @@ public struct ModifyNarrowphaseContacts : IComponentData
 [DisallowMultipleComponent]
 public class ModifyNarrowphaseContactsBehaviour : MonoBehaviour
 {
-    // SurfaceUpNormal used for non-mesh surfaces.
-    // For mesh surface we get the normal from the individual polygon
+    // SurfaceUpNormal 用于非网格表面。
+    // 对于网格表面，我们从单个多边形中获取法线
     public Vector3 SurfaceUpNormal = Vector3.up;
 
     void OnEnable() {}
@@ -42,7 +42,7 @@ class ModifyNarrowphaseContactsBehaviourBaker : Baker<ModifyNarrowphaseContactsB
     }
 }
 
-// A system which configures the simulation step to rotate certain contact normals
+// system，配置模拟步骤以旋转某些接触法线
 [UpdateInGroup(typeof(PhysicsSimulationGroup))]
 [UpdateAfter(typeof(PhysicsCreateContactsGroup)), UpdateBefore(typeof(PhysicsCreateJacobiansGroup))]
 public partial struct ModifyNarrowphaseContactsSystem : ISystem
@@ -96,7 +96,7 @@ public partial struct ModifyNarrowphaseContactsSystem : ISystem
             {
                 if (contactPoint.Index == 0)
                 {
-                    // if we have a mesh surface we can get the surface normal from the plane of the polygon
+                    // 如果我们有一个网格表面，我们可以从多边形平面获得表面法线
                     var rbIdx = CollisionWorld.GetRigidBodyIndex(SurfaceEntity);
                     var body = CollisionWorld.Bodies[rbIdx];
                     if (body.Collider.Value.CollisionType == CollisionType.Composite)
@@ -107,8 +107,8 @@ public partial struct ModifyNarrowphaseContactsSystem : ISystem
                             if (leafCollider.Collider->Type == ColliderType.Triangle || leafCollider.Collider->Type == ColliderType.Quad)
                             {
                                 PolygonCollider* polygonCollider = (PolygonCollider*)leafCollider.Collider;
-                                // Potential optimization: If TransformFromChild has no rotation just use body.WorldFromBody.rot
-                                // This is likely if you only have a MeshCollider with no hierarchy.
+                                // 潜在优化：如果 TransformFromChild 没有旋转，只需使用 body.WorldFromBody.rot
+                                // 如果您只有一个没有层次结构的 MeshCollider，则可能会出现这种情况。
                                 quaternion rotation = math.mul(body.WorldFromBody.rot, leafCollider.TransformFromChild.rot);
                                 float3 surfaceNormal = math.rotate(rotation, polygonCollider->Planes[0].Normal);
                                 distanceScale = math.dot(surfaceNormal, contactHeader.Normal);

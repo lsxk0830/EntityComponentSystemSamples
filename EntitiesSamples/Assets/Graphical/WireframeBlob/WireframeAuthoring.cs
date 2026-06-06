@@ -15,7 +15,7 @@ namespace Graphical.PrefabInitializer
                 var sharedMesh = GetComponent<MeshFilter>().sharedMesh;
                 DependsOn(sharedMesh);
                 var meshVertices = sharedMesh.vertices;
-                var meshIndices = sharedMesh.GetIndices(0); // assume one single submesh and triangles topology
+                var meshIndices = sharedMesh.GetIndices(0); // 假设一个子网格和三角形拓扑
 
                 using var blobBuilder = new BlobBuilder(Allocator.Temp);
                 ref var blobData = ref blobBuilder.ConstructRoot<LocalSpaceBlob>();

@@ -1,5 +1,5 @@
-﻿// This code originates from https://github.cds.internal.unity3d.com/andy-bastable/SpatialTree
-// Check that repo and ask for permission before using it in other projects
+﻿// 此代码源自 https://github.cds.internal.unity3d.com/andy-bastable/SpatialTree
+// 在其他项目中使用该存储库并请求许可之前
 
 using System;
 using Unity.Collections;
@@ -36,7 +36,7 @@ public unsafe struct NativePriorityHeap<T> : IDisposable where T : unmanaged, IC
         long totalSize = UnsafeUtility.SizeOf<T>() * capacity;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        // Native allocation is only valid for Temp, Job and Persistent
+        // 本机分配仅对 Temp、Job 和 Persistent 有效
         if (allocator <= Allocator.None)
             throw new ArgumentException("Allocator must be Temp, TempJob or Persistent", "allocator");
         if (capacity < 0)
@@ -106,7 +106,7 @@ public unsafe struct NativePriorityHeap<T> : IDisposable where T : unmanaged, IC
         if (m_NumEntries >= m_Capacity)
             throw new InvalidOperationException(string.Format("Not enough capacity {0} for NativePriorityHeap of size {1}", m_Capacity, m_NumEntries));
 
-        // add new entry to bottom
+        // 在底部添加新条目
         *(m_Buffer + m_NumEntries) = item;
 
         BubbleUp(m_NumEntries);
@@ -149,11 +149,11 @@ public unsafe struct NativePriorityHeap<T> : IDisposable where T : unmanaged, IC
 
         T root = *m_Buffer;
 
-        // reduce count and swap last entry to top
+        // 减少计数并将最后一个条目交换到顶部
         *m_Buffer = *(m_Buffer + m_NumEntries - 1);
         m_NumEntries--;
 
-        // bubble down to ensure heap is ordered
+        // 向下冒泡以确保堆是有序的
         BubbleDown(0);
 
         return root;
@@ -167,7 +167,7 @@ public unsafe struct NativePriorityHeap<T> : IDisposable where T : unmanaged, IC
         while (entryPtr > m_Buffer
                 && ((m_Buffer + parentIndex)->CompareTo(*entryPtr) * m_CompareMultiplier) > 0)
         {
-            // swap
+            // 交换
             T parentEntry = *(m_Buffer + parentIndex);
             *(m_Buffer + parentIndex) = *entryPtr;
             *entryPtr = parentEntry;

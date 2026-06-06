@@ -9,16 +9,16 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Flag component, denoting whether or not a Player Character Controller (CC) has been spawned
-    /// for a given connection.
+    /// 标志 component，表示是否已生成玩家角色控制器 (CC)
+    /// 对于给定的连接。
     /// </summary>
     public struct PlayerSpawned : IComponentData { }
 
     public struct PlayerReconnected : IComponentData { }
 
     /// <summary>
-    ///     Convenience: This allows us to trivially fetch the connection entity associated with
-    ///     this player character controller entity.
+    ///     方便：这允许我们轻松获取与关联的连接 entity
+    ///     该玩家角色控制器 entity。
     /// </summary>
     public struct ConnectionOwner : IComponentData
     {
@@ -36,12 +36,12 @@ namespace Samples.HelloNetcode
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // Must wait for the spawner entity scene to be streamed in,
-            // which is most likely instantaneous in this sample (but good to be sure).
+            // 必须等待生成器 entity scene 流入，
+            // 在此示例中，这很可能是瞬时的（但可以肯定）。
             state.RequireForUpdate<Spawner>();
             state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<EnableSpawnPlayer, EnableRemotePredictedPlayer>().Build());
             state.RequireForUpdate<NetworkStreamInGame>();
-            // Don't run new player flow for connections which are reconnections, they'll be handled in the reconnection query below
+            // 不要将 run 新玩家流程用于重新连接的连接，它们将在下面的重新连接 query 中处理
             m_NewPlayersQuery = SystemAPI.QueryBuilder().WithAll<NetworkId>().WithNone<PlayerSpawned>().WithNone<NetworkStreamIsReconnected>().Build();
             m_ReconnectedPlayersQuery = SystemAPI.QueryBuilder().
                 WithAll<NetworkId, NetworkStreamIsReconnected, PlayerSpawned>().
@@ -59,7 +59,7 @@ namespace Samples.HelloNetcode
             state.EntityManager.GetName(prefab, out var prefabName);
             if (prefabName.IsEmpty) prefabName = prefab.ToFixedString();
 
-            // Don't attempt spawning new players while a host migration is being applied on a new server
+            // 在新的 server 上应用主机迁移时，请勿尝试生成新玩家
             if (SystemAPI.HasSingleton<HostMigrationInProgress>())
                 return;
 
@@ -82,12 +82,12 @@ namespace Samples.HelloNetcode
                         state.EntityManager.SetComponentData(connectionEntity, new CommandTarget {targetEntity = playerEntities[j]});
                     }
                 }
-                // Ensure we don't process this connection again
+                // 确保我们不会再次处理此连接
                 state.EntityManager.AddComponent<PlayerReconnected>(connectionEntity);
             }
 
-            // Iterate through all connections events raised by netcode,
-            // and if they're new joiners, spawn a player character controller for them:
+            // 迭代Netcode引发的所有连接事件，
+            // 如果他们是新加入者，则为他们生成一个玩家角色控制器：
             var connectionEntities = m_NewPlayersQuery.ToEntityArray(Allocator.Temp);
             var networkIds = m_NewPlayersQuery.ToComponentDataArray<NetworkId>(Allocator.Temp);
             for (var i = 0; i < connectionEntities.Length; i++)
@@ -97,32 +97,32 @@ namespace Samples.HelloNetcode
                 var player = state.EntityManager.Instantiate(prefab);
                 Debug.Log($"[SpawnPlayerSystem][{state.WorldUnmanaged.Name}] Spawning player CC '{player.ToFixedString()}' (from prefab '{prefabName}') for {networkId.ToFixedString()}.");
 
-                // Offset the spawn position so that ghosts don't spawn on top of each other.
-                // In a real game, you'd have set spawn locations/zones.
+                // 偏移生成位置，以便 ghosts 不会生成在彼此之上。
+                // 在真实的游戏中，您需要设置生成位置/区域。
                 var localTransform = state.EntityManager.GetComponentData<LocalTransform>(prefab);
                 localTransform.Position.x += networkId.Value * 2;
                 state.EntityManager.SetComponentData(player, localTransform);
 
-                // The network ID owner must be set on the spawned ghost.
-                // Doing so gives said client the authority to raise inputs for (i.e. to control) this ghost.
+                // 网络 ID 所有者必须在生成的 ghost 上设置。
+                // 这样做使 client 有权为（i.e.控制）此 ghost 筹集投入。
                 state.EntityManager.SetComponentData(player, new GhostOwner {NetworkId = networkId.Value});
 
-                // This is to support thin client players.
-                // You don't normally need to do this, as it's typically easier to simply enable the AutoCommandTarget
-                // (via the GhostAuthoringComponent).
-                // See the ThinClients sample for more details.
+                // 这是为了支持瘦 client 播放器。
+                // 您通常不需要执行此操作，因为通常更容易启用 AutoCommandTarget
+                // （通过 GhostAuthoringComponent）。
+                // 有关更多详细信息，请参阅 ThinClients 示例。
                 state.EntityManager.SetComponentData(connectionEntity, new CommandTarget {targetEntity = player});
 
-                // Add the player to the linked entity group on the connection, so it is destroyed
-                // automatically on disconnect (i.e. it's destroyed along with the connection entity,
-                // when the connection entity is destroyed).
+                // 将播放器添加到连接上链接的 entity 组中，因此它被销毁
+                // 断开连接时自动（i.e。它与连接 entity 一起被破坏，
+                // 当连接 entity 被破坏时）。
                 state.EntityManager.GetBuffer<LinkedEntityGroup>(connectionEntity).Add(new LinkedEntityGroup {Value = player});
 
-                // This is a convenience: It allows us to trivially fetch the connection entity associated with
-                // this player character controller entity.
+                // 这是一个方便：它允许我们轻松获取与关联的连接 entity
+                // 该玩家角色控制器 entity。
                 state.EntityManager.AddComponentData(player, new ConnectionOwner {Entity = connectionEntity});
 
-                // Mark that this connection has had a player spawned for it, so we won't process it again:
+                // 标记此连接已为其生成了一个玩家，因此我们不会再次处理它：
                 state.EntityManager.AddComponent<PlayerSpawned>(connectionEntity);
             }
         }

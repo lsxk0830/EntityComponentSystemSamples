@@ -55,14 +55,14 @@ public partial struct ActivateBodySystem : ISystem
 
                 localTransform.Position += activateBody.ActivationDisplacement;
 
-                // Bodies get out of trigger
+                // 尸体从 trigger 中出来
                 if (activateBody.ActivationDisplacement.y >= 5.0f)
                 {
                     CommandBuffer.RemoveComponent<TriggerEventChecker>(entity);
                 }
                 else if (activateBody.ActivationDisplacement.x > 0)
                 {
-                    // New bodies enter trigger
+                    // 新机构进入 trigger
                     CommandBuffer.AddComponent(entity, new TriggerEventChecker
                     {
                         NumExpectedEvents = 1

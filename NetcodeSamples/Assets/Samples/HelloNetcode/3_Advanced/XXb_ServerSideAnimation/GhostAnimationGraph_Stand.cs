@@ -66,7 +66,7 @@ namespace Samples.HelloNetcode.Hybrid
 
             standData.aimPitch = 90 + input.Pitch * 180.0f / 3.1415f;
 
-            // aimYaw is local rotation
+            // aimYaw 为局部旋转
             var localRot = quaternion.RotateY(input.Yaw);
             localRot = math.mul(localRot, math.inverse(rot));
             standData.aimYaw = math.acos(localRot.value.w) * 2f * 180.0f / 3.1415f;
@@ -91,7 +91,7 @@ namespace Samples.HelloNetcode.Hybrid
                 standData.remainingTurnAngle = turnAngle*math.sign(standData.aimYaw);
             }
 
-            // Turning update
+            // 转动更新
             if (standData.remainingTurnAngle != 0)
             {
                 if (math.abs(standData.aimYaw) > turnFastThreshold)
@@ -136,12 +136,12 @@ namespace Samples.HelloNetcode.Hybrid
                 TurnTransition(mixerPort, info.deltaTime);
                 anim.SetTime(anim.GetAnimationClip().length * fraction);
 
-                // Reset the time of the idle, so it's reset when we transition back
+                // 重置空闲时间，因此当我们转换回来时它会重置
                 if (m_locomotionMixer.GetInputWeight((int)LocoMixerPort.Idle) < 0.01f)
                     m_clipIdle.SetTime(0f);
             }
 
-            // Update aim
+            // 更新目标
             float aimPitchFraction = standData.aimPitch / 180.0f;
 
             m_clipAimL.SetTime(aimPitchFraction * m_clipAimL.GetDuration());
@@ -207,14 +207,14 @@ namespace Samples.HelloNetcode.Hybrid
             m_clipTurnL = CreateTurnAnim(graph, turnLClip, (int)LocoMixerPort.TurnL);
             m_clipTurnR = CreateTurnAnim(graph, turnRClip, (int)LocoMixerPort.TurnR);
 
-            // Aim and Aim mixer
+            // 瞄准和瞄准混合器
             m_aimMixer = AnimationMixerPlayable.Create(graph, (int)AimMixerPort.Count);
 
             m_clipAimL = CreateAimAnim(graph, aimLClip, (int)AimMixerPort.AimLeft);
             m_clipAimMid = CreateAimAnim(graph, aimMidClip, (int)AimMixerPort.AimMid);
             m_clipAimR = CreateAimAnim(graph, aimRClip, (int)AimMixerPort.AimRight);
 
-            // Setup other additive mixer
+            // 设置其他添加剂混合器
             m_additiveMixer = AnimationLayerMixerPlayable.Create(graph);
             var locoMixerPort = m_additiveMixer.AddInput(m_locomotionMixer, 0);
             m_additiveMixer.SetInputWeight(locoMixerPort, 1);
@@ -261,7 +261,7 @@ namespace Samples.HelloNetcode.Hybrid
         {
             var behaviourPlayable = ScriptPlayable<StandGhostPlayableBehaviour>.Create(graph);
             var behaviour = behaviourPlayable.GetBehaviour();
-            // This registers the behaviour for receiving PreparePredictedData, skip this if predicted data is updated by a system (PrepareFrame is still called)
+            // 这注册了接收 PreparePredictedData 的行为，如果 predicted 数据由 system 更新（PrepareFrame 仍然被调用），则跳过此操作
             behaviours.Add(behaviour);
 
             behaviour.Initialize(controller, graph, behaviourPlayable, IdleClip, TurnLeftClip, TurnRightClip,

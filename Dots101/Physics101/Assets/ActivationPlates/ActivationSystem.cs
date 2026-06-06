@@ -6,18 +6,18 @@ using Unity.Rendering;
 
 namespace ActivationPlates
 {
-    // the system runs after collision detection and the solver
+    // system 在碰撞检测和求解器之后运行
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial struct ActivationSystem : ISystem
     {
-        public ulong physicsUpdateCount; // incremented for each physics update
+        public ulong physicsUpdateCount; // 每次物理更新都会增加
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<SimulationSingleton>();
             state.RequireForUpdate<ActivationPlates.Config>();
-            physicsUpdateCount = 1; // start at 1 to prevent generating an erroneous Exit zone state in the first update
+            physicsUpdateCount = 1; // 从 1 开始，以防止在第一次更新时生成错误的退出区域状态
         }
 
         [BurstCompile]
@@ -28,9 +28,9 @@ namespace ActivationPlates
 
             physicsUpdateCount++;
 
-            // for zones that triggered events this update, set their state to Inside or Enter
+            // 对于触发此更新事件的区域，将其状态设置为“内部”或“进入”
             {
-                // get trigger events
+                // 获取 trigger 事件
                 var sim = SystemAPI.GetSingleton<SimulationSingleton>().AsSimulation();
                 sim.FinalJobHandle.Complete();
 
@@ -38,8 +38,8 @@ namespace ActivationPlates
                 {
                     Entity playerEntity;
                     Entity zoneEntity;
-                    
-                    // determine which body is the player and which is a zone 
+
+                    // 确定哪个身体是玩家，哪个是区域
                     if (SystemAPI.HasComponent<Player>(triggerEvent.EntityA) &&
                         SystemAPI.HasComponent<Zone>(triggerEvent.EntityB))
                     {
@@ -54,41 +54,41 @@ namespace ActivationPlates
                     }
                     else
                     {
-                        // skip because this event is not for the player and a zone
+                        // 跳过，因为此事件不适合玩家和区域
                         continue;
                     }
 
                     var zone = SystemAPI.GetComponentRW<Zone>(zoneEntity);
-                    zone.ValueRW.LastPhysicsUpdateCount = physicsUpdateCount;  // track when the zone was last entered
+                    zone.ValueRW.LastPhysicsUpdateCount = physicsUpdateCount;  // 跟踪上次进入该区域的时间
 
                     if (zone.ValueRO.State == ZoneState.Enter)
                     {
-                        // was Enter, so now should be Inside
+                        // 是 Enter，所以现在应该是 Inside
                         zone.ValueRW.State = ZoneState.Inside;
                     }
                     else if (zone.ValueRO.State == ZoneState.Exit ||
                              zone.ValueRO.State == ZoneState.Outside)
                     {
-                        // was Exit or Outside, so now should be Enter
+                        // 之前是 Exit 或 Outside，所以现在应该是 Enter
                         zone.ValueRW.State = ZoneState.Enter;
                     }
                 }
             }
 
-            // for zones that did NOT trigger an event this update, set their state to Exit or Outside
+            // 对于在此更新中执行 NOT trigger 事件的区域，将其状态设置为“退出”或“外部”
             {
                 foreach (var zone in
                          SystemAPI.Query<RefRW<Zone>>())
                 {
                     if (zone.ValueRO.LastPhysicsUpdateCount == physicsUpdateCount)
                     {
-                        // skip because this zone generated a trigger event this update
+                        // 跳过，因为此更新此区域生成了 trigger 事件
                         continue;
                     }
-                    
+
                     if (physicsUpdateCount - zone.ValueRO.LastPhysicsUpdateCount == 1)
                     {
-                        // triggered an event in the prior update but not in this update
+                        // 在之前的更新中触发了事件，但在本次更新中未触发
                         zone.ValueRW.State = ZoneState.Exit;
                     }
                     else
@@ -98,7 +98,7 @@ namespace ActivationPlates
                 }
             }
 
-            // set color of the zones to green when entered, red when exited
+            // 将区域颜色设置为进入时为绿色，退出时为红色
             {
                 foreach (var (zone, color) in
                          SystemAPI.Query<RefRW<Zone>, RefRW<URPMaterialPropertyBaseColor>>())
@@ -114,7 +114,7 @@ namespace ActivationPlates
                 }
             }
 
-            // possibly spawn a box (depending upon zone state and zone type)
+            // 可能会产生一个盒子（取决于区域状态和区域类型）
             {
                 var spawnBox = false;
 
@@ -126,7 +126,7 @@ namespace ActivationPlates
 
                     if (type == ZoneType.OneTime && zoneState == ZoneState.Enter)
                     {
-                        // if has not been previously entered
+                        // 如果之前没有输入过
                         if (zone.ValueRO.LastTriggerTime == 0)
                         {
                             spawnBox = true;
@@ -135,7 +135,7 @@ namespace ActivationPlates
                     }
                     else if (type == ZoneType.Continuous && zoneState == ZoneState.Inside)
                     {
-                        // if enough time has elapsed since last trigger
+                        // 如果自上次 trigger 以来已经过去了足够的时间
                         if (elapsedTime - zone.ValueRO.LastTriggerTime > config.ContinuousRepetitionInterval)
                         {
                             spawnBox = true;

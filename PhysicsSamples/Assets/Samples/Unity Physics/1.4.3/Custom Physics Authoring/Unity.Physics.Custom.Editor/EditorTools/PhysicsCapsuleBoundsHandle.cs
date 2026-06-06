@@ -33,8 +33,8 @@ namespace Unity.Physics.Editor
             var origin      = (float3)this.center;
             var bounds      = new Bounds(this.center, size);
 
-            // Since the geometry is transformed by Handles.matrix during rendering, we transform the camera position
-            // by the inverse matrix so that the two-shaded wireframe will have the proper orientation.
+            // 由于在渲染过程中几何图形被 Handles.matrix 变换，因此我们变换相机位置
+            // 通过逆矩阵，以便两个阴影线框将具有正确的方向。
             var invMatrix       = Handles.inverseMatrix;
             var cameraCenter    = (float3)invMatrix.MultiplyPoint(cameraPos);
             var cameraForward   = (float3)invMatrix.MultiplyVector(cameraFwd);
@@ -74,7 +74,7 @@ namespace Unity.Physics.Editor
             PhysicsBoundsHandleUtility.DrawCorner(s_Corners[5], new bool3(false, true,  true));
             PhysicsBoundsHandleUtility.DrawCorner(s_Corners[6], new bool3(true,  false, true));
 
-            // Draw the horizon edges between the corners
+            // 在角之间绘制地平线边缘
             for (int upA = 3, upB = 0; upB < 4; upA = upB, upB++)
             {
                 int dnA = upA + 4;

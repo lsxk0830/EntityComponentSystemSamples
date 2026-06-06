@@ -6,11 +6,11 @@ using Unity.Rendering;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Set the color on the grenade so it alternates between red and green.
-    /// Note that we have to do this here (for all new grenades) as:
-    /// - It may not be spawned by us.
-    /// - If we do it in predicted code, it can fail to set before it's presented (causing the ball to be black for one render frame).
-    /// - We may fail to predict spawn it (so it's essentially a new ghost from our POV).
+    /// 设置手榴弹的颜色，使其在红色和绿色之间交替。
+    /// Note 我们必须在这里执行此操作（对于所有新手榴弹）：
+    /// - 它可能不是我们产生的。
+    /// - 如果我们在 predicted 代码中执行此操作，则在呈现之前可能无法设置（导致球在一个渲染帧内为黑色）。
+    /// - 我们可能无法预测它的生成（因此它本质上是来自我们的 POV 的新 ghost）。
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     [BurstCompile]
@@ -25,7 +25,7 @@ namespace Samples.HelloNetcode
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // The Change filter ensures we only set this color if the GrenadeData component changes, which will only happen once (when it spawns).
+            // Change 过滤器确保我们仅在 GrenadeData component 更改时设置此颜色，这种情况只会发生一次（当它生成时）。
             foreach (var (urpColorRw, grenadeDataRo) in SystemAPI.Query<RefRW<URPMaterialPropertyBaseColor>, RefRO<GrenadeData>>().WithChangeFilter<GrenadeData>())
             {
                 urpColorRw.ValueRW.Value = grenadeDataRo.ValueRO.SpawnId % 2 == 1

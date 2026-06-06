@@ -24,9 +24,9 @@ namespace Samples.HelloNetcode
         public void OnUpdate(ref SystemState state)
         {
             var camera = UnityEngine.Camera.main;
-            //We need to access the LocalToWorld matrix to match the position of the player in term of presentation.
-            //Because Physics can be either Interpolated or Predicted, we the LocalToWorld can be different than the real world position
-            //of the entity.
+            //我们需要访问 LocalToWorld 矩阵来匹配玩家在演示中的位置。
+            //因为 Physics 可以是 Interpolated 或 Predicted，所以 LocalToWorld 可以与真实的 world 位置不同
+            //entity 的。
             foreach (var (localToWorld, input) in SystemAPI.Query<RefRO<LocalToWorld>, RefRO<CharacterControllerPlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
                 camera.transform.rotation = math.mul(quaternion.RotateY(input.ValueRO.Yaw), quaternion.RotateX(-input.ValueRO.Pitch));

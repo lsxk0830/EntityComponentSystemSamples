@@ -27,22 +27,22 @@ namespace ActivationPlates
         public ZoneType Type;
         public ZoneState State;
 
-        // count of the last physic update when this trigger emitted a trigger event
-        // (ulong to make rollover a non-issue)
-        public ulong LastPhysicsUpdateCount; 
+        // 当此 trigger 发出 trigger 事件时上次物理更新的计数
+        // （ulong 使翻转不再是问题）
+        public ulong LastPhysicsUpdateCount;
 
-        // elapsed time when last occupied
-        public float LastTriggerTime; 
+        // 上次占用时经过的时间
+        public float LastTriggerTime;
     }
-    
+
     public enum ZoneState
     {
-        Inside,    
+        Inside,
         Outside,
-        Enter,    // now inside, but was outside in the prior update
-        Exit,     // now outside, but was inside in the prior update
+        Enter,    // 现在在里面，但在之前的更新中在外面
+        Exit,     // 现在在外面，但在之前的更新中在里面
     }
-    
+
     public enum ZoneType
     {
         OneTime,

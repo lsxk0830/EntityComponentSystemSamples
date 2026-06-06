@@ -24,9 +24,9 @@ namespace Samples.HelloNetcode
 
             var input = default(PhysicsPlayerInput);
 
-            // Note the tick the client is currently simulating, this is attached to the
-            // command and is sent to the server where it is taken into account when the
-            // command is deployed.
+            // Note client 当前正在模拟的勾号，它附加到
+            // 命令并发送到 server，当
+            // 命令已部署。
             input.Tick = SystemAPI.GetSingleton<NetworkTime>().InputTargetTick;
 
             if (UnityEngine.Input.GetKey("left") || TouchInput.GetKey(TouchInput.KeyCode.Left))
@@ -38,17 +38,17 @@ namespace Samples.HelloNetcode
             if (UnityEngine.Input.GetKey("up") || TouchInput.GetKey(TouchInput.KeyCode.Up))
                 input.Vertical += 1;
 
-            // Commands need to be sent every frame they are sampled even if there is no keypress which needs
-            // to be sent to the server (all values are 0). The commands do get ghost snapshot information
-            // embedded into them, which is why they can't be skipped when there is no input present to send.
+            // 即使没有需要按下的按键，命令也需要在采样的每一帧发送
+            // 发送到 server（所有值均为 0）。这些命令确实获取 ghost snapshot 信息
+            // 嵌入到它们中，这就是为什么当没有输入要发送时不能跳过它们。
             var inputBuffer = EntityManager.GetBuffer<PhysicsPlayerInput>(localInputEntity);
             inputBuffer.AddCommandData(input);
         }
     }
 
-    // The input processing but run in the PredictedPhysicsSystemGroup instead of the
-    // PredictionSystemGroup like usually. This ensure the simulation is correctly
-    // built and stepped for each tick as the prediction runs.
+    // 输入处理不过是 run 中的 PredictedPhysicsSystemGroup 而不是
+    // PredictionSystemGroup 像平常一样。这确保模拟正确
+    // 当 prediction 运行时，为每个刻度构建并步进。
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateBefore(typeof(PhysicsInitializeGroup))]
     public partial class PhysicsInputSystem : SystemBase
@@ -63,9 +63,9 @@ namespace Samples.HelloNetcode
         {
             var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
 
-            // How fast the physics entity is allowed to move affects how it looks when it
-            // collides with other physical entities. Dependent also on the physics step
-            // framerate frequency.
+            // 允许物理 entity 移动的速度会影响它的外观
+            // 与其他物理 entities 发生碰撞。还取决于物理步骤
+            // 帧率频率。
             float speed = 3f;
             foreach(var (vel, inputBuffer) in SystemAPI.Query<
                         RefRW<PhysicsVelocity>, DynamicBuffer<PhysicsPlayerInput>>().WithAll<Simulate>())

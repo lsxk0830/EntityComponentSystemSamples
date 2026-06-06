@@ -55,7 +55,7 @@ public partial struct DestroyTriggerSystem : ISystem
             int triggerRbIndex = World.GetRigidBodyIndex(entity);
             RigidBody triggerBody = World.Bodies[triggerRbIndex];
 
-            // Remove the TriggerEventCheckerComponent of all overlapping bodies
+            // 删除所有重叠实体的 TriggerEventCheckerComponent
             OverlapAabbInput input = new OverlapAabbInput
             {
                 Aabb = triggerBody.CalculateAabb(),

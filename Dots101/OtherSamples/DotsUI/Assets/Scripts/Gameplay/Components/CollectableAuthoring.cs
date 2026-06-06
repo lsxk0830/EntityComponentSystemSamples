@@ -19,12 +19,12 @@ namespace Unity.DotsUISample
             }
         }
     }
-    
+
     public struct Collectable : IComponentData
     {
         public CollectableType Type;
     }
-    
+
     public enum CollectableType
     {
         StarMushroom = 0,

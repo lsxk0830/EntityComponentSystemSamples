@@ -26,7 +26,7 @@ namespace Unity.Physics.Authoring
 
         void OnEnable()
         {
-            // included so tick box appears in Editor
+            // 包含，因此勾选框出现在 Editor 中
         }
     }
 }

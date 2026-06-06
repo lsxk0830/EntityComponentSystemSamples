@@ -4,7 +4,7 @@ using Unity.Transforms;
 
 namespace Unity.DotsUISample
 {
-    // update after physics so we can get the accurate player position
+    // 在物理之后更新，以便我们可以获得准确的玩家位置
     [UpdateAfter(typeof(FixedStepSimulationSystemGroup))]
     public partial struct QuestSystem : ISystem
     {
@@ -25,7 +25,7 @@ namespace Unity.DotsUISample
             {
                 return;
             }
-            
+
             var ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
             Entity playerEntity = SystemAPI.GetSingletonEntity<Player>();
@@ -33,37 +33,37 @@ namespace Unity.DotsUISample
 
             const float minDistanceSq = 9f;
 
-            // check for interaction with cauldron to turn in quest
+            // 检查与大锅的互动以提交任务
             if (quest.HasAllItems)
             {
                 Entity cauldronEntity = SystemAPI.GetSingletonEntity<Cauldron>();
                 float3 cauldronPosition = SystemAPI.GetComponentRO<LocalTransform>(cauldronEntity).ValueRO.Position;
 
-                // if close to the cauldron
+                // 如果靠近大锅
                 if (math.distancesq(playerPosition, cauldronPosition.xz) < minDistanceSq)
                 {
                     var proximityEventEntity = ecb.CreateEntity();
                     ecb.AddComponent<Event>(proximityEventEntity);
                     ecb.AddComponent(proximityEventEntity, new CauldronProximityEvent
                     {
-                        Position = cauldronPosition 
+                        Position = cauldronPosition
                     });
-                    
+
                     if (GameInput.Interact.WasPerformedThisFrame())
                     {
                         quest.Done = true;
                     }
                 }
             }
-            
-            // pick up collectables
+
+            // 拿起收藏品
             {
                 Entity closestEntity = Entity.Null;
                 float3 closestCollectablePos = float3.zero;
                 float closestDistanceSq = float.MaxValue;
                 CollectableType collectableType = default;
 
-                // Find the closest collectable item to the player
+                // 找到距离玩家最近的收藏品
                 foreach (var (transform, collectable, entity) in
                          SystemAPI.Query<RefRO<LocalTransform>, RefRO<Collectable>>()
                              .WithEntityAccess())
@@ -77,18 +77,18 @@ namespace Unity.DotsUISample
                         closestCollectablePos =  transform.ValueRO.Position;
                     }
                 }
-                
+
                 if (closestEntity != Entity.Null)
                 {
-                    // event indicating player is in close proximity to a collectable 
+                    // 指示玩家非常接近收藏品的事件
                     var proximityEventEntity = ecb.CreateEntity();
                     ecb.AddComponent<Event>(proximityEventEntity);
                     ecb.AddComponent(proximityEventEntity, new CollectableProximityEvent
                     {
-                        Position = closestCollectablePos 
+                        Position = closestCollectablePos
                     });
 
-                    // Check for player input to pick up the collectable
+                    // 检查玩家输入以拾取收藏品
                     if (GameInput.Interact.WasPerformedThisFrame())
                     {
                         var collectableCountBuf = SystemAPI.GetSingletonBuffer<CollectableCount>();
@@ -100,17 +100,17 @@ namespace Unity.DotsUISample
                             Count = collectableCountBuf[idx].Count + 1
                         };
                         inventoryItemBuf.Add(new InventoryItem { Type = collectableType });
-                        
+
                         var eventEntity = ecb.CreateEntity();
                         ecb.AddComponent<Event>(eventEntity);
                         ecb.AddComponent<PickupEvent>(eventEntity);
-                        
+
                         state.EntityManager.DestroyEntity(closestEntity);
                     }
                 }
             }
-            
-            // check if all items collected
+
+            // 检查是否收集了所有物品
             if (!quest.HasAllItems)
             {
                 var counts = SystemAPI.GetSingletonBuffer<CollectableCount>();

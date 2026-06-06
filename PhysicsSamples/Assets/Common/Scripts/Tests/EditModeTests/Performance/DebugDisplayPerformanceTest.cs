@@ -40,23 +40,23 @@ namespace Unity.Physics.Tests.Performance
             var subScenes = SubScene.AllSubScenes;
             foreach (var subScene in subScenes)
             {
-                // enable sub-scene for editing to ensure it is available immediately
+                // 启用子 scene 进行编辑以确保其立即可用
                 Scenes.Editor.SubSceneUtility.EditScene(subScene);
             }
 
-            // locate camera game object
+            // 定位相机游戏对象
             var camera = UnityEngine.Object.FindFirstObjectByType<Camera>();
             Assert.IsNotNull(camera);
             var cameraPos = camera.transform.localPosition;
             var cameraDeltaPos = new Vector3(0, 0.01f, 0);
 
-            // measure during edit mode
+            // 在编辑模式下测量
             const int kMeasureFrames = 60;
             const int kWarmupFrames = 10;
             yield return MeasurePerformance(kWarmupFrames, kMeasureFrames, "EditMode Frame Time", (frameIndex)
-                => camera.transform.localPosition = cameraPos + (frameIndex % 2) * cameraDeltaPos); // Note: we slightly move the camera every frame to trigger a re-render in EditMode
+                => camera.transform.localPosition = cameraPos + (frameIndex % 2) * cameraDeltaPos); // Note: 我们将每一帧稍微移动相机到 trigger 在 EditMode 中重新渲染
 
-            // enter play mode and measure again during play mode
+            // 进入播放模式并在播放模式下再次测量
             yield return new EnterPlayMode();
 
             yield return MeasurePerformance(kWarmupFrames, kMeasureFrames, "PlayMode Frame Time");

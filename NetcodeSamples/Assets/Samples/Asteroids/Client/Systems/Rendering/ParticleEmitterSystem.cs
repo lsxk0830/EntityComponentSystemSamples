@@ -55,13 +55,13 @@ namespace Asteroids.Client
                 bool colorTrans = math.any(emitter.startColor != emitter.endColor);
                 bool sizeTrans = emitter.startLength != emitter.endLength ||
                                  emitter.startWidth != emitter.endWidth;
-                // Create the first particle, then instantiate the rest based on its value
+                // 创建第一个粒子，然后根据其值实例化其余粒子
                 var particle = commandBuffer.Instantiate(entityIndexInChunk, emitter.particlePrefab);
                 commandBuffer.AddComponent(entityIndexInChunk, particle, default(Particle));
                 commandBuffer.AddComponent(entityIndexInChunk, particle, new URPMaterialPropertyBaseColor {Value = emitter.startColor});
                 commandBuffer.AddComponent(entityIndexInChunk, particle, new ParticleAge(emitter.particleLifetime));
                 commandBuffer.AddComponent(entityIndexInChunk, particle, emitter);
-                // Set initial data
+                // 设置初始数据
                 commandBuffer.AddComponent(entityIndexInChunk, particle, new ParticleVelocity());
 
                 commandBuffer.SetComponent(entityIndexInChunk, particle,

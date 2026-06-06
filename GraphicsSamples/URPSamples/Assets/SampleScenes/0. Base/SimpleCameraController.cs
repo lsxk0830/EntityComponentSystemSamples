@@ -37,7 +37,7 @@ namespace UnityTemplateProjects
                 yaw = Mathf.Lerp(yaw, target.yaw, rotationLerpPct);
                 pitch = Mathf.Lerp(pitch, target.pitch, rotationLerpPct);
                 roll = Mathf.Lerp(roll, target.roll, rotationLerpPct);
-                
+
                 x = Mathf.Lerp(x, target.x, positionLerpPct);
                 y = Mathf.Lerp(y, target.y, positionLerpPct);
                 z = Mathf.Lerp(z, target.z, positionLerpPct);
@@ -49,7 +49,7 @@ namespace UnityTemplateProjects
                 t.position = new Vector3(x, y, z);
             }
         }
-        
+
         CameraState m_TargetCameraState = new CameraState();
         CameraState m_InterpolatingCameraState = new CameraState();
 
@@ -105,59 +105,59 @@ namespace UnityTemplateProjects
             }
             return direction;
         }
-        
+
         void Update()
         {
-            // Exit Sample  
+            // 退出示例
 
             if (Input.GetKey(KeyCode.Escape))
             {
                 Application.Quit();
 				#if UNITY_EDITOR
-				UnityEditor.EditorApplication.isPlaying = false; 
+				UnityEditor.EditorApplication.isPlaying = false;
 				#endif
             }
-            // Hide and lock cursor when right mouse button pressed
+            // 按下鼠标右键时隐藏并锁定光标
             if (Input.GetMouseButtonDown(1))
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
 
-            // Unlock and show cursor when right mouse button released
+            // 释放鼠标右键时解锁并显示光标
             if (Input.GetMouseButtonUp(1))
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
             }
 
-            // Rotation
+            // 旋转
             if (Input.GetMouseButton(1))
             {
                 var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1));
-                
+
                 var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
 
                 m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
                 m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
             }
-            
-            // Translation
+
+            // 翻译
             var translation = GetInputTranslationDirection() * Time.deltaTime;
 
-            // Speed up movement when shift key held
+            // 按住 Shift 键时加快移动速度
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 translation *= 10.0f;
             }
-            
-            // Modify movement by a boost factor (defined in Inspector and modified in play mode through the mouse scroll wheel)
+
+            // 通过增强因子修改移动（在 Inspector 中定义，并通过鼠标滚轮在播放模式下修改）
             boost += Input.mouseScrollDelta.y * 0.2f;
             translation *= Mathf.Pow(2.0f, boost);
 
             m_TargetCameraState.Translate(translation);
 
-            // Framerate-independent interpolation
-            // Calculate the lerp amount, such that we get 99% of the way to our target in the specified time
+            // 与帧率无关的 interpolation
+            // 计算 lerp 量，以便我们在指定时间内完成目标的 99%
             var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / positionLerpTime) * Time.deltaTime);
             var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.deltaTime);
             m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct, rotationLerpPct);

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
-    // put static UnityObject buffers in separate utility class so other methods can Burst compile
+    // 将静态 UnityObject 缓冲区放在单独的实用程序类中，以便其他方法可以编译 Burst
     static class PhysicsShapeExtensions_NonBursted
     {
         internal static readonly List<PhysicsBodyAuthoring> s_PhysicsBodiesBuffer = new List<PhysicsBodyAuthoring>(16);
@@ -20,12 +20,12 @@ namespace Unity.Physics.Authoring
 
     public static partial class PhysicsShapeExtensions
     {
-        // avoids drift in axes we're not actually changing
+        // 避免我们实际上没有改变的轴漂移
         public const float kMinimumChange = HashableShapeInputs.k_DefaultLinearPrecision;
 
         internal static CollisionFilter GetFilter(this PhysicsShapeAuthoring shape)
         {
-            // TODO: determine optimal workflow for specifying group index
+            // TODO: 确定指定组索引的最佳工作流程
             return new CollisionFilter
             {
                 BelongsTo = shape.BelongsTo.Value,
@@ -35,7 +35,7 @@ namespace Unity.Physics.Authoring
 
         internal static Material GetMaterial(this PhysicsShapeAuthoring shape)
         {
-            // TODO: TBD how we will author editor content for other shape flags
+            // TODO: TBD 我们将如何为其他形状标志创作编辑器内容
             return new Material
             {
                 Friction = shape.Friction.Value,
@@ -50,7 +50,7 @@ namespace Unity.Physics.Authoring
 
         public static GameObject FindTopmostEnabledAncestor<T>(GameObject shape, List<T> buffer) where T : Component
         {
-            // include inactive in case the supplied shape GameObject is a prefab that has not been instantiated
+            // 如果提供的形状 GameObject 是尚未实例化的 prefab，则包括非活动状态
             shape.GetComponentsInParent(true, buffer);
             GameObject result = null;
             for (var i = buffer.Count - 1; i >= 0; --i)
@@ -84,12 +84,12 @@ namespace Unity.Physics.Authoring
             if (rb != null)
                 return rb.gameObject;
 
-            // for implicit static shape, first see if it is part of static optimized hierarchy
+            // 对于隐式静态形状，首先查看它是否是静态优化层次结构的一部分
             ColliderExtensions.FindTopmostStaticEnabledAncestor(shape, out GameObject topStatic);
             if (topStatic != null)
                 return topStatic;
 
-            // otherwise, find topmost enabled Collider or PhysicsShapeAuthoring
+            // 否则，查找最顶层启用的 Collider 或 PhysicsShapeAuthoring
             var topCollider = FindTopmostEnabledAncestor(shape, PhysicsShapeExtensions_NonBursted.s_CollidersBuffer);
             var topShape = FindTopmostEnabledAncestor(shape, PhysicsShapeExtensions_NonBursted.s_ShapesBuffer);
 
@@ -208,7 +208,7 @@ namespace Unity.Physics.Authoring
 
         const float k_HashFloatTolerance = 0.01f;
 
-        // used to hash convex hull generation properties in a way that is robust to imprecision
+        // 用于以对不精确性具有鲁棒性的方式散列凸包生成属性
         public static uint GetStableHash(
             this ConvexHullGenerationParameters generationParameters,
             ConvexHullGenerationParameters hashedParameters,
@@ -225,7 +225,7 @@ namespace Unity.Physics.Authoring
                 : unchecked((uint)generationParameters.GetHashCode());
         }
 
-        // used to hash an array of points in a way that is robust to imprecision
+        // 用于以对不精确性具有鲁棒性的方式对点数组进行散列
         public static unsafe uint GetStableHash(
             this NativeList<float3> points, NativeArray<float3> hashedPoints, float tolerance = k_HashFloatTolerance
         )

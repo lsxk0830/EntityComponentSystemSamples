@@ -31,7 +31,7 @@ namespace Samples.HelloNetcode
 
         protected override void OnUpdate()
         {
-            // No need to spawn anything if this is running during a host migration
+            // 如果在主机迁移期间运行，则无需生成任何内容
             if (SystemAPI.HasSingleton<HostMigrationInProgress>())
             {
                 Enabled = false;
@@ -55,14 +55,14 @@ namespace Samples.HelloNetcode
         {
             var rand = Random.CreateFromIndex(301571925u);
 
-            // Declare a square matrix
+            // 声明一个方阵
             int row = 2 * patternSize - 1;
             int column = 2 * patternSize - 1;
 
             for (int k = 0; k < patternSize; k++)
             {
-                // store the first row
-                // from 1st column to last column
+                // 存储第一行
+                // 从第一列到最后一列
                 var j = k;
                 while (j < column - k)
                 {
@@ -70,8 +70,8 @@ namespace Samples.HelloNetcode
                     j++;
                 }
 
-                // store the last column
-                // from top to bottom
+                // 存储最后一列
+                // 从上到下
                 var i = k + 1;
                 while (i < row - k)
                 {
@@ -79,8 +79,8 @@ namespace Samples.HelloNetcode
                     i++;
                 }
 
-                // store the last row
-                // from last column to 1st column
+                // 存储最后一行
+                // 从最后一列到第一列
                 j = column - k - 2;
                 while (j >= k)
                 {
@@ -88,8 +88,8 @@ namespace Samples.HelloNetcode
                     j--;
                 }
 
-                // store the first column
-                // from bottom to top
+                // 存储第一列
+                // 从下到上
                 i = row - k - 2;
                 while (i > k)
                 {

@@ -8,8 +8,8 @@ public partial class SetAlwaysRelevantSystem : SystemBase
     protected override void OnCreate()
     {
         var relevancy = SystemAPI.GetSingletonRW<GhostRelevancy>();
-        // This is set OnCreate but can be updated at runtime as well
-        // You could also add an AlwaysRelevant component to mark entities at authoring time too
+        // 这是设置 OnCreate 但也可以在运行时更新
+        // 您还可以添加 AlwaysRelevant component 来在 authoring 时间标记 entities
         relevancy.ValueRW.DefaultRelevancyQuery = GetEntityQuery(typeof(AsteroidScore));
     }
 

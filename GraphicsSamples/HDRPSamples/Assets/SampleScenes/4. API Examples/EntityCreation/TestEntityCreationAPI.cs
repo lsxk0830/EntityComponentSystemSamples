@@ -36,10 +36,10 @@ public class TestEntityCreationAPI : MonoBehaviour
         public void Execute(int index)
         {
             var e = Ecb.Instantiate(index, Prototype);
-            // Prototype has all correct components up front, can use SetComponent
+            // 原型前面有所有正确的 components，可以使用 SetComponent
             Ecb.SetComponent(index, e, new LocalToWorld {Value = ComputeTransform(index)});
             Ecb.SetComponent(index, e, new MaterialColor() {Value = ComputeColor(index)});
-            // MeshBounds must be set according to the actual mesh for culling to work.
+            // MeshBounds 必须根据实际网格设置才能进行剔除工作。
             int meshIndex = index % MeshCount;
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, meshIndex));
             Ecb.SetComponent(index, e, MeshBounds[meshIndex]);
@@ -75,7 +75,7 @@ public class TestEntityCreationAPI : MonoBehaviour
 
     }
 
-    // Start is called before the first frame update
+    // Start 在第一帧更新之前调用
     void Start()
     {
         var world = World.DefaultGameObjectInjectionWorld;
@@ -107,9 +107,9 @@ public class TestEntityCreationAPI : MonoBehaviour
         for (int i = 0; i < bounds.Length; ++i)
             bounds[i] = new RenderBounds {Value = Meshes[i].bounds.ToAABB()};
 
-        // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
-        // which can be either a Prefab or an entity created at run time like in this sample.
-        // This is the fastest and most efficient way to create entities at run time.
+        // 通过克隆预先创建的原型 entity，在 Burst job 中生成大部分 entities，
+        // 它可以是在 run 时间创建的 Prefab 或 entity，如本示例中所示。
+        // 这是在 run 时间创建 entities 的最快且最有效的方法。
         var spawnJob = new SpawnJob
         {
             Prototype = prototype,
@@ -132,7 +132,7 @@ public class TestEntityCreationAPI : MonoBehaviour
         entityManager.DestroyEntity(prototype);
     }
 
-    // Update is called once per frame
+    // 每帧调用一次更新
     void Update()
     {
 

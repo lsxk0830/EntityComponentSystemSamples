@@ -1,18 +1,18 @@
 # BuiltInMaterialSHProperties
 
-This sample demonstrates override of the built-in material SH property values.
+此示例演示了内置材质 SH 属性值的覆盖。
 
 <img src="../../../../READMEimages/BuiltInMaterialSHProperties.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains spheres which are lit by the LightProbe SH property values on the Authoring components attached to the MeshRenderers.
+scene 包含由附加到 MeshRenderers 的 Authoring components 上的 LightProbe SH 属性值照亮的球体。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select one of the Subscenes
-2. In the Inspector, click **Open**
-3. In the Hierarchy, select a sphere object
-4. In the Inspector, note that **MeshRenderer > Probes > Light Probes** is set to **Custom Provided**
-5. Try to change values on the built-in material property Unity_SH authoring components
-6. Close the Subscene, Save the Subscene
+1. 在 Hierarchy 中，选择子场景之一
+2. 在 Inspector 中，单击“**打开**”
+3. 在 Hierarchy 中，选择一个球体对象
+4. 在 Inspector 中，请注意 **MeshRenderer > 探针 > 光探针** 设置为 **自定义提供**
+5. 尝试更改内置材质属性 Unity_SH authoring components 的值
+6. 关闭子场景，保存子场景

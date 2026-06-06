@@ -6,14 +6,14 @@ using Unity.Physics.Systems;
 using Unity.Rendering;
 using UnityEngine;
 
-// This system is used by the Runtime Collision Filter Modification demo to change the collision filter of the static
-// cubes in the scene. The spheres will fall through the cubes and collide depending on what the CollisionFilter
-// CollidersWith value is set. The cubes will change colour (material) to match the CollisionFilter CollidesWith value.
-// This demo relies on there being only 3 CollisionFilters Categories used and they must be sequential.
-// The Physics Category Names that must be set are:
-// - Category 20 = Red (value = 1 << 20, 1048576)
-// - Category 21 = Green (value = 1 << 21, 2097152)
-// - Category 22 = Blue (value = 1 << 22, 4194304)
+// 运行时碰撞过滤器修改演示使用此 system 来更改静态碰撞过滤器
+// scene 中的立方体。球体将穿过立方体并发生碰撞，具体取决于 CollisionFilter
+// CollidersWith 值已设置。立方体将更改颜色（材质）以匹配 CollisionFilter CollidesWith 值。
+// 该演示仅依赖于使用 3 个 CollisionFilters 类别，并且它们必须是连续的。
+// 必须设置的 Physics 类别名称为：
+// - 类别 20 = 红色（值 = 1 << 20, 1048576）
+// - 类别 21 = 绿色（值 = 1 << 21, 2097152）
+// - 类别 22 = 蓝色（值 = 1 << 22, 4194304）
 [UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
 public partial class RotateThroughCollisionFiltersSystem : SystemBase
 {
@@ -32,16 +32,16 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
         var entityArray = collisionFilterQuery.ToEntityArray(Allocator.Temp);
         if (entityArray.Length == 0) return;
 
-        // Get the RenderMeshArray from the first entity in the query and use it to find the Material indices that
-        // match the Materials of the static cubes in the scene
+        // 从 query 中的第一个 entity 获取 RenderMeshArray 并使用它来查找
+        // 匹配 scene 中静态立方体的材质
         var mesh = EntityManager.GetSharedComponentManaged<RenderMeshArray>(entityArray[0]);
 
-        // For each red/green/blue GameObject, find the matching Material index in the RenderMeshArray
+        // 对于每个红/绿/蓝 GameObject，在 RenderMeshArray 中找到匹配的材质索引
         var indexRed = FindMatchingMaterialIndex("Red", ref mesh);
         var indexBlue = FindMatchingMaterialIndex("Blue", ref mesh);
         var indexGreen = FindMatchingMaterialIndex("Green", ref mesh);
 
-        // Save the Material indices in a singleton component for later use
+        // 将材质索引保存在单例 component 中以供以后使用
         var colours = new ColoursForFilter
         {
             RedIndex = indexRed,
@@ -60,25 +60,25 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
         if (!SystemAPI.TryGetSingleton(out ColoursForFilter colourIndices))
             return;
 
-        // Change the CollisionFilter of the static cubes
+        // 更改静态立方体的 CollisionFilter
         var jobHandle = new RotateFilterCountDownJob()
             .Schedule(Dependency);
 
         Dependency = jobHandle;
         jobHandle.Complete();
 
-        // Change the Material(colour) of the colliders based on their CollisionFilter
+        // 根据 CollisionFilter 更改 colliders 的材质（颜色）
         foreach (var(collider, _, countdown, entity)
                  in SystemAPI.Query<RefRO<PhysicsCollider>, RenderMeshArray, RefRO<ChangeCollisionFilterCountdown>>()
                      .WithEntityAccess()
                      .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))
         {
-            if (countdown.ValueRO.Countdown == countdown.ValueRO.ResetCountdown) // Material will need an update
+            if (countdown.ValueRO.Countdown == countdown.ValueRO.ResetCountdown) // 材料需要更新
             {
-                // Get the modified collision filter
+                // 获取修改后的碰撞过滤器
                 var filter = collider.ValueRO.Value.Value.GetCollisionFilter();
 
-                // Update the material based on the matching collision filter
+                // 根据匹配的碰撞过滤器更新材质
                 int index = -1;
                 if (filter.CollidesWith == RedCollisionFilter)
                 {
@@ -103,8 +103,8 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
         }
     }
 
-    // This job counts down the ChangeCollisionFilterCountdown component and changes the collision filter when the
-    // countdown reaches zero.
+    // 该 job 对 ChangeCollisionFilterCountdown component 进行倒计时，并在发生冲突时更改冲突过滤器
+    // 倒计时归零。
     [BurstCompile]
     private partial struct RotateFilterCountDownJob : IJobEntity
     {
@@ -112,7 +112,7 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
         {
             if (--tag.Countdown > 0) return;
 
-            tag.Countdown = tag.ResetCountdown; //reset the countdown
+            tag.Countdown = tag.ResetCountdown; //重置倒计时
             ref var colliderBlob = ref collider.Value.Value;
 
             if (!colliderBlob.IsUnique)
@@ -122,8 +122,8 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
 
             var currentFilter = colliderBlob.GetCollisionFilter();
             uint filter = currentFilter.CollidesWith;
-            uint newValue = filter << 1; // bit shift to get the next filter
-            if (newValue > BlueCollisionFilter) newValue = RedCollisionFilter; // roll around to the first filter
+            uint newValue = filter << 1; // 位移位以获得下一个过滤器
+            if (newValue > BlueCollisionFilter) newValue = RedCollisionFilter; // 滚动到第一个过滤器
             CollisionFilter newFilter = new CollisionFilter
             {
                 BelongsTo = newValue,
@@ -134,8 +134,8 @@ public partial class RotateThroughCollisionFiltersSystem : SystemBase
         }
     }
 
-    // This method searches through the input RenderMeshArray Materials[] array for the material with the matching name
-    // and returns the index of the matching material
+    // 此方法通过输入 RenderMeshArray Materials[] 数组搜索具有匹配名称的材质
+    // 并返回匹配材料的索引
     private int FindMatchingMaterialIndex(string name, ref RenderMeshArray inputRenderMeshArray)
     {
         bool match = false;

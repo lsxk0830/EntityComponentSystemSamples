@@ -1,5 +1,5 @@
-// This code is used in the 5g2. Unique Collider Blob Sharing demo and inherits from SpawnRandomObjectsSystemBase
-// The OnUpdate method in SpawnRandomObjectsSystemBase will spawn an explosion group where this is defined in
+// 该代码用于 5g2。独特的 Collider Blob 共享演示并继承自 SpawnRandomObjectsSystemBase
+// SpawnRandomObjectsSystemBase 中的 OnUpdate 方法将生成一个爆炸组，其定义在
 // ConfigureInstance(). The prefab being spawned is ExplosionSpawner.
 using System.Collections.Generic;
 using Unity.Assertions;
@@ -52,8 +52,8 @@ class PeriodicallySpawnExplosionAuthoringBaking : Baker<PeriodicallySpawnExplosi
     }
 }
 
-// The data set in ConfigureInstance feeds into the OnUpdate method of PeriodicalySpawnRandomObjectsSystem. This system
-// updates the ExplosionSpawner prefab (the fireworks rocket pre-explosion).
+// ConfigureInstance 中的数据集输入到 PeriodicalySpawnRandomObjectsSystem 的 OnUpdate 方法中。这个 system
+// 更新 ExplosionSpawner prefab（烟花火箭预爆炸）。
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(PhysicsSystemGroup))]
 partial class PeriodicallySpawnExplosionsSystem : PeriodicalySpawnRandomObjectsSystem<PeriodicallySpawnExplosionComponent>
@@ -66,10 +66,10 @@ partial class PeriodicallySpawnExplosionsSystem : PeriodicalySpawnRandomObjectsS
 
         var localTransform = EntityManager.GetComponentData<LocalTransform>(instance);
 
-        // Want a negative ID to use with the CollisionFilter GroupIndex
+        // 想要负 ID 与 CollisionFilter GroupIndex 一起使用
         spawnSettings.Id--;
 
-        // Setting the ID of a new explosion group so that the group gets unique collider
+        // 设置新爆炸组的 ID，使该组获得唯一的 collider
         explosionComponent.Id = spawnSettings.Id;
 
         explosionComponent.Position = localTransform.Position;

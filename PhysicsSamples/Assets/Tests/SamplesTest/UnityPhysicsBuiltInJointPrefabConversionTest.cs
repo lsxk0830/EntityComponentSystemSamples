@@ -14,9 +14,9 @@ using UnityEngine.TestTools;
 namespace Unity.Physics.Tests
 {
     /// <summary>
-    /// Used to test the conversion of prefabs versus instantiation for built-in components.
-    /// Ensures that instantiated and non-instantiated prefab references produce consistent data,
-    /// particularly verifying that <c>BodyBFromJoint</c> remains the same unless intentionally modified at runtime.
+    /// 用于测试prefab的转换与内置 components 的实例化。
+    /// 确保实例化和非实例化的 prefab 引用生成一致的数据，
+    /// 特别是验证 <c>BodyBFromJoint</c> 保持不变，除非在运行时有意修改。
     /// </summary>
     [TestFixture]
     class UnityPhysicsBuiltInJointPrefabConversionTest : UnityPhysicsSamplesTest
@@ -43,11 +43,11 @@ namespace Unity.Physics.Tests
         {
             VerifyConsoleMessages.ClearMessagesInConsole();
 
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Enable multi threaded Unity Physics simulation
+            // 启用多线程 Unity Physics 模拟
             ConfigureSimulation(DefaultWorld, SimulationType.UnityPhysics);
 
             var simulationTime = 1.0f;

@@ -16,14 +16,14 @@ namespace Streaming.SceneManagement.SceneLoading
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Loads all the requested scenes and removes the requests from the entities
+            // 加载所有请求的 scenes 并从 entities 中删除请求
             var query = SystemAPI.QueryBuilder().WithAll<SceneReference>().Build();
             var requests = query.ToComponentDataArray<SceneReference>(Allocator.Temp);
             for (int i = 0; i < requests.Length; i += 1)
             {
-                // Creates an entity with scene-related components, which will later trigger scene loading
-                // in the scene loading systems.
-                // (Because this method may add a component to an entity, it cannot be called in a foreach query.)
+                // 创建一个 entity 与 scene 相关的 components，稍后将加载 trigger scene
+                // 在 scene 中加载 systems。
+                // （因为此方法可能会将 component 添加到 entity，所以不能在 foreach query 中调用它。）
                 SceneSystem.LoadSceneAsync(state.WorldUnmanaged, requests[i].Value);
             }
             state.EntityManager.DestroyEntity(query);

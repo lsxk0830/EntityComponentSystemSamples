@@ -19,8 +19,8 @@ namespace Tutorials.Firefighters
             state.RequireForUpdate<ExecuteAnimation>();
         }
 
-        // Because this update accesses managed objects, it cannot be Burst compiled,
-        // so we do not add the [BurstCompile] attribute.
+        // 由于此更新访问托管对象，因此无法进行 Burst 编译，
+        // 所以我们不添加 [BurstCompile] 属性。
         public void OnUpdate(ref SystemState state)
         {
             if (!isInitialized)
@@ -42,8 +42,8 @@ namespace Tutorials.Firefighters
                     botAnimation.AnimatedGO = go;
                     go.transform.localPosition = (Vector3)transform.ValueRO.Position;
                     ecb.AddComponent(entity, botAnimation);
-                    
-                    // disable rendering
+
+                    // 禁用渲染
                     ecb.RemoveComponent<MaterialMeshInfo>(entity);
                 }
 

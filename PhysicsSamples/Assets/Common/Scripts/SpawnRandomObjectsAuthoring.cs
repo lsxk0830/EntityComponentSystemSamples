@@ -18,10 +18,10 @@ abstract class SpawnRandomObjectsAuthoringBase<T> : MonoBehaviour
     public float3 range = new float3(10f);
     [Tooltip("Limited to 500 on some platforms!")]
     public int count;
-    // The random seed used for spawners is a function of the spawner's quantized position, range, count, etc.
-    // See the GetRandomSeed() method.
-    // Two spawners in the same scene can potentially end up with the same random seed. If so, this field gives scene
-    // authors a way to tweak one of the spawners' seeds without changing its behavior-defining parameters.
+    // 用于生成器的随机种子是生成器的量化位置、范围、计数等的函数。
+    // 请参阅 GetRandomSeed() 方法。
+    // 同一 scene 中的两个生成器可能最终会获得相同的随机种子。如果是这样，该字段给出 scene
+    // 作者提出了一种在不改变其行为定义参数的情况下调整产卵者种子的方法。
     public int randomSeedOffset;
     #pragma warning restore 649
 
@@ -103,7 +103,7 @@ abstract partial class SpawnRandomObjectsSystemBase<T> : SystemBase where T : un
 
     protected override void OnUpdate()
     {
-        // Entities.ForEach in generic system types are not supported
+        // 不支持通用 system 类型中的 Entities.ForEach
         using (var entities = GetEntityQuery(new ComponentType[] { typeof(T) }).ToEntityArray(Allocator.Temp))
         {
             for (int j = 0; j < entities.Length; j++)
@@ -112,7 +112,7 @@ abstract partial class SpawnRandomObjectsSystemBase<T> : SystemBase where T : un
                 var spawnSettings = EntityManager.GetComponentData<T>(entity);
 
 #if UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-                // Limit the number of bodies on platforms with potentially low-end devices
+                // 限制具有潜在低端设备的平台上的主体数量
                 var count = math.min(spawnSettings.Count, 500);
 #else
                 var count = spawnSettings.Count;
@@ -148,7 +148,7 @@ abstract partial class SpawnRandomObjectsSystemBase<T> : SystemBase where T : un
         ref NativeArray<float3> positions, ref NativeArray<quaternion> rotations, int seed = 0)
     {
         var count = positions.Length;
-        // initialize the seed of the random number generator
+        // 初始化随机数生成器的种子
         var random = Unity.Mathematics.Random.CreateFromIndex((uint)seed);
         for (int i = 0; i < count; i++)
         {

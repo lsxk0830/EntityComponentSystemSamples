@@ -83,7 +83,7 @@ namespace HelloCube.StateChange
             var after = ProfilerUnsafeUtility.Timestamp;
 
 #if UNITY_EDITOR
-            // profiling
+            // 剖析
             var conversionRatio = ProfilerUnsafeUtility.TimestampToNanosecondsConversionRatio;
             var elapsed = (after - before) * conversionRatio.Numerator / conversionRatio.Denominator;
             SystemAPI.GetSingletonRW<StateChangeProfilerModule.FrameData>().ValueRW.SetStatePerf = elapsed;
@@ -123,7 +123,7 @@ namespace HelloCube.StateChange
         void Execute(Entity entity, ref URPMaterialPropertyBaseColor color, in LocalTransform transform,
             [ChunkIndexInQuery] int chunkIndex)
         {
-            // If cube is inside the hit radius.
+            // 如果立方体位于命中半径内。
             if (math.distancesq(transform.Position, Hit) <= RadiusSq)
             {
                 color.Value = (Vector4)Color.red;
@@ -143,7 +143,7 @@ namespace HelloCube.StateChange
         void Execute(Entity entity, ref URPMaterialPropertyBaseColor color, in LocalTransform transform,
             [ChunkIndexInQuery] int chunkIndex)
         {
-            // If cube is NOT inside the hit radius.
+            // 如果立方体在命中半径内为 NOT。
             if (math.distancesq(transform.Position, Hit) > RadiusSq)
             {
                 color.Value = (Vector4)Color.white;
@@ -163,7 +163,7 @@ namespace HelloCube.StateChange
         void Execute(Entity entity, ref URPMaterialPropertyBaseColor color, in LocalTransform transform,
             [ChunkIndexInQuery] int chunkIndex)
         {
-            // If cube is inside the hit radius.
+            // 如果立方体位于命中半径内。
             if (math.distancesq(transform.Position, Hit) <= RadiusSq)
             {
                 color.Value = (Vector4)Color.red;
@@ -181,7 +181,7 @@ namespace HelloCube.StateChange
         void Execute(Entity entity, ref URPMaterialPropertyBaseColor color, in LocalTransform transform,
             EnabledRefRW<Spin> spinnerEnabled)
         {
-            // If cube is NOT inside the hit radius.
+            // 如果立方体在命中半径内为 NOT。
             if (math.distancesq(transform.Position, Hit) > RadiusSq)
             {
                 color.Value = (Vector4)Color.white;

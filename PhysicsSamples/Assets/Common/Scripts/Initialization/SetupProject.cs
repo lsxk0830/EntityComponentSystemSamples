@@ -23,13 +23,13 @@ class Initialization
     {
         if (Application.isPlaying)
         {
-            // don't modify the project when entering playmode
+            // 进入 playmode 时不要修改项目
             return;
         }
         // else:
 
-        // Find Unity Physics package samples and auto-import them if not yet imported.
-        // Note: we are setting packageVersion to null here to ignore the version of the package.
+        // 查找 Unity Physics package 示例并自动导入它们（如果尚未导入）。
+        // Note: 我们在这里将 packageVersion 设置为 null 以忽略 package 的版本。
         foreach (var sample in Sample.FindByPackage("com.unity.physics", null))
         {
             if (!sample.isImported)

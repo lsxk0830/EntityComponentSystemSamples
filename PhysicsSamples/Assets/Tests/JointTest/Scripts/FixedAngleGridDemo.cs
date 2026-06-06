@@ -48,14 +48,14 @@ public partial class FixAngleGridDemoSystem : SceneCreationSystem<FixedAngleGrid
             orientationB = quaternion.AxisAngle(math.normalize(new float3(1)), (float)math.PI / 4.0f);
         }
 
-        // Make some joints with fixed position, limited 3D angle
+        // 制作一些位置固定、3D 角度有限的关节
         for (int i = 0; i < 10; i++)
         {
-            // Create a body
+            // 创建一个身体
             Entity body = CreateDynamicBody(
                 new float3((i - 4.5f) * 1.0f, 0, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
-            // Create the ragdoll joint
+            // 创建布娃娃 joint
             float3 pivotLocal = float3.zero;
             float3 pivotInWorld = math.transform(GetBodyTransform(body), pivotLocal);
 

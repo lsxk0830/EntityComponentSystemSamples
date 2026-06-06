@@ -75,7 +75,7 @@ public partial struct VerifyNumEventsSystem : ISystem
 
         getNumCollisionEventsJob.Complete();
 
-        // The test is set up in a way that there is one event for each dynamic body
+        // 测试的设置方式是每个动态体都有一个事件
         Assert.IsTrue(numEvents.Value == numDynamicBodies);
 
         numEvents.Dispose();

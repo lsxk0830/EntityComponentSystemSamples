@@ -19,7 +19,7 @@ namespace Streaming.SceneManagement.StreamingVolume
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Check which volumes contain any relevant entities.
+            // 检查哪些卷包含任何相关的 entities。
             NativeHashSet<Entity> activeVolumes = new NativeHashSet<Entity>(100, Allocator.Temp);
 
             var relevantQuery = SystemAPI.QueryBuilder().WithAll<Relevant, LocalToWorld>().Build();
@@ -39,14 +39,14 @@ namespace Streaming.SceneManagement.StreamingVolume
                     var insideAxis = (distance < range);
                     if (insideAxis.x && insideAxis.y && insideAxis.z)
                     {
-                        // Relevant entity inside volume
+                        // 相关 entity 内卷
                         activeVolumes.Add(volumeEntity);
                         break;
                     }
                 }
             }
 
-            // Load and unload sections in accord with activated volumes.
+            // 根据激活的体积加载和卸载部分。
             NativeList<(Entity, LevelInfo)> toLoadList = new NativeList<(Entity, LevelInfo)>(10, Allocator.Temp);
             NativeList<(Entity, LevelInfo)> toUnloadList = new NativeList<(Entity, LevelInfo)>(10, Allocator.Temp);
 
@@ -64,8 +64,8 @@ namespace Streaming.SceneManagement.StreamingVolume
                     }
                 }
 
-                // We can't add or remove components inside a foreach query, so we
-                // defer the changes to the loops that follow.
+                // 我们无法在 foreach query 中添加或删除 components，因此我们
+                // 推迟对后续循环的更改。
                 if (shouldLoad && levelInfo.ValueRW.runtimeEntity == Entity.Null)
                 {
                     toLoadList.Add((entity, levelInfo.ValueRW));

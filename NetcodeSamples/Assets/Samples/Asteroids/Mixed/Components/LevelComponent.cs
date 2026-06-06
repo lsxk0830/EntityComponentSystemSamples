@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using Unity.NetCode;
 using UnityEngine;
 
-/// <summary>Serializable attribute ensures the Inspector can expose fields as this struct is a field inside ServerSettings.</summary>
+/// <summary>Serializable 属性确保 Inspector 可以公开字段，因为该结构是 ServerSettings.</summary> 内的字段
 [Serializable]
 public struct LevelComponent : IComponentData
 {
@@ -18,7 +18,7 @@ public struct LevelComponent : IComponentData
 
     public float bulletVelocity;
     public float bulletCollisionRadius;
-    /// <summary>Value of 0 implies one bullet per simulation tick. ROF cannot go higher than that.</summary>
+    /// <summary>Value 为 0 意味着每个模拟刻度有一颗子弹。ROF 不能高于 that.</summary>
     public uint bulletRofCooldownTicks;
 
     public float asteroidVelocity;
@@ -26,15 +26,15 @@ public struct LevelComponent : IComponentData
     public int numAsteroids;
 
     public bool asteroidsDamageShips;
-    /// <summary>Can ships destroy each other?</summary>
+    /// <summary>Can 船只互相摧毁？</summary>
     public bool shipPvP;
     public bool asteroidsDestroyedOnShipContact;
     public bool bulletsDestroyedOnContact;
 
-    /// <summary>When > 0, informs <see cref="Unity.NetCode.GhostRelevancyMode"/>. Optimization.</summary>
+    /// <summary>When > 0，通知 <see cref="Unity.NetCode.GhostRelevancyMode"/>。Optimization.</summary>
     /// <remarks>
-    /// Note: If <see cref="enableGhostImportanceScaling"/> is checked, the package uses the const defined in
-    /// <see cref="GhostDistanceImportance.BatchScaleWithRelevancyFunctionPointer"/> instead of this field.
+    /// Note: 如果选中 <see cref="enableGhostImportanceScaling"/>，则 package 使用中定义的 const
+    /// <see cref="GhostDistanceImportance.BatchScaleWithRelevancyFunctionPointer"/> 代替该字段。
     /// </remarks>
     public int relevancyRadius;
     public bool staticAsteroidOptimization;
@@ -42,7 +42,7 @@ public struct LevelComponent : IComponentData
     public bool enableGhostImportanceScaling;
     public GhostDistanceData distanceImportanceTileConfig;
 
-    /// <summary>Distributes the CollisionSystem work over N ticks (1 = OFF).</summary>
+    /// <summary>Distributes CollisionSystem 工作超过 N 个刻度 (1 = OFF).</summary>
     [Min(1)]
     public uint collisionSystemRoundRobinSegments;
 

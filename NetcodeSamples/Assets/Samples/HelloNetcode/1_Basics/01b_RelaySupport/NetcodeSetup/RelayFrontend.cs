@@ -10,13 +10,13 @@ using UnityEngine.UI;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// HUD implementation. Implements behaviour for the buttons, hosting server, joining client, and starting game.
+    /// HUD 实现。实现按钮的行为，托管 server，加入 client，并开始游戏。
     ///
-    /// Text fields output the status of server and client registering with the relay server once the user presses
-    /// the respective buttons.
+    /// 一旦用户按下，文本字段将输出 server 和 client 向继电器 server 注册的状态
+    /// 相应的按钮。
     ///
-    /// A bootstrap world is constructed to run the jobs for setting up host and client configuration for relay server.
-    /// Once this is done the game can be launched and the configuration can be retrieved from the constructed world.
+    /// 引导程序 world 构造为 run 和 jobs，用于设置主机和 client 配置用于继电器 server。
+    /// 完成此操作后，即可启动游戏，并可从构建的 world 中检索配置。
     /// </summary>
     public class RelayFrontend :
 #if UNITY_SERVER
@@ -101,8 +101,8 @@ namespace Samples.HelloNetcode
 
         public void Update()
         {
-            // When relay is toggled on the hosting button should be disabled when the user enters something in
-            // the join code text field, as it's expected you'd want to join a relay session next
+            // 当中继在托管按钮上切换时，当用户在其中输入内容时应禁用
+            // 加入代码文本字段，因为预计您接下来要加入中继会话
             if (EnableRelay.isOn)
             {
                 if (!string.IsNullOrEmpty(JoinCode.text))
@@ -110,8 +110,8 @@ namespace Samples.HelloNetcode
                 else
                     ClientServerButton.interactable = true;
             }
-            // If relay is toggled off then reset hosting button, unless you're on webgl then it should
-            // remain off as it only supports hosting on relay
+            // 如果中继已关闭，则重置托管按钮，除非您使用的是 webgl，否则它应该
+            // 保持关闭状态，因为它仅支持中继托管
             else if (!ClientServerButton.interactable)
             {
 #if !UNITY_WEBGL
@@ -233,13 +233,13 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Collect relay server end point from completed systems. Set up server with relay support and connect client
-        /// to hosted server through relay server.
-        /// Both client and server world is manually created to allow us to override the <see cref="DriverConstructor"/>.
+        /// 从已完成的 systems 收集中继 server 端点。设置带有中继支持的 server 并连接 client
+        /// 通过中继 server 到托管 server。
+        /// client 和 server world 都是手动创建的，允许我们覆盖 <see cref="DriverConstructor"/>。
         ///
-        /// Two singleton entities are constructed with listen and connect requests. These will be executed asynchronously.
-        /// Connecting to relay server will not be bound immediately. The Request structs will ensure that we
-        /// continuously poll until the connection is established.
+        /// 两个单例 entities 是通过监听和连接请求构造的。这些将异步执行。
+        /// 连接到继电器 server 不会立即绑定。Request 结构将确保我们
+        /// 不断轮询，直到建立连接。
         /// </summary>
         void SetupRelayHostedServerAndConnect()
         {
@@ -298,8 +298,8 @@ namespace Samples.HelloNetcode
 
             var networkStreamEntity = client.EntityManager.CreateEntity(ComponentType.ReadWrite<NetworkStreamRequestConnect>());
             client.EntityManager.SetName(networkStreamEntity, "NetworkStreamRequestConnect");
-            // For IPC this will not work and give an error in the transport layer. For this sample we force the client to connect through the relay service.
-            // For a locally hosted server, the client would need to connect to NetworkEndpoint.AnyIpv4, and the relayClientData.Endpoint in all other cases.
+            // 对于 IPC 这将不起作用并在传输层中给出错误。对于此示例，我们强制 client 通过中继服务进行连接。
+            // 对于本地托管的 server，client 需要连接到 NetworkEndpoint.AnyIpv4，在所有其他情况下需要连接到 relayClientData.Endpoint。
             client.EntityManager.SetComponentData(networkStreamEntity, new NetworkStreamRequestConnect { Endpoint = relayClientData.Endpoint });
         }
 #endif

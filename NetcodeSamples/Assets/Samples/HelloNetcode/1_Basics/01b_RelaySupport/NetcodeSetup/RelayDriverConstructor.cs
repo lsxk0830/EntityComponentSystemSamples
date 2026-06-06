@@ -7,10 +7,10 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Register client and server using relay server settings.
+    /// 使用继电器 server 设置注册 client 和 server。
     ///
-    /// Settings are retrieved from bootstrap world. This driver constructor will run when pressing 'Start Game'
-    /// and should only be pressed after both server and client configuration has been properly initialized.
+    /// 从引导程序 world 检索设置。当按下“开始游戏”时，该驱动程序构造函数将显示 run
+    /// 仅应在 server 和 client 配置正确初始化后按下。
     /// </summary>
     public class RelayDriverConstructor : INetworkStreamDriverConstructor
     {
@@ -24,22 +24,22 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// This method will ensure that we register different driver types based on the relay settings
-        /// settings.
+        /// 此方法将确保我们根据继电器设置注册不同的驱动程序类型
+        /// 设置。
         /// <para>
-        /// Mode          |  Relay Settings
-        /// Client/Server |  Valid -> use relay to connect to local server
-        ///                  Invalid -> use IPC to connect to local server
-        /// Client        |  Always use relay. Expect data to be valid.
+        /// 模式|  Relay 设置
+        /// Client/Server |  有效->使用中继连接本地 server
+        ///                  无效->使用 IPC 连接本地 server
+        /// Client |  始终使用继电器。期望数据有效。
         /// <para>
         /// <para>
-        /// For WebGL, websocket is always preferred for client in the Editor, to closely emulate the player behaviour.
+        /// 对于 WebGL，Editor 中的 client 始终首选 websocket，以密切模拟玩家行为。
         /// </para>
         /// </summary>
         public void CreateClientDriver(World world, ref NetworkDriverStore driverStore, NetDebug netDebug)
         {
             var settings = DefaultDriverBuilder.GetNetworkClientSettings();
-            //if the relay data is not valid, connect via local ipc
+            //如果中继数据无效，则通过本地 ipc 连接
             if(ClientServerBootstrap.RequestedPlayType == ClientServerBootstrap.PlayType.ClientAndServer &&
                !m_RelayClientData.Endpoint.IsValid)
             {
@@ -58,11 +58,11 @@ namespace Samples.HelloNetcode
 
         public void CreateServerDriver(World world, ref NetworkDriverStore driverStore, NetDebug netDebug)
         {
-            //The first driver is the IPC for internal client/server connection if necessary.
+            //第一个驱动程序是 IPC，用于内部 client/server（如有必要）。
             var ipcSettings = DefaultDriverBuilder.GetNetworkServerSettings();
             DefaultDriverBuilder.RegisterServerIpcDriver(world, ref driverStore, netDebug, ipcSettings);
             var relaySettings = DefaultDriverBuilder.GetNetworkServerSettings();
-            //The other driver (still the same port) is going to listen using relay for external conections
+            //另一个驱动程序（仍然是同一端口）将使用中继来监听外部连接
             relaySettings.WithRelayParameters(ref m_RelayServerData);
 #if !UNITY_WEBGL
             DefaultDriverBuilder.RegisterServerUdpDriver(world, ref driverStore, netDebug, relaySettings);

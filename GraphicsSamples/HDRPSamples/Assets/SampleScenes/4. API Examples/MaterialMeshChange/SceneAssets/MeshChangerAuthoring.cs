@@ -48,7 +48,7 @@ public partial class MeshChangerSystem : SystemBase
 
     private void RegisterMesh(EntitiesGraphicsSystem hybridRendererSystem, Mesh mesh)
     {
-        // Only register each mesh once, so we can also unregister each mesh just once
+        // 每个网格只注册一次，所以我们也可以只注销每个网格一次
         if (!m_MeshMapping.ContainsKey(mesh))
             m_MeshMapping[mesh] = hybridRendererSystem.RegisterMesh(mesh);
     }

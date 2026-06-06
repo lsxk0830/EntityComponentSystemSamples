@@ -1,10 +1,10 @@
-# HelloNetcode Respawn Weapon sample
+# HelloNetcode 重生武器示例
 
-This samples shows how you can implement respawning players.
+此示例展示了如何实现重生玩家。
 
-## Requirements
+## 要求
 
-The spawn player sample is used to trigger the auto spawning of the player when connection is established. The dynamic physics objects from the physics sample are used.
+生成播放器示例用于 trigger 在建立连接时自动生成播放器。使用Physics 示例中的动态物理对象。
 
 * GoInGame
 * SpawnPlayer
@@ -13,12 +13,12 @@ The spawn player sample is used to trigger the auto spawning of the player when 
 * ThinClients
 * HitScanWeapon
 
-## Sample description
+## 示例描述
 
-This sample builds on the hit scan weapon sample and adds respawning. Run the sample with at least one thin client, which can be set in the multiplayer playmode tools.
-You can aim and click the left mouse button to hit them. Five successful hits will be enough to knock them down. A successful hit can be seen by the hit marks as described in HitScanWeapon sample.
-When dying the clients will do a rotation and then respawn at a random point on the map.
+该示例建立在命中扫描武器示例的基础上，并添加了重生功能。使用至少一个薄 client 运行示例，可以在多人游戏模式工具中进行设置。
+您可以瞄准并单击鼠标左键来击中它们。五次成功的命中就足以击倒他们。通过命中标记可以看出命中成功，如 HitScanWeapon 示例中所述。
+当死亡时，clients 会进行旋转，然后在地图上的随机点重生。
 
-In the `RespawnSystem` the logic for respawning is showing how to destroy the old player entity and reconstructing this.
-For netcode specific parts it is important to set these up again, i.e. if `CommandTargetComponent` and `LinkedEntityGroup` are not set up correctly, disconnecting the player after respawning will not despawn the entity correctly.
+在 `RespawnSystem` 中，重生的逻辑展示了如何摧毁旧玩家 entity 并重建它。
+对于Netcode特定部分，重新​​设置这些部分非常重要，i.e。如果 `CommandTargetComponent` 和 `LinkedEntityGroup` 未正确设置，重生后断开玩家连接将无法正确使 entity 消失。
 

@@ -6,7 +6,7 @@ using Unity.Physics.Systems;
 
 namespace StickmanDrop
 {
-    // the system runs after each iteration of collision detection and the solver
+    // system 在碰撞检测和求解器的每次迭代后运行
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial struct StickmanSystem : ISystem
     {
@@ -21,25 +21,25 @@ namespace StickmanDrop
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // get the impulse events
+            // 获取脉冲事件
             var sim = SystemAPI.GetSingleton<SimulationSingleton>().AsSimulation();
-            
-            // to access the impulse events on main thread, we must sync any outstanding physics sim jobs
-            sim.FinalJobHandle.Complete();   
-            
+
+            // 要访问主线程上的脉冲事件，我们必须同步任何出色的物理模拟 jobs
+            sim.FinalJobHandle.Complete();
+
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            
-            // An impulse event is generated when an impulse exceeds a  
-            // joint's Break Force or Break Torque values.
-            
+
+            // 当脉冲超过某个值时，就会生成脉冲事件
+            // joint 的断裂力或断裂扭矩值。
+
             foreach (var impulseEvent in sim.ImpulseEvents)
             {
-                // An impulse event is generated for both bodies connected by the joint.
-                // So DestroyEntity will be called for each joint twice, but this is not a problem
-                // because multiple destroy commands for the same entity in a single ECB is not an error. 
+                // 为 joint 连接的两个主体生成脉冲事件。
+                // 所以 DestroyEntity 将为每个 joint 调用两次，但这不是问题
+                // 因为在单个 ECB 中对同一 entity 执行多个销毁命令不是错误。
                 ecb.DestroyEntity(impulseEvent.JointEntity);
             }
-            
+
             ecb.Playback(state.EntityManager);
         }
     }

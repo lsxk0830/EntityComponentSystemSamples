@@ -9,8 +9,8 @@ using Unity.Transforms;
 using UnityEngine;
 using RaycastHit = Unity.Physics.RaycastHit;
 
-// Camera Utility to smoothly track a specified target from a specified location
-// Camera location and target are interpolated each frame to remove overly sharp transitions
+// 相机实用程序可从指定位置平滑跟踪指定目标
+// 相机位置和目标是 interpolated 每帧以消除过于尖锐的过渡
 public class CameraSmoothTrack : MonoBehaviour
 {
 #pragma warning disable 649
@@ -126,7 +126,7 @@ partial class SmoothlyTrackCameraTarget : SystemBase
                 ? SystemAPI.GetComponent<LocalToWorld>(cameraSmoothTrack.ValueRW.LookTo).Position
                 : worldPosition + localToWorld.ValueRO.Forward;
 
-            // check barrier
+            // 检查障碍
             var rayInput = new RaycastInput
             {
                 Start = newPositionFrom,
@@ -141,7 +141,7 @@ partial class SmoothlyTrackCameraTarget : SystemBase
 
             if (cameraSmoothTrack.ValueRW.Target != Entity.Null)
             {
-                // add velocity
+                // 添加速度
                 float3 lv = world.GetLinearVelocity(world.GetRigidBodyIndex(cameraSmoothTrack.ValueRW.Target));
                 lv *= timeAhead;
                 newPositionFrom += lv;

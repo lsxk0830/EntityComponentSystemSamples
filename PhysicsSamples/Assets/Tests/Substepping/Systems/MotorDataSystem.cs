@@ -147,7 +147,7 @@ public partial struct MotorDataSystem : ISystem, ISystemStartStop
             var frameCount = quantitativeData.FrameCounter;
             if (frameCount < AllocateSize)
             {
-                // Section copied from ValidateJointBehaviorJob.Execute:
+                // 从 ValidateJointBehaviorJob.Execute 复制的部分：
                 var jointIndex = DynamicsWorld.GetJointIndex(entity);
                 var dynamicsJoint = DynamicsWorld.Joints[jointIndex];
                 var bodyAIx = dynamicsJoint.BodyPair.BodyIndexA;
@@ -178,7 +178,7 @@ public partial struct MotorDataSystem : ISystem, ISystemStartStop
                     PhysicsMassLookup[bodyPair.EntityB],
                     new quaternion(bodyBWorld));
 
-                // actual angular velocity in world space (relative to B)
+                // world 空间中的实际角速度（相对于 B）
                 var angVelRel = wA - wB;
 
                 var velocity = angVelRel - new float3(0, 0, target);
@@ -214,7 +214,7 @@ public partial struct MotorDataSystem : ISystem, ISystemStartStop
 
             const string path = "Assets/Tests/Substepping/ValidateMotorData.txt";
 
-            System.IO.File.Delete(path); //clear contents by deleting the file
+            System.IO.File.Delete(path); //通过删除文件清除内容
             using (var fileStream = System.IO.File.OpenWrite(path))
             using (var writer = new System.IO.StreamWriter(fileStream, Encoding.ASCII))
             {
@@ -230,7 +230,7 @@ public partial struct MotorDataSystem : ISystem, ISystemStartStop
                 Debug.Log("File write is complete. Stop playmode");
             }
 
-            quantitativeData.DataWritten = true; //only write to file once
+            quantitativeData.DataWritten = true; //只写入文件一次
         }
     }
 }

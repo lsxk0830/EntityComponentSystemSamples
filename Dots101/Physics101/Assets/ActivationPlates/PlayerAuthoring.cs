@@ -10,7 +10,7 @@ namespace ActivationPlates
             public override void Bake(PlayerAuthoring authoring)
             {
                 var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                
+
                 AddComponent<Player>(entity);
             }
         }

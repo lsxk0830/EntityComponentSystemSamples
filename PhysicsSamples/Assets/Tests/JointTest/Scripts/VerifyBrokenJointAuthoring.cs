@@ -38,7 +38,7 @@ public partial struct VerifyBrokenJointSystem : ISystem
     {
         m_FrameCount++;
 
-        // Before anything happens, make sure that there are joints in the scene.
+        // 在发生任何事情之前，请确保 scene 中有接头。
         if (m_FrameCount == 1)
         {
             NativeArray<PhysicsJoint> joints = m_PhysicsJointQuery.ToComponentDataArray<PhysicsJoint>(Unity.Collections.Allocator.Temp);
@@ -59,13 +59,13 @@ public partial struct VerifyBrokenJointSystem : ISystem
                 }
             }
 
-            // Make sure that there are breakable and non breakable joints.
+            // 确保有易碎和不易碎的接头。
             Assert.IsTrue(m_numNonBreakableJoints > 0, "Found zero non breakable joints!");
             Assert.IsTrue(numBreakableJoints > 0, "Found zero breakable joints!");
         }
 
-        // After a while, check if breakable joints are broken. Note that some joints need to hit the floor to break
-        // They get destroyed by DestroyBrokenJointsSystem (which checks for ImpulseEventJobs)
+        // 过一段时间后，检查易断接头是否断裂。注意，有些关节需要撞击地板才能断裂
+        // 它们被 DestroyBrokenJointsSystem 摧毁（它检查 ImpulseEventJobs）
         if (m_FrameCount == 30)
         {
             NativeArray<PhysicsJoint> joints = m_PhysicsJointQuery.ToComponentDataArray<PhysicsJoint>(Unity.Collections.Allocator.Temp);

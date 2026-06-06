@@ -52,7 +52,7 @@ pixel_t VertShader(vertex_t input)
     float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
     weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
 
-    // Generate UV for the Masking Texture
+    // 为遮罩纹理生成 UV
     float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
     float2 maskUV = (vert.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
 
@@ -145,7 +145,7 @@ float4 PixShader(pixel_t input) : SV_Target
     faceColor *= a;
     #endif
 
-    // Alternative implementation to UnityGet2DClipping with support for softness
+    // UnityGet2DClipping 的替代实现，支持软性
     #if UNITY_UI_CLIP_RECT
     half2 maskSoftness = half2(max(_UIMaskSoftnessX, _MaskSoftnessX), max(_UIMaskSoftnessY, _MaskSoftnessY));
     float2 maskZW = 0.25 / (0.25 * maskSoftness + 1 / scale);

@@ -17,7 +17,7 @@ namespace Samples.HelloNetcode
         public void OnUpdate(ref SystemState state)
         {
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
-            // Do not perform hit-scan when rolling back, only when simulating the latest tick
+            // 回滚时不执行 hit-scan，仅在模拟最新 tick 时执行
             if (!networkTime.IsFirstTimeFullyPredictingTick)
                 return;
 

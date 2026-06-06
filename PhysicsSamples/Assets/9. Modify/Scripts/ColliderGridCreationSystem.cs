@@ -1,8 +1,8 @@
-// This script is used in the 5g1. Change Collision Filter - Boxes demo. This script instantiates a
-// 3x3 grid of 9 prefab boxes with unique colliders. 3 boxes are created from a PhysicsShape with the
-// Force Unique toggle enabled, 3 boxes are created from a PhysicsShape with the Force Unique toggle
-// disabled with an added Force Unique Component added, and the last 3 boxes are created from a BoxCollider
-// with the Force Unique Component added.
+// 该脚本用于 5g1。更改碰撞过滤器 - 盒子演示。该脚本实例化了一个
+// 9 个 prefab 盒子的 3x3 网格，带有独特的 colliders。从 PhysicsShape 创建 3 个盒子，其中
+// 启用强制独特切换，使用强制独特切换从 PhysicsShape 创建 3 个盒子
+// 添加了强制唯一 Component 后禁用，最后 3 个框是从 BoxCollider 创建的
+// 添加了 Force Unique Component。
 using System;
 using Unity.Collections;
 using Unity.Entities;
@@ -36,7 +36,7 @@ namespace Unity.Physics
 
             var entity = m_ColliderQuery.ToEntityArray(Allocator.TempJob);
 
-            // Grab data from the baked authoring component
+            // 从烘焙的 authoring component 中抓取数据
             var data = entityManager.GetComponentData<CreateColliderGridComponent>(entity[0]);
             var prefabBuiltIn = data.BuiltInEntity;
             var prefabPhysicsShapeToggle = data.PhysicsShapeToggleEntity;
@@ -51,7 +51,7 @@ namespace Unity.Physics
             entityManager.Instantiate(prefabPhysicsShapeToggle, entitiesPhysicsShapeToggle);
             entityManager.Instantiate(prefabBuiltIn, entitiesBuiltIn);
 
-            // Instantiate the colliders using a Physics Shape and a Force Unique Component
+            // 使用 Physics 形状和 Force Unique Component 实例化 colliders
             var verticalOffset = 5f;
             var position = startingPosition + new float3(0f, verticalOffset, -5f);
             foreach (var e in entitiesPhysicsShapeComponent)
@@ -65,7 +65,7 @@ namespace Unity.Physics
                 position += new float3(0f, 0f, 5f);
             }
 
-            // Instantiate the colliders using a Physics Shape with the Force Unique toggle enabled
+            // 使用 Physics 形状实例化 colliders 并启用 Force Unique 切换
             position = startingPosition + new float3(-3.53f, verticalOffset, -5f);
             foreach (var e in entitiesPhysicsShapeToggle)
             {
@@ -78,7 +78,7 @@ namespace Unity.Physics
                 position += new float3(0f, 0f, 5f);
             }
 
-            // Instantiate the colliders using a Built-In Collider with a Force Unique Component
+            // 使用内置 Collider 和 Force Unique Component 实例化 colliders
             position = startingPosition + new float3(3.53f, verticalOffset, -5f);
             foreach (var e in entitiesBuiltIn)
             {

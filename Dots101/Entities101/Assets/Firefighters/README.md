@@ -1,25 +1,25 @@
-# Entities Tutorial: Firefighters
+# Entities 教程：消防员
 
-A fire spreads across a field, and bots form bucket brigade lines to douse the fire.
+大火蔓延到田野，机器人组成水桶队来扑灭大火。
 
-![](Common/firefighters.png)
+![](通用/firefighters.png)
 
-# Step 1: Spawning
+# 第一步：产卵
 
-This step sets up the core data and spawns the field, the bots, the ponds of water around the field, and the buckets on the field.
+此步骤设置核心数据并生成场地、机器人、场地周围的水池以及场地上的水桶。
 
-# Step 2: Fire simulation
+# 第二步：火灾模拟
 
-This step adds code to spread the fire. Three solutions are demonstrated:
+此步骤添加代码来散布火势。演示了三种解决方案：
 
-- A single-threaded solution running on the main thread.
-- A single-threaded solution running in a job.
-- A parallel-threaded solution running in a job.
+- 在主线程上运行的单线程解决方案。
+- 在 job 中运行的单线程解决方案。
+- 在 job 中运行的并行线程解决方案。
 
-# Step 3: Bot behaviour
+# 第 3 步：机器人行为
 
-This step adds behiour to the bots, who are organized into teams. Each team forms a line between a pond and the closest fire. A bucket is filled at the pond and then passed up the line.
+此步骤向机器人添加行为，机器人被组织成团队。每个小组在池塘和最近的火之间排成一条线。在池塘边装满一桶水，然后沿线传递。
 
-# Step 4: Animation and UI
+# 第 4 步：动画和 UI
 
-This step replaces the bot capsules with animated characters. A UI HUD element displays the total count of fires that have been doused. Clicking a HUD button triggers repositioning of the bucket brigade lines.
+此步骤用动画角色替换机器人胶囊。UI HUD 元素显示已扑灭的火灾总数。单击 HUD 按钮会触发铲斗大队线的重新定位。

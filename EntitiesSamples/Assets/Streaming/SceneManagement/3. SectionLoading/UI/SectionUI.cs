@@ -22,31 +22,31 @@ namespace Streaming.SceneManagement.SectionLoading
         private static readonly string ButtonUnloadActionText = "Unload";
         private static readonly string ButtonNoActionActionText = "No Action";
 
-        // Lookup table with the text for the buttons to display based on the section loading state
+        // 查找表，其中包含根据部分加载状态显示的按钮文本
         private static readonly string[] ButtonTextPerState = new[]
         {
-            ButtonLoadActionText, // Unloaded
+            ButtonLoadActionText, // 已卸载
             ButtonUnloadActionText, // LoadRequested
-            ButtonUnloadActionText, // Loaded
-            ButtonUnloadActionText, // Loading
-            ButtonLoadActionText, // UnloadRequested,
+            ButtonUnloadActionText, // 已加载
+            ButtonUnloadActionText, // 加载中
+            ButtonLoadActionText, // UnloadRequested，
             ButtonUnloadActionText, // FailedToLoad
         };
 
-        // Lookup table with the color to use to display the section loading state based on its value
+        // 查找表，其中包含用于根据其值显示部分加载状态的颜色
         private static readonly Color[] ButtonColorPerState = new[]
         {
-            UnloadedColor, // Unloaded
+            UnloadedColor, // 已卸载
             InProgressColor, // LoadRequested
-            LoadedColor, // Loaded
-            InProgressColor, // Loading
+            LoadedColor, // 已加载
+            InProgressColor, // 加载中
             InProgressColor, // UnloadRequested
             ErrorColor, // FailedToLoad
         };
 
         private VisualElement sceneslist;
 
-        // Start is called before the first frame update
+        // Start 在第一帧更新之前调用
         void Start()
         {
             var uiDocument = GetComponent<UIDocument>();
@@ -67,7 +67,7 @@ namespace Streaming.SceneManagement.SectionLoading
 
             if (rows.Count == 0)
             {
-                // We need to initialize the rows
+                // 我们需要初始化行
                 for (var i = 0; i < numSections; i++)
                 {
                     var visualEntry = listEntryTemplate.Instantiate();

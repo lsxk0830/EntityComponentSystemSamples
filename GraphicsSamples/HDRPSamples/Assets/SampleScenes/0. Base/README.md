@@ -1,4 +1,4 @@
-# Base
+# 根据
 
-Running the Base scene you will be able to switch between all scenes in the project in play mode.  
+运行 Base scene，您将能够在播放模式下的项目中的所有 scenes 之间进行切换。
 

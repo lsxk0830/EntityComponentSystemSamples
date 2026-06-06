@@ -20,7 +20,7 @@ namespace Conversion
         public void OnCreate(ref SystemState state)
         {
             gravityWellQuery = SystemAPI.QueryBuilder().WithAll<LocalToWorld>().WithAllRW<GravityWell>().Build();
-            // Only need to update the GravityWellSystem if there are any entities with a GravityWellComponent
+            // 如果存在带有 GravityWellComponent 的 entities，则只需更新 GravityWellSystem
             state.RequireForUpdate(gravityWellQuery);
         }
 
@@ -31,7 +31,7 @@ namespace Conversion
                 gravityWellQuery.CalculateEntityCount(), state.WorldUpdateAllocator,
                 NativeArrayOptions.UninitializedMemory);
 
-            // For each gravity well component, update the position and add them to the array
+            // 对于每个重力井 component，更新位置并将其添加到数组中
             new GravityWellJob
             {
                 GravityWells = gravityWells

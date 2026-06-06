@@ -6,10 +6,10 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Describe the current state of the character to be played by the animation system.
-    /// State such as direction of movement, aim direction etc.
-    /// The system <see cref="UpdateAnimationStateSystem"/> will invoke <see cref="CharacterAnimation.UpdateAnimationState"/>
-    /// with information gathered from the player entity.
+    /// 描述动画 system 要扮演的角色的当前状态。
+    /// 状态，例如运动方向、目标方向等。
+    /// system <see cref="UpdateAnimationStateSystem"/> 将调用 <see cref="CharacterAnimation.UpdateAnimationState"/>
+    /// 从玩家 entity 收集的信息。
     /// </summary>
     public struct CharacterAnimationData
     {
@@ -21,8 +21,8 @@ namespace Samples.HelloNetcode
     }
 
     /// <summary>
-    /// Update animator based on the <see cref="CharacterAnimationData"/> sent from the <see cref="UpdateAnimationState"/> system.
-    /// It is expected that an Animator with related controller is attached to the same game object.
+    /// 根据从 <see cref="UpdateAnimationState"/> system 发送的 <see cref="CharacterAnimationData"/> 更新动画器。
+    /// 预计具有相关控制器的 Animator 会附加到同一个游戏对象。
     /// </summary>
     public class CharacterAnimation : MonoBehaviour
     {
@@ -52,7 +52,7 @@ namespace Samples.HelloNetcode
         static readonly int Shooting = Animator.StringToHash("Shooting");
 
         /// <summary>
-        /// Used to control the rotation of the character based on the length of the animation clip
+        /// 用于根据动画剪辑的长度控制角色的旋转
         /// </summary>
         public AnimationClip TurnAnimationClip;
         public Transform RightOffhandIk;
@@ -89,7 +89,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Returns whether two <see cref="float2"/>s are equal within <see cref="float.Epsilon"/>
+        /// 返回 <see cref="float.Epsilon"/> 内两个 <see cref="float2"/>s 是否相等
         /// </summary>
         static bool NearlyEqual(float2 a, float2 b)
         {
@@ -97,9 +97,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Return the <see cref="CharacterAnimationState"/> and set the animator state accordingly.
-        /// E.g. If the input system says that the character is not on the ground,
-        /// the animation state should be Jumping.
+        /// 返回 <see cref="CharacterAnimationState"/> 并相应地设置动画器状态。
+        /// E.g。如果输入 system 表示角色不在地面上，
+        /// 动画状态应该是跳跃。
         /// </summary>
         CharacterAnimationState ComputeAnimationState(bool onGround, bool isShooting, float2 movement)
         {
@@ -122,8 +122,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Updates the pitch of the character.
-        /// This is limited by 180 degrees in total. 90 degrees down and up.
+        /// 更新角色的音调。
+        /// 总共限制为 180 度。向下和向上 90 度。
         /// </summary>
         void UpdateAim(float pitch)
         {
@@ -133,7 +133,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Returns <paramref name="transform"/> with the rotation set to <paramref name="yawRadians"/>.
+        /// 返回 <paramref name="transform"/>，旋转设置为 <paramref name="yawRadians"/>。
         /// </summary>
         static LocalTransform UpdateRotation(float yawRadians, LocalTransform transform)
         {
@@ -142,10 +142,10 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Updates two animation floats to be used by the blend tree
-        /// in the animator state machine to determine run direction.
+        /// 更新混合树使用的两个动画浮动
+        /// 在动画器状态机中确定 run 方向。
         ///
-        /// The values will be normalized between 0 and 1
+        /// 这些值将在 0 和 1 之间标准化
         /// </summary>
         void RunAnimation(float horizontal, float vertical)
         {
@@ -158,9 +158,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// When standing still the character will turn once <paramref name="yawRadians"/> converted to degrees
-        /// surpass the <see cref="k_TurnAngle"/> constant.
-        /// This turn will be updated every frame using <see cref="Time.deltaTime"/>.
+        /// 当站立不动时，角色将转动一次 <paramref name="yawRadians"/> 转换为度数
+        /// 超过 <see cref="k_TurnAngle"/> 常数。
+        /// 该回合将使用 <see cref="Time.deltaTime"/> 每帧更新。
         /// </summary>
         LocalTransform StandingAnimation(float yawRadians, LocalTransform localTransform)
         {
@@ -219,12 +219,12 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// This will attach the left hand to the gun using the <see cref="RightOffhandIk"/> point.
+        /// 这将使用 <see cref="RightOffhandIk"/> 点将左手连接到枪上。
         /// </summary>
         void OnAnimatorIK(int layerIndex)
         {
             if (m_Animator == null) { return; }
-            // Avatar point left hand to IK left
+            // 头像指向左手 IK 左
             m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 100);
             m_Animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 100);
             m_Animator.SetIKPosition(AvatarIKGoal.LeftHand, RightOffhandIk.position);

@@ -30,13 +30,13 @@ namespace Tutorials.Kickball.Step4
             var vertical = Input.GetAxis("Vertical");
             var input = new float3(horizontal, 0, vertical) * SystemAPI.Time.DeltaTime * config.PlayerSpeed;
 
-            // Only move if the user has directional input.
+            // 仅当用户有方向输入时才移动。
             if (input.Equals(float3.zero))
             {
                 return;
             }
 
-            var minDist = config.ObstacleRadius + 0.5f; // the player capsule radius is 0.5f
+            var minDist = config.ObstacleRadius + 0.5f; // 玩家胶囊半径为 0.5f
 
             var job = new PlayerMovementJob
             {
@@ -49,7 +49,7 @@ namespace Tutorials.Kickball.Step4
         }
     }
 
-    // The implicit query of this IJobEntity matches all entities having LocalTransform and Player components.
+    // 此 IJobEntity 的隐式 query 与具有 LocalTransform 和玩家 components 的所有 entities 匹配。
     [WithAll(typeof(Player))]
     [BurstCompile]
     public partial struct PlayerMovementJob : IJobEntity

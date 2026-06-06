@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // LOD ranges for each tile.
+    // 每个图块的 LOD 范围。
     public class TileLODAuthoring : MonoBehaviour
     {
         public List<float> LODRadius;
@@ -16,8 +16,8 @@ namespace Streaming.SceneManagement.CompleteSample
                 List<float> sorted = new List<float>(authoring.LODRadius);
                 sorted.Sort();
 
-                // index n corresponds to section n+1
-                // (section 0 will be always loaded)
+                // 索引 n 对应第 n+1 节
+                // （第 0 节将始终被加载）
                 for (int index = 0; index < sorted.Count; ++index)
                 {
                     var entity = CreateAdditionalEntity(TransformUsageFlags.None, true);
@@ -32,12 +32,12 @@ namespace Streaming.SceneManagement.CompleteSample
         }
     }
 
-    // Used in only in baking.
+    // 仅用于 baking。
     [BakingType]
     public struct TileLODBaking : IComponentData
     {
-        public float LowerRadius; // Distance to load the section
-        public float HigherRadius; // Distance to unload the section
-        public int Section; // Section index that this component refers to
+        public float LowerRadius; // 加载截面的距离
+        public float HigherRadius; // 卸载截面的距离
+        public int Section; // 该 component 引用的节索引
     }
 }

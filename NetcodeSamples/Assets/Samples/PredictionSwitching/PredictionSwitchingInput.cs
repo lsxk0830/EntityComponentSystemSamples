@@ -76,7 +76,7 @@ public partial class PredictionSwitchingThinInputSystem : SystemBase
             {
                 if (commandTarget.ValueRO.targetEntity == Entity.Null)
                     commandTarget.ValueRW.targetEntity = EntityManager.CreateEntity(ComponentType.ReadOnly<PredictionSwitchingInput>(), ComponentType.ReadOnly<CommandTarget>());
-                input = EntityManager.AddBuffer<PredictionSwitchingInput>(commandTarget.ValueRW.targetEntity); // Returns GetBuffer if the buffer already exists.
+                input = EntityManager.AddBuffer<PredictionSwitchingInput>(commandTarget.ValueRW.targetEntity); // 如果缓冲区已存在，则返回 GetBuffer。
             }
         }
 

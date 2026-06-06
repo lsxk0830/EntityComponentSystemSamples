@@ -50,7 +50,7 @@ namespace Unity.Physics.Extensions
 
     public class QueryData : IComponentData
     {
-        // authoring data
+        // authoring 数据
         public float Distance;
         public float3 Direction;
         public bool CollectAllHits;
@@ -60,7 +60,7 @@ namespace Unity.Physics.Extensions
         public ColliderType ColliderType;
         public float InputColliderScale;
 
-        // calculated data
+        // 计算数据
         public bool ColliderDataInitialized;
         public BlobAssetReference<Collider> Collider;
         public BlobAssetReference<Collider>[] ChildrenColliders;

@@ -21,14 +21,14 @@ namespace Streaming.SceneManagement.SceneState
             var sceneQuery = SystemAPI.QueryBuilder().WithAll<SceneReference>().Build();
             var scenes = sceneQuery.ToComponentDataArray<SceneReference>(Allocator.Temp);
 
-            // We cannot use a foreach query here because the SceneSystem methods add and remove components,
-            // which is not allowed inside a foreach query.
+            // 我们不能在这里使用 foreach query，因为 SceneSystem 方法添加和删除 components，
+            // 这在 foreach query 中是不允许的。
             for (int index = 0; index < scenes.Length; ++index)
             {
                 var scene = scenes[index];
                 scene.StreamingState = SceneSystem.GetSceneStreamingState(state.WorldUnmanaged, scene.EntityScene);
 
-                // The LoadingAction is set when the user clicks a button in the UI.
+                // 当用户单击 UI 中的按钮时，将设置 LoadingAction。
                 switch (scene.LoadingAction)
                 {
                     case LoadingAction.LoadAll:
@@ -68,7 +68,7 @@ namespace Streaming.SceneManagement.SceneState
                 scenes[index] = scene;
             }
 
-            // Copy the values in the array back to the actual components.
+            // 将数组中的值复制回实际的 components。
             sceneQuery.CopyFromComponentDataArray(scenes);
         }
     }

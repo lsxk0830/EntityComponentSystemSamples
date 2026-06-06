@@ -1,29 +1,29 @@
-# HelloNetcode Remote Player Input Prediction
+# HelloNetcode 远程播放器输入 Prediction
 
-A players input can be predicted based on the previous values seen in his input buffer. This sample is exactly like the _Spawn Player_ sample before but tweaked to enable remote player input prediction feature.
+玩家输入可以是基于其输入缓冲区中先前看到的值的 predicted。此示例与之前的 _Spawn Player_ 示例完全相同，但经过调整以启用远程玩家输入 prediction 功能。
 
-See
+看
 
-* [Command stream](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/command-stream.html)
-* _Authoring dynamic buffer serialization_ section in [Ghost snapshots](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/ghost-snapshots.html)
+* [命令流](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/command-stream.html)
+* [Ghost snapshots](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/ghost-snapshots.html) 中的 _ 创作动态缓冲区序列化 _ 部分
 
-## Requirements
+## 要求
 
-Connection needs to be in game already and scripts from the player spawning sample are re-used.
+连接需要已经在游戏中，并且来自玩家生成示例的脚本被重新使用。
 
 * GoInGame
 * SpawnPlayer
 
-## Sample description
+## 示例描述
 
-The input struct and player prefab have changes for remote player prediction but otherwise this is the same sample as _Spawn Player_. On the prefab we have these changes:
+输入结构和播放器 prefab 对于远程播放器 prediction 进行了更改，但除此之外，这与 _Spawn Player_ 是相同的示例。在 prefab 上我们有以下更改：
 
-* `Supported Ghost Modes` toggle. Changed to _Predicted_ since all the player ghosts are now only running in prediction mode and we don't spawn interpolated players.
+* `Supported Ghost Modes` 切换。更改为 _ 预测 _，因为所有玩家 ghosts 现在仅在 prediction 模式下运行，并且我们不会生成 interpolated 玩家。
 
-Inputs are set up using `IInputComponentData` as in _Spawn Player_ but now each variable has the `[GhostField]` attribute set which will make the input buffer be synchronized to all non-owner players. The ghost component attributes doesn't need to be further tweaked as the default values are configured for this scenario. A `[GhostComponent]` attribute is now also added which specifies the input struct should only appear on the predicted ghost prefab (_AllPredicted_ prefab type).
+输入是使用 `IInputComponentData` 设置的，如 _Spawn Player_ 中所示，但现在每个变量都具有 `[GhostField]` 属性集，这将使输入缓冲区同步到所有非所有者玩家。ghost component 属性不需要进一步调整，因为默认值是为此场景配置的。现在还添加了 `[GhostComponent]` 属性，该属性指定输入结构应仅出现在 predicted ghost prefab （_AllPredicted_ prefab 类型）上。
 
-The `RemotePredictedPlayerAutoCommands.cs` script is a duplicate of the _Spawn Player_ auto command script except it is configure to work on the `RemotePredictedPlayerInput` input struct.
+`RemotePredictedPlayerAutoCommands.cs` 脚本是 _Spawn Player_ 自动命令脚本的副本，只不过它被配置为在 `RemotePredictedPlayerInput` 输入结构上工作。
 
-## Notes
+## 笔记
 
-The players in this sample might look pretty much identical to the non-predicted players in the previous sample. To be sure inputs are actually synchronized you can look at the input buffers on the spawned remote players using the DOTS Hierarchy window.
+此示例中的玩家可能看起来与上一个示例中的非 predicted 玩家几乎相同。为了确保输入实际上同步，您可以使用 DOTS Hierarchy 窗口查看生成的远程播放器上的输入缓冲区。

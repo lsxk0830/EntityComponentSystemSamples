@@ -72,7 +72,7 @@ public partial struct DriveAnimationBodySystem : ISystem
             var drivingLocalTransform = LocalTransforms[driveData.DrivingEntity];
             var currentLocalTransform = LocalTransforms[drivenEntity];
 
-            // First order gains - position/rotation
+            // 一阶增益 - 位置/旋转
             var worldFromDriving = new RigidTransform(drivingLocalTransform.Rotation, drivingLocalTransform.Position);
             var worldFromDriven = math.mul(worldFromDriving, driveData.DrivingFromDriven);
 
@@ -82,7 +82,7 @@ public partial struct DriveAnimationBodySystem : ISystem
                 LocalTransforms[drivenEntity].Scale);
             LocalTransforms[drivenEntity] = desiredLocalTransform;
 
-            // Second order gains - velocity
+            // 二阶增益 - 速度
             var currentVelocity = Velocities[drivenEntity];
             var desiredVelocity = PhysicsVelocity.CalculateVelocityToTarget(
                 in mass, in desiredLocalTransform.Position, in desiredLocalTransform.Rotation,

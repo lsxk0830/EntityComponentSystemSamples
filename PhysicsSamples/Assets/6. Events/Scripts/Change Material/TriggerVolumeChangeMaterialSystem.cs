@@ -34,8 +34,8 @@ public partial class TriggerVolumeChangeMaterialSystem : SystemBase
     {
         EntityCommandBuffer commandBuffer = m_CommandBufferSystem.CreateCommandBuffer();
 
-        // Need this extra variable here so that it can
-        // be captured by Entities.ForEach loop below
+        // 这里需要这个额外的变量，这样它就可以
+        // 由下面的 Entities.ForEach 循环捕获
         var nonTriggerMask = m_NonTriggerMask;
 
         ComponentLookup<MaterialMeshInfo> materialMeshInfoFromEntity = GetComponentLookup<MaterialMeshInfo>();
@@ -47,7 +47,7 @@ public partial class TriggerVolumeChangeMaterialSystem : SystemBase
                 var triggerEvent = triggerEventBuffer[i];
                 var otherEntity = triggerEvent.GetOtherEntity(entity);
 
-                // exclude other triggers and processed events
+                // 排除其他触发器和已处理的事件
                 if (triggerEvent.State == StatefulEventState.Stay || !nonTriggerMask.MatchesIgnoreFilter(otherEntity))
                 {
                     continue;

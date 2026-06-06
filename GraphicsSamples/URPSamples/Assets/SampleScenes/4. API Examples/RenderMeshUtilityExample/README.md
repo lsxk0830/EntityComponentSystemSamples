@@ -1,19 +1,19 @@
 # RenderMeshUtilityExample
 
-This sample demonstrates the new `RenderMeshUtility.AddComponents` API and how to do color setting via runtime created materials and material property setting.
+此示例演示了新的 `RenderMeshUtility.AddComponents` API 以及如何通过运行时创建的材质和材质属性设置进行颜色设置。
 
 <img src="../../../../READMEimages/RenderMeshUtilityExample.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The AddComponentsExample script shows how to use `RenderMeshUtility.AddComponents` to create a base entity and then instantiate that entity many times in a Burst job.
+AddComponentsExample 脚本演示如何使用 `RenderMeshUtility.AddComponents` 创建基础 entity，然后在 Burst job 中多次实例化该 entity。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select Spawner
-2. In the Inspector, configure settings
-3. Hit play
+1. 在 Hierarchy 中，选择 Spawner
+2. 在 Inspector 中，配置设置
+3. 点击播放
 
-## More information
+## 更多信息
 
-For more information about RenderMeshUtility and run time entity creation, see the [Runtime entity creation](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/runtime-entity-creation.html) documentation.
+有关 RenderMeshUtility 和 run 时间 entity 创建的更多信息，请参阅[运行时 entity 创建](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/runtime-entity-creation.html) 文档。

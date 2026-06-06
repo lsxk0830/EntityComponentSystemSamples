@@ -1,7 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
-// in order to circumvent API breakages that do not affect physics, some packages are removed from the project on CI
-// any code referencing APIs in com.unity.inputsystem must be guarded behind UNITY_INPUT_SYSTEM_EXISTS
+// 为了避免 API 不影响物理的破损，一些 packages 从 CI 上的项目中删除
+// com.unity.inputsystem 中引用 APIs 的任何代码必须在 UNITY_INPUT_SYSTEM_EXISTS 后面进行保护
 #if UNITY_INPUT_SYSTEM_EXISTS
 using UnityEngine.InputSystem;
 #endif
@@ -64,7 +64,7 @@ partial class DemoInputGatheringSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        // character controller
+        // 角色控制器
         if (m_CharacterControllerInputQuery.CalculateEntityCount() == 0)
             EntityManager.CreateEntity(typeof(CharacterControllerInput));
 
@@ -86,7 +86,7 @@ partial class DemoInputGatheringSystem : SystemBase
 
         m_CharacterJumped = false;
 
-        // vehicle
+        // 车辆
         if (m_VehicleInputQuery.CalculateEntityCount() == 0)
             EntityManager.CreateEntity(typeof(VehicleInput));
 

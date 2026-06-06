@@ -22,7 +22,7 @@ namespace Kickball
         public void OnUpdate(ref SystemState state)
         {
             var ballConfig = SystemAPI.GetSingleton<BallConfig>();
-            
+
             foreach (var (input, playerTransform) in
                      SystemAPI.Query<RefRO<PlayerInput>, RefRO<LocalTransform>>()
                          .WithAll<Player, Simulate>())

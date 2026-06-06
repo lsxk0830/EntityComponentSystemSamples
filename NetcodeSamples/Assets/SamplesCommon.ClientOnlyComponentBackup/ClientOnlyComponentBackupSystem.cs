@@ -11,27 +11,27 @@ using Unity.NetCode.LowLevel.Unsafe;
 namespace Unity.NetCode.Samples
 {
     /// <summary>
-    /// System responsible for:
-    /// - creating the ClientOnlyCollection and the necessary metadata for processing ghosts with client-only components.
-    /// - add to all ghosts (that present or not the client-only components) a state component, the ClientOnlyBackup.
-    /// - backup the client-only components data for every full tick and store them inside the ClientOnlyBackup buffer.
+    /// System 负责：
+    /// - 创建 ClientOnlyCollection 和必要的元数据，用于仅使用 client-components 处理 ghosts。
+    /// -向所有 ghosts（存在或不存在 client-仅 components）添加状态 component、ClientOnlyBackup。
+    /// - 每个完整刻度备份仅 client 的 components 数据，并将它们存储在 ClientOnlyBackup 缓冲区内。
     /// <para>
-    /// System used to make a backup of all client-only component state. The system run at the end of the prediction loop,
-    /// and store inside the <see cref="ClientOnlyBackup"/> history buffer the state of components for each full predicted tick.
-    /// Partial ticks are not saved.
+    /// System 用于制作所有 client-仅 component 状态的备份。prediction 循环末尾的 system run，
+    /// 并将每个完整 predicted 刻度的 components 状态存储在 <see cref="ClientOnlyBackup"/> 历史缓冲区内。
+    /// 不保存部分报价。
     /// </para>
     /// <para>
-    /// The backup consist of a mem-copy of the components data and, if the some of the component also implements
-    /// the <see cref="IEnableableComponent"/>, their enable bits.
+    /// 备份由 components 数据的内存副本组成，并且如果某些 component 也实现了
+    /// <see cref="IEnableableComponent"/>，它们的使能位。
     /// </para>
     /// <remarks>
-    /// The size of the <see cref="ClientOnlyBackup"/> buffer is not fixed and can grow,to accomodate both latency and
-    /// ghosts update frequency. The size of the buffer is still bounded, due to fact the oldest backup are removed and
-    /// the slot reused.
+    /// <see cref="ClientOnlyBackup"/> 缓冲区的大小不固定并且可以增长，以适应延迟和延迟
+    /// ghosts 更新频率。缓冲区的大小仍然受到限制，因为最旧的备份已被删除并且
+    /// 插槽被重复使用。
     /// </remarks>
     /// <para>
-    /// The saved components states are then used to restore the the components data when a new snapshot is received from the server.
-    /// See <see cref="ClientOnlyComponentRestoreSystem"/> for more information.
+    /// 然后，当从 server 接收到新的 snapshot 时，保存的 components 状态用于恢复 components 数据。
+    /// 有关详细信息，请参阅 <see cref="ClientOnlyComponentRestoreSystem"/>。
     /// </para>
     /// </summary>
     [BurstCompile]
@@ -91,7 +91,7 @@ namespace Unity.NetCode.Samples
             m_childEntityLookup = state.GetEntityStorageInfoLookup();
             m_linkedEntityGroupHandle = state.GetBufferTypeHandle<LinkedEntityGroup>(true);
 
-            //Create the singleton.
+            //创建单例。
             var types = new NativeArray<ComponentType>(1, Allocator.Temp);
             types[0] = ComponentType.ReadWrite<ClientOnlyCollection>();
             var singleton = state.EntityManager.CreateEntity(state.EntityManager.CreateArchetype(types));
@@ -144,30 +144,30 @@ namespace Unity.NetCode.Samples
                 state.EntityManager.RemoveComponent<ClientOnlyBackup>(m_destroyedGhostsWithClientOnlyBackup);
             }
 
-            //Add to ghost the necessary state to backup the components and buffers.
+            //向 ghost 添加必要的状态以备份 components 和缓冲区。
             if (!m_predictedGhostsNotProcessed.IsEmpty)
             {
                 var entities = m_predictedGhostsNotProcessed.ToEntityArray(Allocator.Temp);
                 var ghostTypes = m_predictedGhostsNotProcessed.ToComponentDataArray<GhostType>(Allocator.Temp);
-                //Mark entities as processed
+                //将 entities 标记为已处理
                 state.EntityManager.AddComponent<ClientOnlyProcessed>(m_predictedGhostsNotProcessed);
                 for(int ent=0;ent<entities.Length;++ent)
                 {
                     var ghostType = ghostTypes[ent];
-                    //If the type does not have any client only component, skip.
+                    //如果类型没有任何 client 只有 component，则跳过。
                     if(!clientOnlyCollection.GhostTypeToPrefabMetadata.ContainsKey(ghostType))
                         continue;
-                    //Adding component one by one like that is very very slow. Ideally I would like to add the component "per chunk"
-                    //but it is not really possible (or is not that easy to achieve)
+                    //像这样一一添加 component 是非常非常慢的。理想情况下，我想添加 component “per chunk”
+                    //但这实际上是不可能的（或者说并不容易实现）
                     var clientOnlyMetadata = clientOnlyCollection.GhostTypeToPrefabMetadata[ghostType];
                     var clientOnlyBackup = new ClientOnlyBackup(slotSize:clientOnlyMetadata.backupSize, capacity:InitialBackupCapacity);
                     state.EntityManager.AddComponentData(entities[ent], clientOnlyBackup);
                 }
             }
 
-            //Pre-spawned ghosts has a special path, because the handling is a little different. In particular we can just assign
-            //the processed flag to the query (the fastest way) but we need to inspect entities one by one.
-            //That generate quite a lot of burden in term of structural changes.
+            //预生成的 ghosts 有一个特殊的路径，因为处理有点不同。特别是我们可以分配
+            //已处理的标志到 query（最快的方法），但我们需要一一检查 entities。
+            //这在结构性变化方面产生了相当大的负担。
             if (!m_predictedPrespawendGhostsNotProcessed.IsEmpty)
             {
                 var entities = m_predictedPrespawendGhostsNotProcessed.ToEntityArray(Allocator.Temp);
@@ -184,7 +184,7 @@ namespace Unity.NetCode.Samples
                 }
             }
 
-            //Only backup full server tick. Partial tick will always start from the last full simulated tick so no need to backup
+            //仅备份完整的 server 勾选。部分报价始终从最后一个完整模拟报价开始，因此无需备份
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
             if (networkTime.IsPartialTick)
                 return;
@@ -219,7 +219,7 @@ namespace Unity.NetCode.Samples
             }
         }
 
-        //Little class that help writing component backup. Abstract some pointer manipulation and add some
+        //帮助编写 component 备份的小课程。抽象一些指针操作并添加一些
         //boundary checks (in the editor)
         unsafe ref struct ClientOnlyBackupWriter
         {
@@ -251,7 +251,7 @@ namespace Unity.NetCode.Samples
 #endif
             }
 
-            //Skip the component/buffer backup. Reset the data to 0 and advance the backup pointers
+            //跳过 component/缓冲区备份。将数据重置为 0 并推进备份指针
             public void Skip(in ClientOnlyBackupInfo comp)
             {
                 CheckBounds();
@@ -264,11 +264,11 @@ namespace Unity.NetCode.Samples
                 *backupTick = serverTick.SerializedData;
             }
 
-            //Store the enable bit for the component inside the backup. The backup slot data format is
-            //  4 bytes       4 bytes            4 bytes
-            // [   tick   ][EnableBits 0][EnableBits 1]
+            //将 component 的启用位存储在备份内。备份槽数据格式为
+            //  4 字节 4 字节 4 字节
+            // [勾选][EnableBits 0][EnableBits 1]
             //              3130 ...   0  64 ...    32
-            // the bits are stored left to right
+            // 位从左到右存储
             public void BackupEnableBitForComponent(int compIdx, int ent, [ReadOnly] long* bitArrayPtr)
             {
                 int entIdx = 1 << (ent & 0x3f);
@@ -278,11 +278,11 @@ namespace Unity.NetCode.Samples
                 backupEnableBitPtr[compIdx >> 5] |= (int)(bitIdx * compEnableFroEntity);
             }
 
-            //Store the component data into the backup buffer.
+            //将 component 数据存储到备份缓冲区中。
             public void BackupComponent([ReadOnly] byte* compDataPtr, in ClientOnlyBackupInfo comp)
             {
                 CheckBounds();
-                //TODO: probably better to optimise that for small component data size (like 8/64 bytes)
+                //TODO: 对于小 component 数据大小（如 8/64 字节）进行优化可能更好
                 UnsafeUtility.MemCpy(backupCompDataPtr, compDataPtr, comp.ComponentSize);
                 backupCompDataPtr += comp.ComponentSize;
             }
@@ -303,18 +303,18 @@ namespace Unity.NetCode.Samples
             public NetDebug netDebug;
             public void Execute(in ArchetypeChunk chunk, int chunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                //Lookup for the ghost type. If the chunk contains predicted prespawed-ghost and the type has not been assigned
-                //yet, we skip the backup.
+                //查找 ghost 类型。如果 chunk 包含 predicted prespawed-ghost 并且类型尚未分配
+                //然而，我们跳过了备份。
                 var ghostTypes = chunk.GetNativeArray(ref ghostTypeHandle);
                 var firstGhostType = ghostTypes[0];
-                //Retrieve the backup metadata. This should have been constructed already by the system before scheduling the jobs
+                //检索备份元数据。在调度 jobs 之前，这应该已经由 system 构建
                 if (!prefabMetadata.TryGetValue(firstGhostType, out var metadata))
                 {
                     netDebug.LogError($"Unable to find client-only backup metadata for ghost with ghost type {firstGhostType}");
                     return;
                 }
-                //Prepare thw writers and copy the ghost data in the backup buffer.
-                //Components and buffers data are backup on per entity basis, with some slightly different code in between root and child entites.
+                //准备 thw writers 并将 ghost 数据复制到备份缓冲区中。
+                //Components 和缓冲区数据按 entity 进行备份，根实体和子实体之间的代码略有不同。
                 var backupWriters = stackalloc ClientOnlyBackupWriter[chunk.Count];
                 InitBackupWriters(chunk, metadata, backupWriters);
                 BackupComponents(chunk, metadata, backupWriters);
@@ -323,19 +323,19 @@ namespace Unity.NetCode.Samples
             private void BackupComponents(in ArchetypeChunk chunk, in ClientOnlyBackupMetadata metadata, ClientOnlyBackupWriter *backupWriters)
             {
                 int chunkEntityCount = chunk.Count;
-                //store the server tick for the current slot
+                //存储当前插槽的 server 刻度
                 for (int ent = 0; ent < chunkEntityCount; ++ent)
                     backupWriters[ent].WriteTick(serverTick);
 
-                //Backup all the root component for the whole chunk.
+                //备份整个 chunk 的所有根 component。
                 var iterEnd = metadata.componentBegin + metadata.numRootComponents;
                 var compIdx = metadata.componentBegin;
-                //just a convenient way to add some boundary checks
+                //只是添加一些边界检查的便捷方法
                 var typeHandles = new UnsafeList<DynamicComponentTypeHandle>(componentTypeHandles.Ptr, clientOnlyComponentCollection.Length);
                 for (;compIdx < iterEnd; ++compIdx)
                 {
                     var comp = clientOnlyComponentCollection[compIdx];
-                    //Buffers aren't supported
+                    //不支持缓冲区
                     Unity.Assertions.Assert.IsFalse(comp.ComponentType.IsBuffer);
                     var typeHandle = typeHandles[comp.ComponentIndex];
                     if (!chunk.Has(ref typeHandle))
@@ -363,7 +363,7 @@ namespace Unity.NetCode.Samples
                         compDataPtr += comp.ComponentSize;
                     }
                 }
-                //backup all child entities components.
+                //备份所有子 entities components。
                 if (!chunk.Has(ref linkedEntityGroupHandle))
                     return;
                 var entityGroup = chunk.GetBufferAccessor(ref linkedEntityGroupHandle);
@@ -406,7 +406,7 @@ namespace Unity.NetCode.Samples
             {
                 var enableBitsIntSize = ClientOnlyBackup.EnableBitByteSize(metadata.componentEnd - metadata.componentBegin);
                 var compDataStartOffset = GhostComponentSerializer.SnapshotSizeAligned(sizeof(uint) + enableBitsIntSize);
-                //use the raw pointer for accessing the component data by ref. This is used to acquire and grow the buffer.
+                //使用原始指针通过 ref 访问 component 数据。这用于获取和增长缓冲区。
                 var states = (ClientOnlyBackup*)chunk.GetNativeArray(ref backupTypeHandle).GetUnsafePtr();
                 for (int ent = 0, chunkEntityCount = chunk.Count; ent < chunkEntityCount; ++ent)
                 {

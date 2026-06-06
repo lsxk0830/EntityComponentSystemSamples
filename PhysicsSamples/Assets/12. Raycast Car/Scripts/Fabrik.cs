@@ -1,4 +1,4 @@
-//From: https://github.com/stonneau/fabrik
+//来自：https://github.com/stonneau/fabrik
 
 using System;
 using System.Collections.Generic;
@@ -6,18 +6,18 @@ using UnityEngine;
 
 public class Fabrik : MonoBehaviour
 {
-    /*Constant object maintaining the relation between joints of a skeleton
-     * iterating through the transforms in a depth-first order.
+    /*维持骨骼关节之间关系的恒定对象
+     * 以深度优先的顺序迭代变换。
      * */
     public class JointInfo
     {
-        public readonly float distanceToParent_; // if 0, no parent
-        public readonly float distanceToRoot_; // if 0, no parent
-        public readonly int id_; // unique id
+        public readonly float distanceToParent_; // 如果为 0，则没有父级
+        public readonly float distanceToRoot_; // 如果为 0，则没有父级
+        public readonly int id_; // 唯一 ID
         public readonly JointInfo parent_;
-        public readonly JointInfo fork_; // closest parent with several children
+        public readonly JointInfo fork_; // 有几个孩子的最亲近的父母
         public readonly JointInfo[] children_;
-        public readonly JointInfo[] effectors_; // effectors associated with the chain starting at "this"
+        public readonly JointInfo[] effectors_; // 与从“this”开始的链相关的效应器
 
         public JointInfo(Transform joint, ref int id) : this(joint, ref id, null, null)
         {
@@ -41,7 +41,7 @@ public class Fabrik : MonoBehaviour
             }
             int nbChildren = joint.childCount;
             children_ = new JointInfo[nbChildren];
-            if (nbChildren == 0) // joint is effector
+            if (nbChildren == 0) // joint 是效应器
             {
                 effectors_ = new JointInfo[1];
                 effectors_[0] = this;
@@ -56,7 +56,7 @@ public class Fabrik : MonoBehaviour
                 }
                 for (int i = 0; i < nbChildren; ++i)
                 {
-                    // id is updated with a depth-first iteration
+                    // id 通过深度优先迭代更新
                     ++id;
                     JointInfo jInfo = new JointInfo(joint.GetChild(i), ref id, this, childFork);
                     children_[i] = jInfo;
@@ -80,14 +80,14 @@ public class Fabrik : MonoBehaviour
         }
     }
 
-    // exposed attributes
-    public Transform ikChain; // kinematic chain on which Ik will be performed
-    public Transform[] targets; // ordered list of targets
+    // 暴露的属性
+    public Transform ikChain; // 将在其上执行 Ik 的运动链
+    public Transform[] targets; // 有序的目标列表
                                 /*public float treshold;*/
-                                // End exposed attributes
+                                // 结束暴露的属性
 
-    private JointInfo jointInfo_; // constant
-    private Transform[] transforms_; // transforms associated with our Chain
+    private JointInfo jointInfo_; // 持续的
+    private Transform[] transforms_; // 与我们的链相关的转换
 
     void Start()
     {
@@ -98,7 +98,7 @@ public class Fabrik : MonoBehaviour
         InitTransform(ikChain, ref id);
     }
 
-    // indexes transforms of interest
+    // 兴趣指数变换
     private void InitTransform(Transform transform, ref int id)
     {
         transforms_[id] = transform;
@@ -124,8 +124,8 @@ public class Fabrik : MonoBehaviour
     }
 
     /*
-     * Structure allowing to compute the Centroid between different points
-     * TODO : Target prioritization ?
+     * 允许计算不同点之间质心的结构
+     * TODO : 目标优先顺序?
      */
     private class TargetCentroid
     {
@@ -149,9 +149,9 @@ public class Fabrik : MonoBehaviour
         }
     }
 
-    // First step : from every end effectors go up to closest fork
-    // At fork, determine centroid position for the targets
-    // then go up to the next fork
+    // 第一步：从每个末端执行器到最近的货叉
+    // 在分叉处，确定目标的质心位置
+    // 然后走到下一个岔路口
     private void ForwardStep(JointInfo[] effectors, Vector3[] targets)
     {
         Dictionary<JointInfo, TargetCentroid> centroids = new Dictionary<JointInfo, TargetCentroid>();
@@ -196,7 +196,7 @@ public class Fabrik : MonoBehaviour
             float r = Vector3.Distance(transform.position, parentTransform.position);
             float delta = jointInfo.distanceToParent_ / r;
             Vector3 newPos = (1 - delta) * transform.position + delta * parentTransform.position;
-            if (jointInfo.parent_.Equals(jointInfo.fork_)) // parent is fork don't modify position, we'll take centroid
+            if (jointInfo.parent_.Equals(jointInfo.fork_)) // 父级是 fork，不要修改位置，我们将取质心
             {
                 return newPos;
             }

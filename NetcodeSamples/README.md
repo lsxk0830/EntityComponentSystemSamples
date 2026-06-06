@@ -1,35 +1,35 @@
-### Unity Netcode for Entities Samples
+### Unity Netcode for Entities 示例
 
-*For more Netcode and DOTS starter material, see the [main page of this repo](../README.md).*
+*有关更多 Netcode 和 DOTS 入门材料，请参阅[此仓库主页](../README.md)。*
 
-The Netcode for Entities package provides the multiplayer features needed to implement
-world synchronization in an [entities]((https://docs.unity3d.com/Packages/com.unity.entities@latest))-based multiplayer game. It uses the transport package
-for the socket level functionality, Unity Physics for networked physics simulation, Logging package for packet dump logs. Key Netcode for Entities features include:
+Netcode for Entities package 提供了实现所需的多人游戏功能
+基于 [entities]((https://docs.unity3d.com/Packages/com.unity.entities@latest)) 的多人游戏中的 world 同步。它使用传输 package
+对于套接字级功能，Unity Physics 用于网络物理模拟，记录 package 用于数据包转储日志。Netcode for Entities 的主要功能包括：
 
-* Server authoritative synchronization model.
-* RPC support, useful for control flow or network events.
-* Client / server world bootstrapping so you have clear separation of logic and you can run a server with multiple clients in a single process, like the editor when testing.
-* Synchronize entities with interpolation and client side prediction working by default.
-* Network traffic debugging tools.
-* GameObject conversion flow support, so you can use a hybrid model to add multiplayer to a GameObject/MonoBehaviour based project.
+* Server 权威同步模型。
+* RPC 支持，对于控制流或网络事件很有用。
+* Client / server world 引导，因此您可以清晰地分离逻辑，并且您可以在单个进程中使用 run 和 server 与多个 clients，就像测试时的编辑器一样。
+* 默认情况下，将 entities 与 interpolation 和 client 端 prediction 同步工作。
+* 网络流量调试工具。
+* GameObject 转换流程支持，因此您可以使用混合模型将多人游戏添加到基于 GameObject/MonoBehaviour 的项目。
 
-[Netcode for Entities Manual](https://docs.unity3d.com/Packages/com.unity.netcode@latest)
+[Netcode for Entities 手册](https://docs.unity3d.com/Packages/com.unity.netcode@latest)
 
-[The Netcode for Entitiets forum](https://forum.unity.com/forums/dots-netcode.425/)
+[实体论坛 Netcode](https://forum.unity.com/forums/dots-netcode.425/)
 
-### Samples
+### 示例
 
 #### NetCube
-A small sample featuring the Netcode for Entities Package basic features, this is the sample used in the __Getting Started__ guide in the manual.
+具有 Netcode for Entities Package 基本功能的小示例，这是手册中的 __ 入门 __ 指南中使用的示例。
 
 #### HelloNetcode
-This is a suite of samples which aim to be small, simple and show features in isolation. Later samples then re-use earlier ones so it's simpler to see exactly what's being shown and similar routines (like connecting, going in game etc) don't need to be repeated. This way samples can also build on top of each other and become more complex. They are split into Basic, Intermediate and Advanced areas depending on level of complexity and how commonly the things shown are needed in a normal project.
+这是一套旨在小而简单并单独显示功能的示例。随后的示例会重复使用早期的示例，因此可以更轻松地准确查看所显示的内容，并且不需要重复类似的例程（例如连接、进入游戏等）。通过这种方式，示例也可以相互构建并变得更加复杂。根据复杂程度以及正常项目中所显示内容的需要程度，它们分为基础、中级和高级区域。
 
-#### Asteroids
-A small game featuring the Netcode for Entities Package features.
+#### 小行星
+一款具有 Netcode for Entities Package 功能的小游戏。
 
 #### PredictionSwitching
-A sample using predicted physics based on Unity Physics. The sample is predicting all objects close the the player but not objects far away. The color of the spheres will change to indicate if they are predicted or interpolated.
+使用基于 Unity Physics 的 predicted 物理的示例。该示例预测所有靠近玩家的物体，但不预测远处的物体。球体的颜色将发生变化，以指示它们是 predicted 还是 interpolated。
 
 #### PlayerList
-A sample which shows how to maintain a list of connected players by using the RPC feature.
+该示例展示了如何使用 RPC 功能维护已连接玩家的列表。

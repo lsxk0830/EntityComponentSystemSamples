@@ -1,5 +1,5 @@
-// This system iterates over all tree root entities and spawns a new tree at their original location if their state is
-// LifeCycleStates.TransitionToInsert.
+// 此 system 迭代所有树根 entities 并在其原始位置生成一棵新树（如果其状态为）
+// LifeCycleStates.TransitionToInsert。
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -40,7 +40,7 @@ namespace Unity.Physics
                 var deadInCounts = deadTime / TimeStep;
                 var regrowInCounts = regrowDelay / TimeStep;
 
-                // Reset TreeComponent data for the next lifecycle - reusing the previous initialization values
+                // 为下一个生命周期重置 TreeComponent 数据 - 重用之前的初始化值
                 var newTreeComponent = new TreeComponent()
                 {
                     SpawningPosition = treeComponent.SpawningPosition,
@@ -56,9 +56,9 @@ namespace Unity.Physics
                 ECB.AddComponent(chunkIndex, newTreeEntity, newTreeComponent);
                 ECB.AddComponent(chunkIndex, newTreeEntity, new TreeState { Value = TreeState.States.Default });
                 ECB.AddComponent(chunkIndex, newTreeEntity, new TempIntermediateTreeSpawningTag());
-                ECB.DestroyEntity(chunkIndex, entity); // Destroys remaining, dead Tree instance
+                ECB.DestroyEntity(chunkIndex, entity); // 销毁剩余的死树实例
 
-                // Update the new Tree instance:
+                // 更新新的 Tree 实例：
                 ECB.SetComponent(chunkIndex, newTreeEntity,  new LocalTransform
                 {
                     Position =  treeComponent.SpawningPosition,
@@ -114,8 +114,8 @@ namespace Unity.Physics
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            ProfilerMarker pm = new ProfilerMarker("Profile: TreeRegrowSystem.OnUpdate"); //PROFILE
-            pm.Begin(); //PROFILE
+            ProfilerMarker pm = new ProfilerMarker("Profile: TreeRegrowSystem.OnUpdate"); //ZXQXLQRM 摩托车 ZHCZXQ
+            pm.Begin(); //ZXQXLQRM 摩托车 ZHCZXQ
 
             var spawner = SystemAPI.GetSingleton<TreeSpawnerComponent>();
             Entity treePrefab = spawner.TreeEntity;
@@ -150,7 +150,7 @@ namespace Unity.Physics
                 ECB = ecb.AsParallelWriter()
             }.ScheduleParallel(state.Dependency);
 
-            pm.End(); //PROFILE
+            pm.End(); //ZXQXLQRM 摩托车 ZHCZXQ
         }
 
         [BurstCompile]

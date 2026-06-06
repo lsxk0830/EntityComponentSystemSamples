@@ -43,7 +43,7 @@ public class ConveyorBeltAuthoringEditor : Editor
 }
 #endif
 
-// Displays conveyor belt data in Editor.
+// 以 Editor 格式显示传送带数据。
 [RequireComponent(typeof(PhysicsBodyAuthoring))]
 public class ConveyorBeltAuthoring : MonoBehaviour
 {
@@ -113,14 +113,14 @@ public struct ConveyorBeltDebugDisplayData : IComponentData
     public float Offset;
 }
 
-// Displays conveyor belt data at Runtime
+// 在运行时显示传送带数据
 [UpdateInGroup(typeof(PhysicsSimulationGroup))]
 public partial struct DisplayConveyorBeltSystem : ISystem
 {
     private EntityQuery m_ConveyorBeltQuery;
 
-    // Returns true if drawing should be done.
-    // Expecting speed in radians/s in case of isLinear == false
+    // 如果应该进行绘制则返回 true。
+    // 在 isLinear == false 的情况下，期望速度以弧度/秒为单位
     public static bool ComputeDebugDisplayData(in RigidTransform localToWorld, float speed, float3 localDirection,
         float deltaTime, bool isLinear, ref float offset,
         out RigidTransform worldDrawingTransform, out float3 boxSize)
@@ -198,7 +198,7 @@ public partial struct DisplayConveyorBeltSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
 #if UNITY_EDITOR
-        // Properly chain up dependencies
+        // 正确链接依赖关系
         {
             if (!SystemAPI.TryGetSingleton<PhysicsDebugDisplayData>(out _))
             {
@@ -216,7 +216,7 @@ public partial struct DisplayConveyorBeltSystem : ISystem
     }
 }
 
-// A system which configures the simulation step to modify contact jacobians in various ways
+// system，配置模拟步骤以各种方式修改接触雅可比矩阵
 
 [UpdateInGroup(typeof(PhysicsSimulationGroup))]
 [UpdateAfter(typeof(PhysicsCreateContactsGroup))]
@@ -225,9 +225,9 @@ public partial struct PrepareConveyorBeltSystem : ISystem
 {
     private ComponentLookup<ConveyorBelt> m_ConveyorBeltData;
 
-    // This job reads the modify component and sets some data on the contact, to get propagated to the jacobian
-    // for processing in our jacobian modifier job. This is necessary because some flags require extra data to
-    // be allocated along with the jacobian (e.g., SurfaceVelocity data typically does not exist).
+    // 此 job 读取修改 component 并设置联系人上的一些数据，以传播到雅可比
+    // 用于在我们的雅可比修改器 job 中进行处理。这是必要的，因为某些标志需要额外的数据
+    // 与雅可比一起分配（e.g.、SurfaceVelocity 数据通常不存在）。
     [BurstCompile]
     struct SetConveyorBeltFlagJob : IContactsJob
     {
@@ -282,7 +282,7 @@ public partial struct ConveyorBeltSystem : ISystem
         [NativeDisableContainerSafetyRestriction]
         public NativeArray<RigidBody> Bodies;
 
-        // Don't do anything for triggers
+        // 不要为触发器做任何事情
         public void Execute(ref ModifiableJacobianHeader h, ref ModifiableTriggerJacobian j) {}
 
         public void Execute(ref ModifiableJacobianHeader jacHeader, ref ModifiableContactJacobian contactJacobian)
@@ -292,7 +292,7 @@ public partial struct ConveyorBeltSystem : ISystem
             float3 linearVelocity = float3.zero;
             float3 angularVelocity = float3.zero;
 
-            // Get the surface velocities if available
+            // 获取表面速度（如果可用）
             for (int i = 0; i < 2; i++)
             {
                 var entity = (i == 0) ? jacHeader.EntityA : jacHeader.EntityB;
@@ -304,10 +304,10 @@ public partial struct ConveyorBeltSystem : ISystem
 
                 if (belt.IsAngular)
                 {
-                    // assuming rotation is around contact normal.
+                    // 假设旋转围绕接触法线。
                     var av = contactJacobian.Normal * belt.Speed;
 
-                    // calculate linear velocity at point, assuming rotating around body pivot
+                    // 假设绕身体枢轴旋转，计算该点的线速度
                     var otherIndex = (i == 0) ? jacHeader.BodyIndexB : jacHeader.BodyIndexA;
                     var offset = Bodies[otherIndex].WorldFromBody.pos - Bodies[index].WorldFromBody.pos;
                     var lv = math.cross(av, offset);
@@ -321,7 +321,7 @@ public partial struct ConveyorBeltSystem : ISystem
                 }
             }
 
-            // Add the extra velocities
+            // 添加额外的速度
             jacHeader.SurfaceVelocity = new SurfaceVelocity
             {
                 LinearVelocity = jacHeader.SurfaceVelocity.LinearVelocity + linearVelocity,

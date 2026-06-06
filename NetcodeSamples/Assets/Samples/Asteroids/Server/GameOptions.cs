@@ -21,7 +21,7 @@ namespace Samples.Asteroids.Host.UI
 
         void Update()
         {
-            // Can only set options on the host/server
+            // 只能在主机/server 上设置选项
             if (ClientServerBootstrap.ServerWorld == null)
                 return;
 

@@ -6,7 +6,7 @@ using Unity.NetCode;
 
 namespace Samples.HelloNetcode
 {
-#pragma warning disable CS0618 // Disable Aspects obsolete warnings
+#pragma warning disable CS0618 // 禁用 Aspects 过时警告
     readonly partial struct CharacterWithHealth : IAspect
     {
         readonly RefRW<AutoCommandTarget> m_AutoCommandTarget;
@@ -72,9 +72,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initialize new player at a random point within the plane. (Hardcoded to [-50;50]).
-        /// To patch up the network components we set CommandTarget as well as removing the destroyed entity
-        /// and adding the new player entity to the linked entity group of the connection entity.
+        /// 在平面内的随机点初始化新玩家。（硬编码为 [-50;50]）。
+        /// 为了修补网络 components，我们设置了 CommandTarget 并删除了被破坏的 entity
+        /// 并将新玩家 entity 添加到连接 entity 的链接 entity 组中。
         /// </summary>
         void InitializeNewPlayer(EntityCommandBuffer ecb, Entity destroyedPlayer, Entity newPlayer, GhostOwner networkId,
             ConnectionOwner connectionOwner, BufferLookup<LinkedEntityGroup> linkedEntityGroupFromEntity)
@@ -97,9 +97,9 @@ namespace Samples.HelloNetcode
                 if (linkedEntityGroup.Value == destroyedPlayer)
                 {
                     linkedEntityGroup.Value = newPlayer;
-                    // linkedEntityGroups[index] = new LinkedEntityGroup { Value = spawnedPlayer };
+                    // linkedEntityGroups[索引] = 新 LinkedEntityGroup { 值 = spawnedPlayer };
                     // linkedEntityGroups.RemoveAtSwapBack(index);
-                    // --index;
+                    //  - 指数;
                 }
             }
 

@@ -24,13 +24,13 @@ public partial struct SpawnAnimatedCubeSystem : ISystem
 
         foreach (var entity in entities)
         {
-            //Get the animator reference
+            //获取动画师参考
             var animRef = SystemAPI.GetComponent<AnimatorRefComponent>(entity);
 
-            //Instantiate the GO
+            //实例化 GO
             var rotatingCube = (GameObject)Object.Instantiate(animRef.AnimatorAsGO);
 
-            //Add the animator to the entity
+            //将动画师添加到 entity
             state.EntityManager.AddComponentObject(entity, rotatingCube.GetComponent<Animator>());
         }
     }

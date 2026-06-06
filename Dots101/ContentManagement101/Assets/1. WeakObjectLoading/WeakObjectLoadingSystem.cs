@@ -7,10 +7,10 @@ using UnityEngine.Rendering;
 
 namespace ContentManagement.Sample
 {
-    // This system looks for the entities that have the components added by WeakRenderedObjectAuthoring
-    // and turns them into renderable entities by:
-    // 1. asynchronously loading their weakly referenced meshes and materials
-    // 2. once the assets have loaded, adding the required rendering components
+    // 此 system 查找具有由 WeakRenderedObjectAuthoring 添加的 components 的 entities
+    // 并通过以下方式将它们转换为可渲染的 entities：
+    // 1. 异步加载弱引用的网格和材质
+    // 2. 资源加载后，添加所需的渲染 components
     public partial struct WeakObjectLoadingSystem : ISystem
     {
         private EntityQuery weakQuery;
@@ -18,25 +18,25 @@ namespace ContentManagement.Sample
 
         public void OnCreate(ref SystemState state)
         {
-            // Renderable entities have the RenderBounds component (among other rendering components), so
-            // these queries match only entities that haven't yet been made renderable.
+            // 可渲染的 entities 具有 RenderBounds component（以及其他渲染 components），因此
+            // 这些查询仅匹配尚未可渲染的 entities。
             weakQuery = SystemAPI.QueryBuilder().WithAll<WeakMesh, WeakMaterial>().WithNone<RenderBounds>().Build();
             weakUntypedQuery = SystemAPI.QueryBuilder().WithAll<WeakMeshUntyped, WeakMaterialUntyped>()
                 .WithNone<RenderBounds>().Build();
 
-            // The system should update only if entities exist which still need to be made renderable.
+            // 仅当 entities 存在且仍需要可渲染时，system 才应更新。
             var query = SystemAPI.QueryBuilder().WithAny<WeakMesh, WeakMeshUntyped>().WithNone<RenderBounds>().Build();
             state.RequireForUpdate(query);
         }
 
         public void OnUpdate(ref SystemState state)
         {
-#region WeakObjectReference            
+#region WeakObjectReference
             var weakEntities = weakQuery.ToEntityArray(Allocator.Temp);
             var weakMeshes = weakQuery.ToComponentDataArray<WeakMesh>(Allocator.Temp);
 
-            // note that we can't use SystemAPI.Query for this loop because 
-            // are making structural changes to the entities
+            // note 我们不能在这个循环中使用 SystemAPI.Query 因为
+            // 正在对 entities 进行结构性更改
             for (int i = 0; i < weakEntities.Length; i++)
             {
                 var loaded = true;
@@ -45,12 +45,12 @@ namespace ContentManagement.Sample
                 var mesh = weakMeshes[i];
                 var materials = state.EntityManager.GetBuffer<WeakMaterial>(entity);
 
-                // mesh load status
+                // 网格负载状态
                 var meshStatus = mesh.Value.LoadingStatus;
                 if (meshStatus == ObjectLoadingStatus.None)
                 {
                     Debug.Log("Initiate mesh LOAD");
-                    mesh.Value.LoadAsync(); // trigger load
+                    mesh.Value.LoadAsync(); // trigger 负载
                 }
 
                 if (meshStatus != ObjectLoadingStatus.Completed)
@@ -58,7 +58,7 @@ namespace ContentManagement.Sample
                     loaded = false;
                 }
 
-                // material load status
+                // 物料装载状态
                 for (int j = 0; j < materials.Length; j++)
                 {
                     var mat = materials[j];
@@ -66,7 +66,7 @@ namespace ContentManagement.Sample
                     if (materialStatus == ObjectLoadingStatus.None)
                     {
                         Debug.Log("Initiate material LOAD");
-                        mat.Value.LoadAsync(); // trigger load
+                        mat.Value.LoadAsync(); // trigger 负载
                     }
 
                     if (materialStatus != ObjectLoadingStatus.Completed)
@@ -78,9 +78,9 @@ namespace ContentManagement.Sample
                 if (loaded)
                 {
                     Debug.Log("Creating rendered entity");
-                    
-                    // each rendered object has a single mesh, but the mesh may
-                    // have submeshes, each with their own material
+
+                    // 每个渲染的对象都有一个网格，但是网格可以
+                    // 有子网格，每个子网格都有自己的材质
                     var meshArray = new Mesh[] { mesh.Value.Result };
                     var materialArray = new Material[materials.Length];
                     var indices = new MaterialMeshIndex[materials.Length];
@@ -96,9 +96,9 @@ namespace ContentManagement.Sample
                         };
                     }
 
-                    // Add the rendering components to the entity
-                    // (including RenderBounds, so the entity will hereafter 
-                    // be excluded from this system's queries) 
+                    // 将渲染 components 添加到 entity
+                    // （包括 RenderBounds，因此 entity 此后将
+                    // 被排除在此 system 的查询之外）
                     RenderMeshUtility.AddComponents(entity, state.EntityManager,
                         new RenderMeshDescription(ShadowCastingMode.On),
                         new RenderMeshArray(materialArray, meshArray, indices),
@@ -109,7 +109,7 @@ namespace ContentManagement.Sample
 #endregion
 
 #region UntypedWeakReferenceId
-            // very similar to above but for UntypedWeakReferenceId...
+            // 与上面非常相似，但对于 UntypedWeakReferenceId...
 
             var weakUntypedEntities = weakUntypedQuery.ToEntityArray(Allocator.Temp);
             var untypedWeakMeshes = weakUntypedQuery.ToComponentDataArray<WeakMeshUntyped>(Allocator.Temp);
@@ -122,25 +122,25 @@ namespace ContentManagement.Sample
                 var mesh = untypedWeakMeshes[i];
                 var materials = state.EntityManager.GetBuffer<WeakMaterialUntyped>(entity);
 
-                // mesh load status
+                // 网格负载状态
                 var meshStatus = RuntimeContentManager.GetObjectLoadingStatus(mesh.Value);
                 if (meshStatus == ObjectLoadingStatus.None)
                 {
-                    RuntimeContentManager.LoadObjectAsync(mesh.Value);  // trigger load
+                    RuntimeContentManager.LoadObjectAsync(mesh.Value);  // trigger 负载
                 }
                 if (meshStatus != ObjectLoadingStatus.Completed)
                 {
                     loaded = false;
                 }
 
-                // material load status
+                // 物料装载状态
                 for (int j = 0; j < materials.Length; j++)
                 {
                     var mat = materials[j];
                     var materialStatus = RuntimeContentManager.GetObjectLoadingStatus(mat.Value);
                     if (materialStatus == ObjectLoadingStatus.None)
                     {
-                        RuntimeContentManager.LoadObjectAsync(mat.Value);  // trigger load
+                        RuntimeContentManager.LoadObjectAsync(mat.Value);  // trigger 负载
                     }
 
                     if (materialStatus != ObjectLoadingStatus.Completed)
@@ -151,8 +151,8 @@ namespace ContentManagement.Sample
 
                 if (loaded)
                 {
-                    // each rendered object has a single mesh, but the mesh may
-                    // have submeshes, each with their own material
+                    // 每个渲染的对象都有一个网格，但是网格可以
+                    // 有子网格，每个子网格都有自己的材质
                     var meshArray = new Mesh[] { RuntimeContentManager.GetObjectValue<Mesh>(mesh.Value) };
                     var materialArray = new Material[materials.Length];
                     var indices = new MaterialMeshIndex[materials.Length];
@@ -168,8 +168,8 @@ namespace ContentManagement.Sample
                         };
                     }
 
-                    // Add the rendering components to the entity
-                    // (including RenderBounds, so the entity will hereafter be excluded from this system's queries) 
+                    // 将渲染 components 添加到 entity
+                    // （包括 RenderBounds，因此 entity 将从此 system 的查询中排除）
                     RenderMeshUtility.AddComponents(entity, state.EntityManager,
                         new RenderMeshDescription(ShadowCastingMode.On),
                         new RenderMeshArray(materialArray, meshArray, indices),

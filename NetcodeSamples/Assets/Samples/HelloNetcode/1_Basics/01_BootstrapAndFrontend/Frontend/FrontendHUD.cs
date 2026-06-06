@@ -38,8 +38,8 @@ namespace Samples.HelloNetcode
                 }
             }
 
-            // Session destroys the server world but server destruction will also be covered here when not using sessions.
-            // Client world will always need to be destroyed
+            // 会话销毁 server world 但不使用会话时 server 销毁也将在此处介绍。
+            // Client world 始终需要销毁
             var clientServerWorlds = new List<World>();
             foreach (var world in World.All)
             {
@@ -69,8 +69,8 @@ namespace Samples.HelloNetcode
                 simGroup.AddSystemToUpdateList(sys);
             }
 
-            // We must always have an event system (DOTS-7177), but some scenes will already have one,
-            // so we only enable ours if we can't find someone else's.
+            // 我们必须始终有一个事件 system (DOTS-7177)，但有些 scenes 已经有一个，
+            // 因此，只有在找不到其他人的情况下，我们才会启用我们的。
             if (FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
                 m_EventSystem.gameObject.SetActive(true);
         }

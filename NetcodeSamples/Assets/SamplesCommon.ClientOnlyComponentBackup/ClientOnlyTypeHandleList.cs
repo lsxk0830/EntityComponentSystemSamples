@@ -8,8 +8,8 @@ using Unity.NetCode;
 namespace Unity.NetCode.Samples
 {
     /// <summary>
-    /// Helper struct to collect and pass to job dynamic type handles.
-    /// The list capacity is fixed to 32 different components types
+    /// 用于收集并传递给 job 动态类型句柄的帮助程序结构。
+    /// 列表容量固定为 32 种不同的 components 类型
     /// </summary>
     internal struct ClientOnlyTypeHandleList
     {
@@ -76,11 +76,11 @@ namespace Unity.NetCode.Samples
         }
 
         /// <summary>
-        /// Create the type handle list if empty or just update the dynamic handles.
+        /// 如果为空，则创建类型句柄列表或仅更新动态句柄。
         /// </summary>
         /// <param name="state"></param>
         /// <param name="clientOnlyComponentTypes"></param>
-        /// <param name="isReadonly">Set to true when you only need to access the component data readonly</param>
+        /// 当只需要访问 component 数据 readonly</param>时，<param name="isReadonly">Set 为 true
         public void CreateOrUpdateTypeHandleList(ref SystemState state, in NativeArray<ComponentType> clientOnlyComponentTypes, bool isReadonly=false)
         {
             unsafe

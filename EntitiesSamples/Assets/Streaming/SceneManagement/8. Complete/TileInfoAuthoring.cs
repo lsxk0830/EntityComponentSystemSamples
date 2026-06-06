@@ -10,7 +10,7 @@ namespace Streaming.SceneManagement.CompleteSample
     public class TileInfoAuthoring : MonoBehaviour
     {
         public int randomSeed;
-        public float tileSize; // size of square side
+        public float tileSize; // 正方形边长的大小
         public int2 minBoundary;
         public int2 maxBoundary;
         public List<TileTemplate> tileTemplates;
@@ -20,19 +20,19 @@ namespace Streaming.SceneManagement.CompleteSample
         {
             public override void Bake(TileInfoAuthoring authoring)
             {
-                // Make a copy to filter entries with null scenes
+                // 制作副本以过滤包含 null scenes 的条目
                 List<TileTemplate> tileTemplates =
                     new List<TileTemplate>(authoring.tileTemplates.Count);
                 List<EntitySceneReference> sceneReferences =
                     new List<EntitySceneReference>(authoring.tileTemplates.Count);
 
-                // Get the scene references
+                // 获取 scene 参考
                 foreach (var tileTemplate in authoring.tileTemplates)
                 {
                     if (tileTemplate != null)
                     {
-                        // We want to create a dependency to the scene in case the scene gets deleted
-                        // This needs to be outside the authoring.scene != null check in case the asset file gets deleted and then restored.
+                        // 我们希望创建对 scene 的依赖关系，以防 scene 被删除
+                        // 这需要在 authoring.scene!= null 检查之外，以防资产文件被删除然后恢复。
                         DependsOn(tileTemplate.tileScene);
 
                         if (tileTemplate.tileScene != null)
@@ -49,7 +49,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 var random = new Unity.Mathematics.Random((uint)authoring.randomSeed);
                 float2 tileSize = new float2(authoring.tileSize, authoring.tileSize);
 
-                // Choose the tiles for the world from the patterns
+                // 从图案中选择 world 的瓷砖
                 for (int x = min.x; x <= max.x; ++x)
                 {
                     for (int y = min.y; y <= max.y; ++y)
@@ -58,19 +58,19 @@ namespace Streaming.SceneManagement.CompleteSample
 
                         var tileEntity = CreateAdditionalEntity(TransformUsageFlags.None, false, $"Tile {x}_{y}");
 
-                        // Store the information to instantiate the scene into the right tile position
+                        // 存储信息以将 scene 实例化到正确的图块位置
                         var loadingDistance = tileTemplates[selectedTile].loadingDistance;
                         var unloadingDistance = tileTemplates[selectedTile].unloadingDistance;
                         AddComponent(tileEntity, new TileInfo
                         {
                             Scene = sceneReferences[selectedTile],
                             Position = tileSize * new float2(x, y),
-                            Rotation = random.NextInt(4) * (math.PI / 2f),  // 0, 90, 180, or 270 degrees
+                            Rotation = random.NextInt(4) * (math.PI / 2f),  // 0、90、180 或 270 度
                             LoadingDistanceSq = loadingDistance * loadingDistance,
                             UnloadingDistanceSq = unloadingDistance * unloadingDistance
                         });
 
-                        // This component will store the distance to the Relevant entities
+                        // 此 component 将存储到相关 entities 的距离
                         AddComponent<DistanceToRelevant>(tileEntity);
                     }
                 }
@@ -82,16 +82,16 @@ namespace Streaming.SceneManagement.CompleteSample
         public class TileTemplate
         {
 #if UNITY_EDITOR
-            public UnityEditor.SceneAsset tileScene; // the scene to instantiate
+            public UnityEditor.SceneAsset tileScene; // 实例化 scene
 #endif
-            public float loadingDistance; // proximity distance within which to consider loading the scene
-            public float unloadingDistance; // proximity distance within which to consider unloading the scene
+            public float loadingDistance; // 考虑加载 scene 的接近距离
+            public float unloadingDistance; // 考虑卸载 scene 的邻近距离
         }
     }
 
     public struct TileInfo : IComponentData
     {
-        public EntitySceneReference Scene; // scene instance
+        public EntitySceneReference Scene; // scene 实例
         public float2 Position;
         public float Rotation;
         public float LoadingDistanceSq;

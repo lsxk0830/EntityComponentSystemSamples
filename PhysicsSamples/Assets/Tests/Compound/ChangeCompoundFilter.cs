@@ -50,12 +50,12 @@ namespace Unity.Physics.Tests
 
         public override void CreateScene(ChangeCompoundFilterScene sceneSettings)
         {
-            // Common params
+            // 常用参数
             float3 groundSize = new float3(5.0f, 1.0f, 5.0f);
             float3 boxSize = new float3(1.0f, 1.0f, 1.0f);
             float mass = 1.0f;
 
-            // Compound ground which will have child 0 change filter
+            // 复合地面将有子 0 更换过滤器
             {
                 var compoundCollider = CreateGroundCompoundWith2Children(groundSize);
                 CreateStaticBody(new float3(-20.0f, 0.0f, 0.0f), quaternion.identity, compoundCollider);
@@ -67,7 +67,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Compound ground which will have child 1 change filter
+            // 复合地面将有孩子 1 换过滤器
             {
                 var compoundCollider = CreateGroundCompoundWith2Children(groundSize);
                 CreateStaticBody(new float3(-10.0f, 0.0f, 0.0f), quaternion.identity, compoundCollider);
@@ -79,7 +79,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Compound ground which will have both children change filter
+            // 复合地面将让两个孩子更换过滤器
             {
                 var compoundCollider = CreateGroundCompoundWith2Children(groundSize);
                 CreateStaticBody(new float3(0.0f, 0.0f, 0.0f), quaternion.identity, compoundCollider);
@@ -91,7 +91,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Compound ground which will have its filter changed through root collider
+            // 通过根 collider 更换滤波器的复合接地
             {
                 var compoundCollider = CreateGroundCompoundWith2Children(groundSize);
                 CreateStaticBody(new float3(10.0f, 0.0f, 0.0f), quaternion.identity, compoundCollider);
@@ -134,7 +134,7 @@ namespace Unity.Physics.Tests
                 var bpwData = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(state.World.GetExistingSystem<BuildPhysicsWorld>());
                 var staticEntities = bpwData.StaticEntityGroup.ToEntityArray(Allocator.TempJob);
 
-                // Change filter of child 0 in compound
+                // 更改复合中子级 0 的过滤器
                 unsafe
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[0]);
@@ -144,7 +144,7 @@ namespace Unity.Physics.Tests
                     state.EntityManager.SetComponentData(staticEntities[0], colliderComponent);
                 }
 
-                // Change filter of child 1 in compound
+                // 更改复合中子级 1 的过滤器
                 unsafe
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[1]);
@@ -154,7 +154,7 @@ namespace Unity.Physics.Tests
                     state.EntityManager.SetComponentData(staticEntities[1], colliderComponent);
                 }
 
-                // Change filter of both children in compound
+                // 更改复合中两个孩子的过滤器
                 unsafe
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[2]);
@@ -165,7 +165,7 @@ namespace Unity.Physics.Tests
                     state.EntityManager.SetComponentData(staticEntities[2], colliderComponent);
                 }
 
-                // Change filter of the compound itself
+                // 更改化合物本身的过滤器
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[3]);
                     colliderComponent.Value.Value.SetCollisionFilter(CollisionFilter.Zero);
@@ -179,7 +179,7 @@ namespace Unity.Physics.Tests
                 var bpwData = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(state.World.GetExistingSystem<BuildPhysicsWorld>());
                 var dynamicEntities = bpwData.DynamicEntityGroup.ToEntityArray(Allocator.TempJob);
 
-                // First 2 boxes should stay still, while other 2 should fall through
+                // 前 2 个盒子应该保持静止，而另外 2 个盒子应该掉落
                 {
                     var transform1 = state.EntityManager.GetComponentData<LocalTransform>(dynamicEntities[0]);
                     Assert.IsTrue(transform1.Position.y > 0.99f, "Box started falling!");

@@ -18,7 +18,7 @@ public class DoubleModifyBroadphasePairsBehaviour : MonoBehaviour
     }
 }
 
-// A system which configures the simulation step to disable certain broad phase pairs
+// system，配置模拟步骤以禁用某些宽相对
 [UpdateInGroup(typeof(PhysicsSimulationGroup))]
 [UpdateAfter(typeof(PhysicsCreateBodyPairsGroup))]
 [UpdateBefore(typeof(PhysicsCreateContactsGroup))]
@@ -43,7 +43,7 @@ public partial struct DoubleModifyBroadphasePairsSystem : ISystem
 
         PhysicsWorldSingleton worldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
 
-        // Add a custom callback to the simulation, which will inject our custom job after the body pairs have been created
+        // 向模拟添加自定义回调，这将在创建主体对后注入我们的自定义 job
         state.Dependency = new DisableDynamicDynamicPairsJob
         {
             NumDynamicBodies = worldSingleton.PhysicsWorld.NumDynamicBodies
@@ -62,7 +62,7 @@ public partial struct DoubleModifyBroadphasePairsSystem : ISystem
 
         public unsafe void Execute(ref ModifiableBodyPair pair)
         {
-            // Disable the pair if it's dynamic-dynamic
+            // 如果是动态-动态，则禁用该对
             bool isDynamicDynamic = pair.BodyIndexA < NumDynamicBodies && pair.BodyIndexB < NumDynamicBodies;
             if (isDynamicDynamic)
             {
@@ -78,7 +78,7 @@ public partial struct DoubleModifyBroadphasePairsSystem : ISystem
 
         public unsafe void Execute(ref ModifiableBodyPair pair)
         {
-            // Disable the pair if it's dynamic-static
+            // 如果是动态-静态，则禁用该对
             bool isDynamicStatic = (pair.BodyIndexA < NumDynamicBodies && pair.BodyIndexB >= NumDynamicBodies) ||
                 (pair.BodyIndexB < NumDynamicBodies && pair.BodyIndexA >= NumDynamicBodies);
             if (isDynamicStatic)

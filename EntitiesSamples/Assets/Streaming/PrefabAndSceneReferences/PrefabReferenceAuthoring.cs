@@ -18,7 +18,7 @@ namespace Streaming.PrefabAndSceneReferences
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, new PrefabReference()
                 {
-                    // The EntityPrefabReferences stores the GUID of the prefab.
+                    // EntityPrefabReferences 存储 prefab 的 GUID。
                     Value = new EntityPrefabReference(authoring.Prefab)
                 });
             }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Tutorials.Jobs.Step3
 {
-    // Exactly the same as in prior step except this schedules a parallel job instead of a single-threaded job.
+    // 与之前的步骤完全相同，只是这会调度并行 job 而不是单线程 job。
     public class FindNearest : MonoBehaviour
     {
         NativeArray<float3> TargetPositions;
@@ -47,9 +47,9 @@ namespace Tutorials.Jobs.Step3
                 NearestTargetPositions = NearestTargetPositions,
             };
 
-            // Execute will be called once for every element of the SeekerPositions array,
-            // with every index from 0 up to (but not including) the length of the array.
-            // The Execute calls will be split into batches of 100.
+            // 对于 SeekerPositions 数组的每个元素都会调用一次 Execute，
+            // 每个索引从 0 到（但不包括）数组的长度。
+            // 执行调用将被分成 100 个批次。
             JobHandle findHandle = findJob.Schedule(SeekerPositions.Length, 100);
 
             findHandle.Complete();

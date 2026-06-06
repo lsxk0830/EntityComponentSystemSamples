@@ -56,22 +56,22 @@ class TestsMenu : EditorWindow
 
         if (defines.StartsWith(_define + ";"))
         {
-            // First of multiple defines.
+            // 多重定义中的第一个。
             defines = defines.Remove(0, _define.Length + 1);
         }
         else if (defines.StartsWith(_define))
         {
-            // The only define.
+            // 唯一定义。
             defines = defines.Remove(0, _define.Length);
         }
         else if (defines.EndsWith(";" + _define))
         {
-            // Last of multiple defines.
+            // 多个定义中的最后一个。
             defines = defines.Remove(defines.Length - _define.Length - 1, _define.Length + 1);
         }
         else
         {
-            // Somewhere in the middle or not defined.
+            // 中间某处或未定义。
             var index = defines.IndexOf(_define, 0, StringComparison.Ordinal);
             if (index >= 0) { defines = defines.Remove(index, _define.Length + 1); }
         }

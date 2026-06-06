@@ -47,7 +47,7 @@ partial struct ChangeActiveVehicleSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        // update stable list of vehicles if they have changed
+        // 如果车辆发生变化，则更新稳定的车辆列表
         if (m_NewVehicleQuery.CalculateEntityCount() > 0 || m_DeletedVehicleQuery.CalculateEntityCount() > 0)
         {
             state.EntityManager.AddComponent(m_NewVehicleQuery, typeof(AvailableVehicle));
@@ -58,11 +58,11 @@ partial struct ChangeActiveVehicleSystem : ISystem
                 m_AllVehicles.AddRange(allVehicles);
         }
 
-        // do nothing if there are no vehicles
+        // 如果没有车辆，则不执行任何操作
         if (m_AllVehicles.Length == 0)
             return;
 
-        // validate active vehicle singleton
+        // 验证主动车辆单例
         var activeVehicle = Entity.Null;
         if (m_ActiveVehicleQuery.CalculateEntityCount() == 1)
             activeVehicle = m_ActiveVehicleQuery.GetSingletonEntity();
@@ -75,13 +75,13 @@ partial struct ChangeActiveVehicleSystem : ISystem
                     "First available vehicle is being set to active."
                 );
 
-                // prefer the first vehicle prospectively marked as active
+                // 更喜欢第一辆被标记为活跃的车辆
                 if (activeVehicles.Length > 0)
                 {
                     activeVehicle = activeVehicles[0];
                     state.EntityManager.RemoveComponent<ActiveVehicle>(m_AllVehicles.AsArray());
                 }
-                // otherwise use the first vehicle found
+                // 否则使用找到的第一辆车
                 else
                     activeVehicle = m_AllVehicles[0];
 
@@ -89,7 +89,7 @@ partial struct ChangeActiveVehicleSystem : ISystem
             }
         }
 
-        // do nothing else if there are no vehicles to change to or if there is no input to change vehicle
+        // 如果没有要更换的车辆或没有输入要更换的车辆，则不执行任何其他操作
         if (m_AllVehicles.Length < 2)
             return;
 
@@ -98,7 +98,7 @@ partial struct ChangeActiveVehicleSystem : ISystem
         if (input.Change == 0)
             return;
 
-        // find the index of the currently active vehicle
+        // 查找当前活动车辆的索引
         var activeVehicleIndex = 0;
         for (int i = 0, count = m_AllVehicles.Length; i < count; ++i)
         {
@@ -106,7 +106,7 @@ partial struct ChangeActiveVehicleSystem : ISystem
                 activeVehicleIndex = i;
         }
 
-        // if the active vehicle index has actually changed, then move the active vehicle tag to the new vehicle
+        // 如果活动车辆索引实际上已更改，则将活动车辆标签移至新车辆
         var numVehicles = m_AllVehicles.Length;
         var newVehicleIndex = ((activeVehicleIndex + input.Change) % numVehicles + numVehicles) % numVehicles;
         if (newVehicleIndex == activeVehicleIndex)

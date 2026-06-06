@@ -5,11 +5,11 @@ using Unity.Entities;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // Adds PostLoadCommandBuffer to the section meta entities.
+    // 将 PostLoadCommandBuffer 添加到元 entities 部分。
     [UpdateAfter(typeof(TileLoadingSystem))]
     partial struct RequestPostLoadSystem : ISystem
     {
-        // Cannot be Burst-compiled because it uses PostLoadCommandBuffer.
+        // 无法进行 Burst 编译，因为它使用 PostLoadCommandBuffer。
         public void OnUpdate(ref SystemState state)
         {
             var requiresQuery = SystemAPI.QueryBuilder().WithAll<RequiresPostLoadCommandBuffer>().Build();
@@ -22,7 +22,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 var buf = new PostLoadCommandBuffer();
                 buf.CommandBuffer = new EntityCommandBuffer(Allocator.Persistent, PlaybackPolicy.MultiPlayback);
 
-                // Create an entity with the subscene offset and rotation
+                // 使用 subscene 偏移和旋转创建 entity
                 var postLoadEntity = buf.CommandBuffer.CreateEntity();
                 buf.CommandBuffer.AddComponent(postLoadEntity, new TileOffset
                 {

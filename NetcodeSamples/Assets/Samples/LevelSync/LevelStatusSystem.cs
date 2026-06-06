@@ -65,7 +65,7 @@ public partial class LevelStatusSystem : SystemBase
                 }
             }
             m_StatusText.text += inGame;
-            // Flip toggle to off if it's is on currently but sync is disabled
+            // 如果当前打开但同步已禁用，则将切换开关切换为关闭
             if (syncOn)
                 m_SyncButton.image.color = Color.gray;
             else

@@ -9,8 +9,8 @@ namespace Unity.NetCode.Samples.PlayerList
     public static class UsernameSanitizer
     {
         /// <summary>
-        ///     Usernames should be a min length and not contain any funky characters.
-        ///     Basic sanitizing using <see cref="IsAlphanumeric" /> and <see cref="IsValidExtraChar" />.
+        ///     用户名的长度应达到最小长度，并且不包含任何时髦的字符。
+        ///     使用 <see cref="IsAlphanumeric" /> 和 <see cref="IsValidExtraChar" /> 进行基本消毒。
         /// </summary>
         [GenerateTestsForBurstCompatibility]
         public static FixedString64Bytes SanitizeUsername(FixedString64Bytes input, int networkId, out bool didSanitize)
@@ -25,7 +25,7 @@ namespace Unity.NetCode.Samples.PlayerList
 
             didSanitize = sanitized != input;
 
-            // Failed to sanitize and END UP with a usable name, so use this instead.
+            // 无法使用可用名称清理 END UP，因此请改用此名称。
             if (sanitized.Length < 2)
                 sanitized = $"Player{networkId}";
             return sanitized;
@@ -81,7 +81,7 @@ namespace Unity.NetCode.Samples.PlayerList
             return username;
         }
 
-        /// <example>"john.doe" would become "jon".</example>>
+        /// <example>"john.doe" 将变为“jon”。</example>>
         public static FixedString64Bytes GetFirstPartOfEnvironmentUsername()
         {
             var username = Environment.UserName;

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Unity.NetCode.Samples.Common
 {
     /// <summary>
-    ///     Every NetworkId has its own unique Debug color. This system sets it.
+    ///     每个 NetworkId 都有自己独特的调试颜色。这个 system 设置它。
     /// </summary>
     [AlwaysSynchronizeSystem]
     [RequireMatchingQueriesForUpdate]

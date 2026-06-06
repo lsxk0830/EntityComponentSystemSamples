@@ -8,7 +8,7 @@ using Unity.Scenes;
 
 namespace Streaming.SceneManagement.SubsceneInstancing
 {
-    // Spawns the scene in a square grid pattern.
+    // 以方形网格图案生成 scene。
     public partial struct SpawnSystem : ISystem
     {
         [BurstCompile]
@@ -17,12 +17,12 @@ namespace Streaming.SceneManagement.SubsceneInstancing
             state.RequireForUpdate<Grid>();
         }
 
-        // Cannot be Burst compiled because it uses PostLoadCommandBuffer.
+        // 无法编译 Burst，因为它使用 PostLoadCommandBuffer。
         public void OnUpdate(ref SystemState state)
         {
             state.Enabled = false;
 
-            // Set the parameters to indicate we are going to create instances
+            // 设置参数以指示我们要创建实例
             var loadParameters = new SceneSystem.LoadParameters
             {
                 Flags = SceneLoadFlags.NewInstance
@@ -33,11 +33,11 @@ namespace Streaming.SceneManagement.SubsceneInstancing
 
             for (int index = 0; index < grids.Length; index += 1)
             {
-                // Relative to the origin
+                // 相对于原点
                 float2 centerOffset = -((grids[index].Size - 1) * grids[index].Spacing);
                 centerOffset /= 2f;
 
-                // Create the subscene instances.
+                // 创建 subscene 实例。
                 for (int i = 0; i < grids[index].Size; ++i)
                 {
                     for (int j = 0; j < grids[index].Size; ++j)
@@ -45,12 +45,12 @@ namespace Streaming.SceneManagement.SubsceneInstancing
                         var sceneEntity = SceneSystem.LoadSceneAsync(state.WorldUnmanaged,
                             grids[index].Scene, loadParameters);
 
-                        // A PostLoadCommandBuffer wraps an EntityCommandBuffer that will execute commands
-                        // after the subscene instance is loaded.
+                        // PostLoadCommandBuffer 包装将执行命令的 EntityCommandBuffer
+                        // 加载 subscene 实例后。
                         var buf = new PostLoadCommandBuffer();
                         buf.CommandBuffer = new EntityCommandBuffer(Allocator.Persistent, PlaybackPolicy.MultiPlayback);
 
-                        // After the cell is loaded, create an entity to hold the offset for the cell.
+                        // 加载单元格后，创建一个 entity 来保存单元格的偏移量。
                         var postLoadEntity = buf.CommandBuffer.CreateEntity();
                         buf.CommandBuffer.AddComponent(postLoadEntity, new Offset
                         {

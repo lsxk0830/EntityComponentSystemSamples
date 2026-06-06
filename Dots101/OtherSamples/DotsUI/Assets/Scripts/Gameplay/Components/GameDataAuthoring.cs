@@ -9,19 +9,19 @@ namespace Unity.DotsUISample
         public DialogueData endDialogue;
         public QuestData quest;
         public CollectablesData collectables;
-        
+
         class Baker : Baker<GameDataAuthoring>
         {
             public override void Bake(GameDataAuthoring authoring)
             {
                 var entity = GetEntity(authoring, TransformUsageFlags.None);
-                
-                // to avoid mutating the original scriptable objects, we make copies
+
+                // 为了避免改变原始的可编写脚本的对象，我们制作副本
                 AddComponent(entity, new GameData
                 {
                     StartDialogue = Instantiate(authoring.startDialogue),
                     EndDialogue = Instantiate(authoring.endDialogue),
-                    Quest = Instantiate(authoring.quest),  
+                    Quest = Instantiate(authoring.quest),
                     Collectables = Instantiate(authoring.collectables),
                     State = GameState.Init,
                     InterfaceState = InterfaceState.Questing,
@@ -29,7 +29,7 @@ namespace Unity.DotsUISample
             }
         }
     }
-    
+
     public struct GameData : IComponentData
     {
         public GameState State;
@@ -39,7 +39,7 @@ namespace Unity.DotsUISample
         public UnityObjectRef<DialogueData> StartDialogue;
         public UnityObjectRef<DialogueData> EndDialogue;
     }
-    
+
     public enum GameState
     {
         Init,
@@ -48,7 +48,7 @@ namespace Unity.DotsUISample
         Questing,
         ClosingDialogue,
     }
-    
+
     public enum InterfaceState
     {
         Questing,

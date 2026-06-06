@@ -13,28 +13,28 @@ namespace Samples.CustomChunkSerializer
     [BurstCompile]
     public struct ChunkSerializer
     {
-        //About the snapshot buffer memory layout
-        //The snapshot buffer contains entries in this format
+        //关于 snapshot 缓冲存储器布局
+        //snapshot 缓冲区包含此格式的条目
         // [tick][ent1 data][ent2 data] ... [entN data]
-        // the data has the following layout:
-        // uint Tick
-        // 4 bytes aligned change mask bits
-        // (optional)
-        // 4 bytes aligned enable bits state
+        // 数据具有以下布局：
+        // uint 刻度
+        // 4 字节对齐的更改掩码位
+        // （选修的）
+        // 4 字节对齐的使能位状态
         // padding (to 16 bytes)
         // component1 (aligned to 16 byte boundary)
         // component2 (aligned to 16 byte boundary)
         // ..
         // componentN (aligned to 16 byte boundary)
 
-        //About the bitsize memory layout.
-        //The bitStartAndSize contains the start uint and bit len of the ghost data.
-        //Has the following layout
-        // [Component1                                ][Component2
-        // |ent1 start|ent1 len|..|entN start|entN len||ent1 start|ent1 len|..|entN start|entN len|
+        //关于位大小内存布局。
+        //bitStartAndSize 包含 ghost 数据的起始 uint 和位 len。
+        //有以下布局
+        // [组件 1][组件 2
+        // |ent1 开始|ent1 len|..|entN 开始|entN len||ent1 开始|ent1 len|..|entN 开始|entN len|
         //
-        // The stride is NumComponent * (endIndex - startIndex), where endIndex and startIndex are the first and last
-        // relevant entity index in the chunk.
+        // 步幅为 NumComponent * (endIndex - startIndex)，其中 endIndex 和 startIndex 是第一个和最后一个
+        // chunk 中的相关 entity 索引。
 
         public static PortableFunctionPointer<GhostPrefabCustomSerializer.CollectComponentDelegate> CollectComponentFunc =
                 new PortableFunctionPointer<GhostPrefabCustomSerializer.CollectComponentDelegate>(CollectComponents);
@@ -45,15 +45,15 @@ namespace Samples.CustomChunkSerializer
         public static PortableFunctionPointer<GhostPrefabCustomSerializer.ChunkPreserializeDelegate> PreSerializerFunc =
             new PortableFunctionPointer<GhostPrefabCustomSerializer.ChunkPreserializeDelegate>(PreSerializeChunk);
 
-        //Custom method to register the component types in a specific order, so that the chunk serializer can be written
-        //way more easily.
+        //自定义方法以特定顺序注册 component 类型，以便可以编写 chunk 序列化器
+        //更容易。
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(GhostPrefabCustomSerializer.CollectComponentDelegate))]
         public static void CollectComponents(IntPtr componentTypesPtr, IntPtr componentCountPtr)
         {
             ref var componentTypes = ref GhostComponentSerializer.TypeCast<NativeList<ComponentType>>(componentTypesPtr);
             ref var componentCount = ref GhostComponentSerializer.TypeCast<NativeArray<int>>(componentCountPtr);
-            //Root
+            //根
             componentTypes.Add(ComponentType.ReadWrite<GhostOwner>());
             componentTypes.Add(ComponentType.ReadWrite<LocalTransform>());
             componentTypes.Add(ComponentType.ReadWrite<IntCompo1>());
@@ -68,12 +68,12 @@ namespace Samples.CustomChunkSerializer
             componentTypes.Add(ComponentType.ReadWrite<Buf2>());
             componentTypes.Add(ComponentType.ReadWrite<Buf3>());
             componentCount[0] = 13;
-            //Child 1
+            //儿童 1
             componentTypes.Add(ComponentType.ReadWrite<IntCompo1>());
             componentTypes.Add(ComponentType.ReadWrite<FloatCompo1>());
             componentTypes.Add(ComponentType.ReadWrite<Buf1>());
             componentCount[1] = 3;
-            //Child 2
+            //儿童 2
             componentTypes.Add(ComponentType.ReadWrite<IntCompo2>());
             componentTypes.Add(ComponentType.ReadWrite<FloatCompo2>());
             componentTypes.Add(ComponentType.ReadWrite<Buf2>());
@@ -91,8 +91,8 @@ namespace Samples.CustomChunkSerializer
         }
 
         const int BaselinesPerEntity = 4;
-        //Assumptions made:
-        // - components are never removed (so we not check for presence)
+        //所做的假设：
+        // - components 永远不会被删除（所以我们不检查是否存在）
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(GhostPrefabCustomSerializer.ChunkSerializerDelegate))]
         private static unsafe void SerializeChunk(ref ArchetypeChunk chunk,
@@ -117,34 +117,34 @@ namespace Samples.CustomChunkSerializer
             {
                 var old = tempWriter;
                 var entOffset = ent - context.startIndex;
-                //Avoid serializing irrelevant entities
+                //避免序列化不相关的 entities
                 var sameBaselineCount = sameBaselinePerEntity[entOffset];
                 if (sameBaselineCount < 0)
                 {
-                    // This is an irrelevant ghost, do not send . There is no need to reset the
-                    //bits size and start bit, because the same check is also done outside.
+                    // 这是一个无关的 ghost，请勿发送。无需重置
+                    //位大小和起始位，因为外部也进行相同的检查。
                     continue;
                 }
 
-                //The writer contains data in a different format in the case of the chunk serializer:
-                //we are serializing on per "entity" directly here.
-                //This give the advantage of being able to early exit without need to serialise other entities if
-                //they don't fit (or at least early exiting after the first one that fails)
-                //Ideally, (this is a second phase), we can now write directly in the real data stream. Right now
-                //this is not possible because we are adding the size of buffers and ghosts data (delta compressed) before
-                //the ghost stream.
+                //对于 chunk 序列化器，写入器包含不同格式的数据：
+                //我们直接在这里对“entity”进行序列化。
+                //这提供了能够提前退出而不需要序列化其他 entities 的优点，如果
+                //他们不适合（或者至少在第一个失败后提前退出）
+                //理想情况下（这是第二阶段），我们现在可以直接写入真实的数据流。现在
+                //这是不可能的，因为我们之前添加了缓冲区的大小和 ghosts 数据（增量压缩）
+                //ghost 流。
                 var snapshotData = context.snapshotDataPtr + entOffset*context.snapshotStride;
                 var changeMaskData = snapshotData + sizeof(int);
                 var currentWrittenBits = tempWriter.LengthInBits;
                 var baseline0Ptr = baselinesPerEntity[BaselinesPerEntity*entOffset];
                 var baseline1Ptr = baselinesPerEntity[BaselinesPerEntity*entOffset + 1];
                 var baseline2Ptr = baselinesPerEntity[BaselinesPerEntity*entOffset + 2];
-                //This can an IntPtrZero if there are no buffers of the baseline does not exist
+                //如果没有基线的缓冲区不存在，这可以是 IntPtrZero
                 var dynamicDataBaselinePtr = baselinesPerEntity[BaselinesPerEntity*entOffset + 3];
-                //This requires to overwrite the snapshot data with all zeros or keep the current predicted baseline (optimal)
+                //这需要用全零覆盖 snapshot 数据或保留当前 predicted 基线（最佳）
                 var ghostSendType = GhostSendType.AllClients;
                 var sendToOwner = SendToOwnerType.All;
-                //the comp bit size already point to the entityBitSize[1] for the first component entry.
+                //comp 位大小已指向第一个 component 条目的 entityBitSize[1]。
                 var compBitSize = componentBitsSize + 2*entOffset + 1;
                 if (typeData.PredictionOwnerOffset != 0)
                 {
@@ -161,7 +161,7 @@ namespace Samples.CustomChunkSerializer
                         changeMaskData, context.snapshotDynamicDataPtr, dynamicDataBaselinePtr,
                         ref dynamicDataSizePerEntity[entOffset], compBitSize, compBitSizeStride);
                 }
-                //Single baseline
+                //单基线
                 else if (baseline0Ptr != IntPtr.Zero)
                 {
                     SerializeWithSingleBaseline(snapshotData, context.snapshotOffset, sendToOwner, ghostSendType,
@@ -169,9 +169,9 @@ namespace Samples.CustomChunkSerializer
                         changeMaskData, context.snapshotDynamicDataPtr, dynamicDataBaselinePtr,
                         ref dynamicDataSizePerEntity[entOffset], compBitSize, compBitSizeStride);
                 }
-                //No baseline, we are passing a pointer to a baseline that contains all zero.
-                //The advantage of this is that can be extended, to allow using "initial-value"
-                //optimization, to send the delta in respect the prefab initial data.
+                //没有基线，我们传递一个指向包含全零的基线的指针。
+                //这样做的优点是可以扩展，允许使用“初始值”
+                //优化，发送 prefab 初始数据的增量。
                 else
                 {
                     SerializeWithSingleBaseline(snapshotData, context.snapshotOffset, sendToOwner, ghostSendType,
@@ -179,7 +179,7 @@ namespace Samples.CustomChunkSerializer
                         changeMaskData, context.snapshotDynamicDataPtr, IntPtr.Zero,
                         ref dynamicDataSizePerEntity[entOffset], compBitSize, compBitSizeStride);
                 }
-                //Count the number of bits for each ghosts.
+                //计算每个 ghosts 的位数。
                 entityBitAndSize[2*entOffset] = currentWrittenBits / 32;
                 entityBitAndSize[2*entOffset+1] = tempWriter.LengthInBits - currentWrittenBits;
                 var missing = 32 - tempWriter.LengthInBits & 31;
@@ -187,9 +187,9 @@ namespace Samples.CustomChunkSerializer
                     tempWriter.WriteRawBits(0, missing);
                 if (tempWriter.HasFailedWrites)
                 {
-                    //If we were able to store at least one entity there is not need to mark the stream
-                    //as failed.
-                    //Rollback it here and let the outer loop to serialize the full entities.
+                    //如果我们能够存储至少一个 entity 则不需要标记流
+                    //失败了。
+                    //Rollback 在这里并让外循环序列化完整的 entities。
                     if (entOffset > 0)
                     {
                         tempWriter = old;

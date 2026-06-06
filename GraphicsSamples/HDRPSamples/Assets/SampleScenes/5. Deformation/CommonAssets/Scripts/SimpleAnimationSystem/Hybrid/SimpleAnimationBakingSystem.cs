@@ -28,17 +28,17 @@ internal class DeformationSampleBaker : Baker<DeformationsSampleAuthoring>
         var entity = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent(entity, new DeformationSampleColor { Value = color });
 
-        // Only execute this if we have a valid skinning setup
+        // 仅当我们有有效的蒙皮设置时才执行此操作
         DependsOn(skinnedMeshRenderer.sharedMesh);
         var hasSkinning = skinnedMeshRenderer.bones.Length > 0 && skinnedMeshRenderer.sharedMesh.bindposes.Length > 0;
         if (hasSkinning)
         {
-            // Setup reference to the root bone
+            // 设置对根骨骼的参考
             var rootTransform = skinnedMeshRenderer.rootBone ? skinnedMeshRenderer.rootBone : skinnedMeshRenderer.transform;
             var rootEntity = GetEntity(rootTransform, TransformUsageFlags.Dynamic);
             AddComponent(entity, new RootEntity { Value = rootEntity });
 
-            // Setup reference to the other bones
+            // 设置对其他骨骼的引用
             var boneEntityArray = AddBuffer<BoneEntity>(entity);
             boneEntityArray.ResizeUninitialized(skinnedMeshRenderer.bones.Length);
 
@@ -49,7 +49,7 @@ internal class DeformationSampleBaker : Baker<DeformationsSampleAuthoring>
                 boneEntityArray[boneIndex] = new BoneEntity { Value = boneEntity };
             }
 
-            // Store the bindpose for each bone
+            // 存储每个骨骼的绑定姿势
             var bindPoseArray = AddBuffer<BindPose>(entity);
             bindPoseArray.ResizeUninitialized(skinnedMeshRenderer.bones.Length);
 
@@ -69,7 +69,7 @@ public partial class ComputeSkinMatricesBakingSystem : SystemBase
     {
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-        // This is only executed if we have a valid skinning setup
+        // 仅当我们有有效的蒙皮设置时才会执行此操作
         foreach (var (rootEntity, bones) in SystemAPI.Query<RefRO<RootEntity>, DynamicBuffer<BoneEntity>>()
                      .WithAll<DeformationSampleColor>()
                      .WithOptions(EntityQueryOptions.IncludeDisabledEntities))
@@ -88,7 +88,7 @@ public partial class ComputeSkinMatricesBakingSystem : SystemBase
                  SystemAPI.Query<DeformationSampleColor, DynamicBuffer<AdditionalEntitiesBakingData>>()
                      .WithOptions(EntityQueryOptions.IncludeDisabledEntities))
         {
-            // Override the material color of the deformation materials
+            // 覆盖变形材质的材质颜色
             foreach (var rendererEntity in additionalEntities.AsNativeArray())
             {
                 if (EntityManager.HasComponent<RenderMeshUnmanaged>(rendererEntity.Value))

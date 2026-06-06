@@ -7,7 +7,7 @@ void VertShader(inout appdata_full v, out Input data)
 
 	float bold = step(v.texcoord.w, 0);
 
-	// Generate normal for backface
+	// 生成背面法线
 	float3 view = ObjSpaceViewDir(v.vertex);
 	v.normal *= sign(dot(v.normal, view));
 
@@ -40,13 +40,13 @@ void PixShader(Input input, inout SurfaceOutput o)
 	float scale = input.param.y;
 #endif
 
-	// Signed distance
+	// 有符号距离
 	float c = tex2D(_MainTex, input.uv_MainTex).a;
 	float sd = (.5 - c - input.param.x) * scale + .5;
 	float outline = _OutlineWidth*_ScaleRatioA * scale;
 	float softness = _OutlineSoftness*_ScaleRatioA * scale;
 
-	// Color & Alpha
+	// 颜色和阿尔法
 	float4 faceColor = _FaceColor;
 	float4 outlineColor = _OutlineColor;
 	faceColor *= input.color;
@@ -64,16 +64,16 @@ void PixShader(Input input, inout SurfaceOutput o)
 					tex2D(_MainTex, input.uv_MainTex - delta.zy).a,
 					tex2D(_MainTex, input.uv_MainTex + delta.zy).a };
 
-	// Face Normal
+	// 脸部正常
 	float3 n = GetSurfaceNormal(smp4x, input.param.x);
 
-	// Bumpmap
+	// 凹凸贴图
 	float3 bump = UnpackNormal(tex2D(_BumpMap, input.uv2_FaceTex.xy)).xyz;
 	bump *= lerp(_BumpFace, _BumpOutline, saturate(sd + outline * 0.5));
 	bump = lerp(float3(0, 0, 1), bump, faceColor.a);
 	n = normalize(n - bump);
 
-	// Cubemap reflection
+	// 立方体贴图反射
 	fixed4 reflcol = texCUBE(_Cube, reflect(input.viewDirEnv, mul((float3x3)unity_ObjectToWorld, n)));
 	float3 emission = reflcol.rgb * lerp(_ReflectFaceColor.rgb, _ReflectOutlineColor.rgb, saturate(sd + outline * 0.5)) * faceColor.a;
 #else
@@ -89,7 +89,7 @@ void PixShader(Input input, inout SurfaceOutput o)
 	faceColor.rgb /= max(faceColor.a, 0.0001);
 #endif
 
-	// Set Standard output structure
+	// 设置标准输出结构
 	o.Albedo = faceColor.rgb;
 	o.Normal = -n;
 	o.Emission = emission;

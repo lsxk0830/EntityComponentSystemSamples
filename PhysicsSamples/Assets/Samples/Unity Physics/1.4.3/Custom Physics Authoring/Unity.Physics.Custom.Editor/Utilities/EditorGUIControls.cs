@@ -38,9 +38,9 @@ namespace Unity.Physics.Editor
             null,
             new[]
             {
-                typeof(Rect),          // position
-                typeof(GUIContent),    // label
-                typeof(float),         // value
+                typeof(Rect),          // 位置
+                typeof(GUIContent),    // 标签
+                typeof(float),         // 价值
                 typeof(float),         // sliderMin
                 typeof(float),         // sliderMax
                 typeof(float),         // textFieldMin

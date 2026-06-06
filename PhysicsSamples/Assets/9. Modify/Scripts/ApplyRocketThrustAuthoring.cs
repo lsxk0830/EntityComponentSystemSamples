@@ -26,14 +26,14 @@ public class ApplyRocketThrustAuthoring : MonoBehaviour
 
         Gizmos.color = Color.red;
 
-        // Calculate the final Physics Body runtime coordinate system which bakes out skew from non-uniform scaling in parent
+        // 计算最终的 Physics 主体运行时坐标 system，该坐标消除了父级中非均匀缩放带来的倾斜
         var worldFromLocalRigidTransform = Math.DecomposeRigidBodyTransform(transform.localToWorldMatrix);
         var worldFromLocal = Matrix4x4.TRS(worldFromLocalRigidTransform.pos, worldFromLocalRigidTransform.rot, Vector3.one);
 
         Vector3 directionWorld = worldFromLocal.MultiplyVector(LocalDirection.normalized);
         Vector3 offsetWorld = worldFromLocal.MultiplyPoint(LocalOffset);
 
-        // Calculate the final world Thrust coordinate system from the world Body transform and local offset and direction
+        // 根据 world 主体变换和局部偏移和方向计算最终的 world 推力坐标 system
         Math.CalculatePerpendicularNormalized(directionWorld, out _, out var directionPerpendicular);
         var worldFromThrust = Matrix4x4.TRS(offsetWorld, Quaternion.LookRotation(directionWorld, directionPerpendicular), Vector3.one);
 
@@ -80,8 +80,8 @@ public partial struct ApplyRocketThrustSystem : ISystem
 
         public void Execute(ref ApplyRocketThrust rocket, ref LocalTransform transform, ref PhysicsVelocity pv, ref PhysicsMass pm)
         {
-            // Newton's 3rd law states that for every action there is an equal and opposite reaction.
-            // As this is a rocket thrust the impulse applied with therefore use negative Direction.
+            // 牛顿第三定律指出，每一个作用力都会产生一个大小相等、方向相反的反应。
+            // 由于这是火箭推力，因此施加的冲量使用负方向。
             float3 impulse = -rocket.Direction * rocket.Magnitude;
             impulse = math.rotate(transform.Rotation.value, impulse);
             impulse *= DeltaTime;

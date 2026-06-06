@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.DotsUISample
 {
-    // displays buttons for opening the inventory and help
+    // 显示用于打开库存和帮助的按钮
     public class HUDScreen : UIScreen
     {
         Button m_HelpButton;

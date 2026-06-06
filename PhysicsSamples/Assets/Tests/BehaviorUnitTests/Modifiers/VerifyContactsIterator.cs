@@ -76,7 +76,7 @@ namespace Unity.Physics.Tests
                     NumContacts = 0;
                 }
 
-                // Header verification
+                // 标头验证
                 Assert.AreEqual(manifold.CustomTagsA, (byte)0);
                 Assert.AreEqual(manifold.CustomTagsB, (byte)0);
                 Assert.AreNotEqual(manifold.BodyIndexA, manifold.BodyIndexB);
@@ -92,11 +92,11 @@ namespace Unity.Physics.Tests
 
                 NumContacts++;
 
-                // Contact point verification
+                // 接触点验证
                 Assert.IsTrue(contact.Index == NumContacts - 1);
                 Assert.IsFalse(contact.Modified);
 
-                // Save for later verification
+                // 保存以供以后验证
                 CurrentManifoldNumContacts[0] = CurrentManifold.NumContacts;
                 CurrentManifoldNumContacts[1] = NumContacts;
             }

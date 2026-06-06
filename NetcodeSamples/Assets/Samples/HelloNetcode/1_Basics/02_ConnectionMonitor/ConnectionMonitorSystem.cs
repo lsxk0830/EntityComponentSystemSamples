@@ -46,7 +46,7 @@ namespace Samples.HelloNetcode
 
             FixedString32Bytes worldName = World.Name;
             var unmanagedWorld = World.Unmanaged;
-            // Buttons are laid out in columns according to worlds, Server,ClientWorld0,ClientWorld1 and so on
+            // 按钮按照 worlds、Server、ClientWorld0、ClientWorld1 等按列布局
             int worldIndex = 0;
             if (int.TryParse(World.Name[World.Name.Length - 1].ToString(), out worldIndex))
                 worldIndex++;
@@ -55,7 +55,7 @@ namespace Samples.HelloNetcode
                 buffer.AddComponent(entity, new InitializedConnection());
                 UnityEngine.Debug.Log($"[{worldName}] New connection ID:{id.ValueRO.Value}");
 
-                // Not thread safe, so all UI logic is kept on main thread
+                // 不是线程安全的，因此所有 UI 逻辑都保留在主线程上
                 ConnectionMonitorUIData.Connections.Data.Enqueue(new Connection(){Id = id.ValueRO.Value, WorldIndex = worldIndex, World = unmanagedWorld});
             }
 
@@ -64,7 +64,7 @@ namespace Samples.HelloNetcode
                 var state = stateRef.ValueRO;
                 UnityEngine.Debug.Log($"[{worldName}] Connection disconnected ID:{state.NetworkId} Reason:{state.DisconnectReason.ToFixedString()}");
 
-                // Not thread safe, so all UI logic is kept on main thread
+                // 不是线程安全的，因此所有 UI 逻辑都保留在主线程上
                 ConnectionMonitorUIData.Connections.Data.Enqueue(new Connection(){Id = state.NetworkId, WorldIndex = worldIndex, World = unmanagedWorld, ConnectionDeleted = true});
                 buffer.RemoveComponent<ConnectionState>(entity);
             }
@@ -138,8 +138,8 @@ namespace Samples.HelloNetcode
         }
     }
 
-    // Management for the queue which passes data between DOTS and GameObject systems, this way
-    // the two are decoupled a bit cleaner
+    // 对 DOTS 和 GameObject systems 之间传递数据的队列进行管理，这样
+    // 两者解耦得更干净一些
     [UpdateInGroup(typeof(HelloNetcodeSystemGroup))]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class ConnectionMonitor_UIDataSystem : SystemBase
@@ -174,7 +174,7 @@ namespace Samples.HelloNetcode
     {
         public static readonly SharedStatic<UnsafeRingQueue<Connection>> Connections = SharedStatic<UnsafeRingQueue<Connection>>.GetOrCreate<ConnectionKey>();
 
-        // Identifiers for the shared static fields
+        // 共享静态字段的标识符
         private class ConnectionKey {}
     }
 }

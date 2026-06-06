@@ -61,7 +61,7 @@ public partial struct InvalidPhysicsJointExcludeDemoSystem : ISystem
             timer.ValueRW.Tick(deltaTime);
         }
 
-        // add/remove PhysicsExclude
+        // 添加/删除 PhysicsExclude
         using (var commandBuffer = new EntityCommandBuffer(Allocator.TempJob))
         {
             foreach (var(timer, entity)
@@ -69,7 +69,7 @@ public partial struct InvalidPhysicsJointExcludeDemoSystem : ISystem
             {
                 if (timer.ValueRW.Fired(true))
                 {
-                    // If we want to support multiple worlds, we need to store PhysicsWorldIndex.Value somewhere
+                    // 如果我们想支持多个 worlds，我们需要将 PhysicsWorldIndex.Value 存储在某个地方
                     commandBuffer.RemoveComponent<PhysicsWorldIndex>(entity);
                 }
             }
@@ -110,20 +110,20 @@ public partial class InvalidPhyiscsJointExcludeDemoSceneCreationSystem : SceneCr
         var bodyAPos = new float3(2f, 5.0f, 2);
         var bodyBPos = new float3(2f, 6.0f, 2);
 
-        // Add constrained dynamic/dynamic body pair that will have their bodies excluded
+        // 添加约束动态/动态主体对，将排除其主体
         bool buildThisSection = true;
         if (buildThisSection)
         {
             bodyAPos += new float3(1, 0, 0);
             bodyBPos += new float3(1, 0, 0);
 
-            // Create a body
+            // 创建一个身体
             Entity bodyA = CreateDynamicBody(bodyAPos, quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
             Entity bodyB = CreateDynamicBody(bodyBPos, quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
             for (int i = 0; i < 2; i++)
             {
-                // Create the joint
+                // 创建 joint
                 var joint = PhysicsJoint.CreateBallAndSocket(new float3(0, colliderSize, 0), new float3(0, -colliderSize, 0));
                 var jointEntity = CreateJoint(joint, bodyA, bodyB);
 
@@ -132,7 +132,7 @@ public partial class InvalidPhyiscsJointExcludeDemoSceneCreationSystem : SceneCr
                 EntityManager.SetComponentData(jointEntity, pair);
             }
 
-            // add exclude components.
+            // 添加排除 components。
             EntityManager.AddComponentData(bodyA, new InvalidPhysicsJointExcludeBodies());
             EntityManager.AddComponentData(bodyA, new InvalidPhysicsJointExcludeTimerEvent { TimeLimit = timeToSwap, Timer = timeToSwap });
             EntityManager.AddComponentData(bodyB, new InvalidPhysicsJointExcludeBodies());

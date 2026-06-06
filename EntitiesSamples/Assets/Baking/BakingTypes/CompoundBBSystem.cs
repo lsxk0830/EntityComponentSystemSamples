@@ -17,12 +17,12 @@ namespace Baking.BakingTypes
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Add the cleanup component to every entity contributing the bounding boxes.
+            // 将清理 component 添加到每个提供边界框的 entity 中。
             var missingCleanupQuery = SystemAPI.QueryBuilder().WithAll<BoundingBox>()
                 .WithNone<BoundingBoxCleanup>().Build();
             state.EntityManager.AddComponent<BoundingBoxCleanup>(missingCleanupQuery);
 
-            // Find the parent bounding boxes that have changes in their children and reset their values.
+            // 找到其子级发生变化的父级边界框并重置其值。
             var changedCBBs = new NativeHashSet<Entity>(1, Allocator.Temp);
             foreach (var (bb, pp) in
                      SystemAPI.Query<RefRO<BoundingBox>, RefRW<BoundingBoxCleanup>>()
@@ -34,14 +34,14 @@ namespace Baking.BakingTypes
                 var previousParent = pp.ValueRO.PreviousParent;
                 if (previousParent != Entity.Null && previousParent != parent)
                 {
-                    // If this entity has been re-parented, both the previous and current parent need to be updated.
+                    // 如果此 entity 已重新设置父级，则之前的父级和当前的父级都需要更新。
                     changedCBBs.Add(previousParent);
                 }
 
                 pp.ValueRW.PreviousParent = parent;
             }
 
-            // If an entity has been destroyed, only its cleanup component is left. The previous parent needs updating.
+            // 如果 entity 已被销毁，则只剩下其清理 component。之前的父级需要更新。
             foreach (var pp in
                      SystemAPI.Query<RefRO<BoundingBoxCleanup>>()
                          .WithNone<BoundingBox>())
@@ -53,12 +53,12 @@ namespace Baking.BakingTypes
                 }
             }
 
-            // Destroyed entities are kept alive by their cleanup component, so they have to be explicitly removed.
+            // 被破坏的 entities 通过清理 component 保持活动状态，因此必须显式删除它们。
             var removedEntities = SystemAPI.QueryBuilder().WithAll<BoundingBoxCleanup>()
                 .WithNone<BoundingBox>().Build();
             state.EntityManager.RemoveComponent<BoundingBoxCleanup>(removedEntities);
 
-            // Every parent that needs updating has its bounding box reset.
+            // 每个需要更新的父级都会重置其边界框。
             foreach (var parent in changedCBBs)
             {
                 SystemAPI.SetComponent(parent, new CompoundBBComponent()
@@ -68,7 +68,7 @@ namespace Baking.BakingTypes
                 });
             }
 
-            // Calculate the compounded bounding box of all the cubes
+            // 计算所有立方体的复合边界框
             var compoundBBLookup = SystemAPI.GetComponentLookup<CompoundBBComponent>();
             foreach (var bb in
                      SystemAPI.Query<RefRO<BoundingBox>>())

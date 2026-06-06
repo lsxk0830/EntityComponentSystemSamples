@@ -45,7 +45,7 @@ namespace Unity.Physics.Tests
             {
                 var localTransform = state.EntityManager.GetComponentData<LocalTransform>(entity);
 
-                // Cube should never get past the X == 0
+                // Cube 永远不应该超过 X == 0
                 Assert.IsTrue(localTransform.Position.x < 0.0f);
             }
             entities.Dispose();

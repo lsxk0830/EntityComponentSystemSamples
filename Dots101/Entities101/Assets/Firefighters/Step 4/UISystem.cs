@@ -7,7 +7,7 @@ namespace Tutorials.Firefighters
     public partial struct UISystem : ISystem
     {
         private bool initialized;
-        
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -15,13 +15,13 @@ namespace Tutorials.Firefighters
             state.RequireForUpdate<ExecuteUI>();
         }
 
-        // Because this update accesses managed objects, it cannot be Burst compiled,
-        // so we do not add the [BurstCompiled] attribute.
+        // 由于此更新访问托管对象，因此无法进行 Burst 编译，
+        // 所以我们不添加 [BurstCompiled] 属性。
         public void OnUpdate(ref SystemState state)
         {
             var configEntity = SystemAPI.GetSingletonEntity<Config>();
             var configManaged = state.EntityManager.GetComponentObject<ConfigManaged>(configEntity);
-            
+
             if (!initialized)
             {
                 initialized = true;
@@ -31,19 +31,19 @@ namespace Tutorials.Firefighters
 
             var shouldReposition = configManaged.UIController.ShouldReposition();
             var totalFiresDoused = 0;
-            
-            foreach (var (team, entity) in 
+
+            foreach (var (team, entity) in
                      SystemAPI.Query<RefRO<Team>>()
                          .WithEntityAccess())
             {
                 totalFiresDoused += team.ValueRO.NumFiresDoused;
-                
+
                 if (shouldReposition)
                 {
                     SystemAPI.SetComponentEnabled<RepositionLine>(entity, true);
-                }    
+                }
             }
-            
+
             configManaged.UIController.SetNumFiresDoused(totalFiresDoused);
         }
     }

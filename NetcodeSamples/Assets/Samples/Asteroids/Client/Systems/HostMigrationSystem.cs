@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Asteroids.Client
 {
     /// <summary>
-    /// Custom host migration logic for clients in the Asteroids sample. Place the client immediately in game again
-    /// after a host migration.
+    /// Asteroids 示例中 clients 的自定义主机迁移逻辑。立即再次将 client 放入游戏
+    /// 主机迁移后。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation|WorldSystemFilterFlags.ThinClientSimulation)]
     public partial struct HostMigrationSystem : ISystem
@@ -25,7 +25,7 @@ namespace Asteroids.Client
                 if (evt.State == ConnectionState.State.Connected && reconnected.HasComponent(evt.ConnectionEntity))
                 {
                     state.EntityManager.AddComponent<NetworkStreamInGame>(evt.ConnectionEntity);
-                    // Remove the reconnection tag as we're done with it
+                    // 完成后删除重新连接标签
                     state.EntityManager.RemoveComponent<NetworkStreamIsReconnected>(evt.ConnectionEntity);
                 }
             }

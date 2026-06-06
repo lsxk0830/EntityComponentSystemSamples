@@ -24,10 +24,10 @@ namespace HelloCube.CrossQuery
             state.Enabled = false;
             var prefabCollection = SystemAPI.GetSingleton<PrefabCollection>();
 
-            // spawn boxes
+            // 产卵箱
             state.EntityManager.Instantiate(prefabCollection.Box, 20, Allocator.Temp);
 
-            // init the newly spawned boxes
+            // 初始化新生成的盒子
             int i = 0;
             foreach (var (velocity, trans, defaultColor, colorProperty) in
                      SystemAPI.Query<RefRW<Velocity>, RefRW<LocalTransform>,
@@ -35,7 +35,7 @@ namespace HelloCube.CrossQuery
             {
                 if (i < 10)
                 {
-                    // black box on left
+                    // 左边的黑框
                     velocity.ValueRW.Value = new float3(2, 0, 0);
                     var verticalOffset = i * 2;
                     trans.ValueRW.Position = new float3(-3, -8 + verticalOffset, 0);
@@ -44,7 +44,7 @@ namespace HelloCube.CrossQuery
                 }
                 else
                 {
-                    // white box on right
+                    // 右侧白色方框
                     velocity.ValueRW.Value = new float3(-2, 0, 0);
                     var verticalOffset = (i - 10) * 2;
                     trans.ValueRW.Position = new float3(3, -8 + verticalOffset, 0);

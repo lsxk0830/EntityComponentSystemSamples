@@ -1,9 +1,9 @@
-// This system changes the colour of the tree top from green to orange when DeadTree.EnableColourChange is true.
-// This system iterates on entities based on the TreeFlag value where the flag value = TriggerChangeTreeColor (this is
-// set in TreeDeathSystem). It is a non-issue if this system is not run, and the flag value is not updated. After this
-// state change, the flag values in the TreeTop and TreeTrunk aren't used for anything before the entity is destroyed.
-// The colour change will happen during the LifeCycleStates.IsDead state.
-// Goals: a purely visual tool to show when a tree is killed and is dynamic
+// 当 DeadTree.EnableColourChange 为 true 时，此 system 将树顶的颜色从绿色更改为橙​​色。
+// 此 system 基于 TreeFlag 值迭代 entities，其中标志值 = TriggerChangeTreeColor（这是
+// 在 TreeDeathSystem 中设置）。如果此 system 不是 run，则不是问题，并且标志值未更新。在此之后
+// 状态更改时，TreeTop 和 TreeTrunk 中的标志值在 entity 被销毁之前不会用于任何用途。
+// 颜色变化将在 LifeCycleStates.IsDead 状态期间发生。
+// 目标：一个纯粹的视觉工具，用于显示树木何时被杀死并且是动态的
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Physics.Systems;
@@ -30,7 +30,7 @@ namespace Unity.Physics
                 return;
             }
 
-            // Change the color of the tree tops:
+            // 更改树顶的颜色：
             state.Dependency = new ChangeTreeColourJob
             {
                 DeadTreeMaterialIndex = spawner.DeadTreeMaterialIndex

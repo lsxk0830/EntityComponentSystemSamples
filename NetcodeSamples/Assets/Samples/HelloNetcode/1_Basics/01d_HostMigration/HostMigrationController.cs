@@ -21,9 +21,9 @@ using Unity.Services.Core;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// The string keys used in the lobby data to communicate the current joincode and host ID in use by the
-    /// games host. During host migration events this will be used so everyone connects to the right relay
-    /// allocation.
+    /// 大厅数据中使用的字符串键，用于传达当前加入代码和主机使用的 ID
+    /// 游戏主持人。在主机迁移事件期间，将使用此功能，以便每个人都连接到正确的中继
+    /// 分配。
     /// </summary>
     static class LobbyKeys
     {
@@ -37,13 +37,13 @@ namespace Samples.HelloNetcode
         public string RelayJoinCode { get; set; }
 
         /// <summary>
-        /// Set when the first join of a host is delayed because the host is not yet ready (relay join code not updated)
-        /// In this case we'll not react to host migration events until the initial host join is finished.
+        /// 当主机的第一次加入因主机尚未准备好而延迟时设置（中继加入代码未更新）
+        /// 在这种情况下，在初始主机加入完成之前，我们不会对主机迁移事件做出反应。
         /// </summary>
         public bool WaitForInitialJoin { get; set; }
 
         /// <summary>
-        /// By default use the Datagram Transport Layer Security (dtls) connection type with the network transport
+        /// 默认情况下，使用数据报传输层安全 (dtls) 连接类型进行网络传输
         /// </summary>
 #if !UNITY_WEBGL
         public string ConnectionType { get; } = "dtls";
@@ -66,23 +66,23 @@ namespace Samples.HelloNetcode
 
         public int InitialDataSize { get; set; } = 100_000;
 
-        // Interval at which Lobby heartbeats are performed.
-        // This must be done at least once every 30s.
-        // Note: this call is subject to service rate limiting (max 1 rq/s).
+        // 执行大厅心跳的时间间隔。
+        // 此操作必须至少每 30 秒执行一次。
+        // Note: 此呼叫受服务速率限制（最大 1 rq/s）。
         const int k_HeartbeatIntervalSeconds = 10;
 
-        // Maximum number of players allowed in the created lobby for this game/sample. This is also set in the Lobby
-        // cloud config tab for the project ID (see your project on https://cloud.unity.com). Relay's max supported
-        // players is: https://docs.unity.com/ugs/manual/relay/manual/limitations
+        // 为此游戏/示例创建的大厅中允许的最大玩家数量。这也设置在大堂
+        // 项目 ID 的云配置选项卡（请参阅 https://cloud.unity.com 上的项目）。Relay 的最大支持
+        // 玩家是：https://docs.unity.com/ugs/manual/relay/manual/limitations
         const int k_DefaultMaxLobbyPlayers = 50;
 
-        // The timeout for establishing a relay connection after a host migration
+        // 主机迁移后建立中继连接的超时时间
         const double k_TimeoutForRelayConnectionSeconds = 60;
 
-        // When retrying service API calls use this delay between the calls
+        // 重试服务 API 调用时，使用调用之间的此延迟
         const int k_ServiceRetryDelayMS = 1000;
 
-        // The retry count limit for service API calls
+        // 服务 API 调用的重试次数限制
         const int k_ServiceRetryCount = 10;
 
         MigrationDataInfo m_MigrationConfig;
@@ -164,7 +164,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Just leave the lobby, keep it running as we need it for the other clients for host migration
+        /// 只需离开大厅，保持其运行，因为我们需要其他 clients 进行主机迁移
         /// </summary>
         void LeaveLobby()
         {
@@ -217,8 +217,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Upload the host migration data to the host migration service. If needed the upload location URL is
-        /// refreshed. This will be called regularly so it's ok if it fails because of service rate limiting.
+        /// 将主机迁移数据上传至主机迁移服务。如果需要，上传位置 URL 是
+        /// 神清气爽。这将被定期调用，因此如果由于服务速率限制而失败也没关系。
         /// </summary>
         async Task UploadMigrationData()
         {
@@ -230,7 +230,7 @@ namespace Samples.HelloNetcode
                     return;
                 }
 
-                // Subtract a minute from expiration time to be sure we update the migration URL in time
+                // 从过期时间减去一分钟以确保我们及时更新迁移 URL
                 if (m_MigrationConfig.Expires.AddMinutes(-1) < DateTime.UtcNow)
                 {
                     Debug.Log($"[HostMigration] Refreshing migration config as it has expired.");
@@ -291,21 +291,21 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Check the lobby change event for a host migration event.
-        ///   - If it's a host migration event for the host we're already connected to it can be ignored
-        ///   - Reset the client driver, even if the connection entity is destroyed there can still be a connection
-        ///     present to the relay server in the network driver itself.
-        ///   - If it's a host migration event for us, we need to take over hosting duties
-        ///     - Start the lobby heartbeat (needs to be pinged regularly or the lobby thinks we're inactive)
-        ///     - Download the host migration data and deploy it to a new server world (perform host migration)
-        ///     - When connected to relay server with a new allocation update the lobby with the new join code
-        ///       so the other clients can now connect to me
-        ///   - If it's a host migration event, and we'll stay as a client we need to wait until a new join
-        ///     code for the new relay allocation has been reported by the new host (so basically do nothing)
+        /// 检查大厅更改事件以了解主机迁移事件。
+        ///   - 如果这是我们已经连接到的主机的主机迁移事件，则可以忽略
+        ///   - 重置 client 驱动，即使连接 entity 被破坏仍然可以有连接
+        ///     呈现给网络驱动程序本身中的继电器 server。
+        ///   - 如果这是我们的主机迁移活动，我们需要接管托管职责
+        ///     - 启动大厅心跳（需要定期进行 ping 操作，否则大厅认为我们不活动）
+        ///     - 下载主机迁移数据并将其部署到新的 server world（执行主机迁移）
+        ///     - 当使用新的分配连接到中继 server 时，使用新的加入代码更新大厅
+        ///       所以其他 clients 现在可以连接到我
+        ///   - 如果是主机迁移事件，并且我们将继续作为 client，我们需要等待新的加入
+        ///     新主机已报告新中继分配的代码（所以基本上什么都不做）
         /// </summary>
         async Task CheckHostMigration(ILobbyChanges changes)
         {
-            // Do the changes include a hostId modification?
+            // 这些更改是否包括 hostId 修改？
             if (changes.HostId.Changed)
             {
                 var newHostId = changes.HostId.Value;
@@ -316,11 +316,11 @@ namespace Samples.HelloNetcode
                 }
                 Debug.Log($"[HostMigration] Host change event. Previously '{m_PrevHostId}', now '{newHostId}'.");
 
-                // Sever the relay connection of the client right here to ensure it doesn't get in the way later
-                // when reconnecting the client
+                // 在这里切断 client 的中继连接，以确保它以后不会妨碍
+                // 重新连接 client 时
                 ResetClientNetworkDriver();
 
-                // Are we the new host?
+                // 我们是新主人吗？
                 if (newHostId == CurrentPlayerId)
                 {
                     Debug.Log($"[HostMigration] We are the new elected host!");
@@ -339,10 +339,10 @@ namespace Samples.HelloNetcode
                         return;
                     }
 
-                    // Take over heartbeat duties
+                    // 接管心跳职责
                     StartHeartbeat();
 
-                    // It will take a bit of time to download data and do lobby updates, update the UI with what's happening (this will happen in client world as the server world is only created at the end)
+                    // 下载数据并进行大厅更新需要一些时间，更新 UI 发生的情况（这将在 client world 中发生，因为 server world 仅在最后创建）
                     var clientRelayEntity = HostMigrationHUD.SetWaitForRelayConnection(new WaitForRelayConnection() { WaitForHostSetup = true, IsHostMigration = true, StartTime = Time.realtimeSinceStartup});
 
                     Debug.Log($"[HostMigration] Fetching migration data information");
@@ -366,43 +366,43 @@ namespace Samples.HelloNetcode
                         return;
                     }
 
-                    // TODO: Wait for cooldown, multiple requests queued, etc
+                    // TODO: 等待冷却、多个请求排队等
 
                     var waitEntityQuery = ClientServerBootstrap.ServerWorld.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<WaitForRelayConnection>());
                     if (!waitEntityQuery.TryGetSingletonEntity<WaitForRelayConnection>(out var serverRelayEntity))
                         serverRelayEntity = ClientServerBootstrap.ServerWorld.EntityManager.CreateEntity(ComponentType.ReadOnly<WaitForRelayConnection>());
                     waitEntityQuery.Dispose();
                     ClientServerBootstrap.ServerWorld.EntityManager.AddComponentData(serverRelayEntity, new WaitForRelayConnection() { IsHostMigration = true, StartTime = Time.realtimeSinceStartup});
-                    ClientServerBootstrap.ClientWorld.EntityManager.DestroyEntity(clientRelayEntity); // cleanup as this is no longer needed
+                    ClientServerBootstrap.ClientWorld.EntityManager.DestroyEntity(clientRelayEntity); // 清理，因为不再需要它
 
-                    // Connect the server migration stats HUD
+                    // 连接 server 迁移统计信息 HUD
                     var statsText = FindFirstObjectByType<HostMigrationHUD>().StatsText;
                     ClientServerBootstrap.ServerWorld.GetExistingSystemManaged<ServerHostMigrationHUDSystem>().StatsText = statsText;
 
-                    // Disable the client status HUD
+                    // 禁用 client 状态 HUD
                     ClientServerBootstrap.ClientWorld.GetOrCreateSystemManaged<ClientHostMigrationHUDSystem>().Enabled = false;
 
                     await UpdateJoinCodeWhenReady();
                 }
                 else
                 {
-                    // Not the host; stop sending lobby heartbeats if we were
+                    // 不是主人；如果我们是，请停止发送大厅心跳
                     StopHeartbeat();
 
-                    // In a forced migration, this host is still alive and well but
-                    // should stop being a server
+                    // 在一次强制迁移中，该宿主仍然活着并且状况良好，但是
+                    // 应该停止成为 server
                     if (ClientServerBootstrap.ServerWorld != null)
                     {
                         Debug.Log("[HostMigration] Disposing of Server world.");
                         ClientServerBootstrap.ServerWorld.Dispose();
                     }
 
-                    // TODO: There should always be a client world at this point, but seems this does happen and needs debugging
+                    // TODO: 此时应该始终有一个 client world，但似乎确实发生了这种情况并且需要调试
                     if (ClientServerBootstrap.ClientWorld != null)
                     {
                         HostMigrationHUD.SetWaitForRelayConnection(new WaitForRelayConnection() { WaitForJoinCode = true, OldJoinCode = RelayJoinCode, IsHostMigration = true, StartTime = Time.realtimeSinceStartup});
 
-                        // Connect the migration stats HUD
+                        // 连接迁移统计信息 HUD
                         var statsText = FindFirstObjectByType<HostMigrationHUD>().StatsText;
                         var clientMigrationSystem = ClientServerBootstrap.ClientWorld.GetExistingSystemManaged<ClientHostMigrationHUDSystem>();
                         clientMigrationSystem.StatsText = statsText;
@@ -413,16 +413,16 @@ namespace Samples.HelloNetcode
                     }
 
                     // CheckLobbyDataForNewRelayHost() will be called next to see if the present changes include a new
-                    // join code. More likely though, a separate change event will be arriving soon.
+                    // 加入代码。但更有可能的是，一个单独的变更事件很快就会到来。
                     Debug.Log("[HostMigration] Host migration triggered, waiting for updates from new host before connecting");
                 }
             }
         }
 
         /// <summary>
-        /// Update the lobby with the new relay allocation id and joincode.
-        /// This signals to other players that they can now connect. We need to wait until the connection to the relay
-        /// server is established or else the clients might try to join before we're ready to accept incoming
+        /// 使用新的中继分配 ID 和加入代码更新大厅。
+        /// 这向其他玩家发出信号，表明他们现在可以连接。我们需要等到连接到中继
+        /// server 已建立，否则 clients 可能会在我们准备好接受传入之前尝试加入
         /// connections (such cases would result in errors on the client side).
         /// </summary>
         async Task UpdateJoinCodeWhenReady()
@@ -432,7 +432,7 @@ namespace Samples.HelloNetcode
             var networkStreamDriver = drvQuery.GetSingletonRW<NetworkStreamDriver>();
             drvQuery.Dispose();
 
-            // Find which driver is using the relay
+            // 查找哪个驱动程序正在使用继电器
             int relayDriverNr = 0;
             for (var i = networkStreamDriver.ValueRO.DriverStore.FirstDriver;
                  i < networkStreamDriver.ValueRO.DriverStore.LastDriver;
@@ -446,7 +446,7 @@ namespace Samples.HelloNetcode
             }
             Debug.Log("[HostMigration] Waiting for relay connection before join code update");
 
-            // Wait until connection is established
+            // 等待连接建立
             var relayNetworkDriver = networkStreamDriver.ValueRO.DriverStore.GetDriverRO(relayDriverNr);
             var startTime = Time.realtimeSinceStartup;
             serverWorld.EntityManager.CompleteAllTrackedJobs();
@@ -454,10 +454,10 @@ namespace Samples.HelloNetcode
             while (status != RelayConnectionStatus.Established)
             {
                 await Task.Delay(100);
-                // Server world has been destroyed while waiting to update the join code (most likely returned to main menu)
+                // Server world 在等待更新加入代码时已被破坏（很可能返回主菜单）
                 if (serverWorld == null || !serverWorld.IsCreated)
                 {
-                    // Leave immediately as we're the host and someone else needs to take over
+                    // 立即离开，因为我们是房东，需要其他人接管
                     LeaveLobby();
                     return;
                 }
@@ -473,7 +473,7 @@ namespace Samples.HelloNetcode
             var connectionTime = Time.realtimeSinceStartup - startTime;
             Debug.Log($"[HostMigration] Relay connection established ({connectionTime:F2} s). Updating relay join code.");
 
-            // Announce the join code as relay should be ready for the clients now
+            // 宣布加入代码，因为中继现在应该为 clients 做好准备
             UpdateLobbyOptions updateLobbyOptions = new UpdateLobbyOptions()
             {
                 Data = new Dictionary<string, DataObject>(){
@@ -492,8 +492,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// The relay connection isn't immediately removed when the host is disconnected, this can be forced by
-        /// disposing the NetworkDriver (via resetting the driver store).
+        /// 当主机断开连接时，中继连接不会立即删除，这可以通过以下方式强制
+        /// 处置 NetworkDriver（通过重置驱动程序存储）。
         /// </summary>
         void ResetClientNetworkDriver()
         {
@@ -509,8 +509,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Check if the new host has updated the relay connection info on the lobby data.
-        /// If a new and valid join code is being reported we'll connect to the new host using the relay.
+        /// 检查新主机是否更新了大厅数据上的中继连接信息。
+        /// 如果报告新的有效加入代码，我们将使用中继连接到新主机。
         /// </summary>
         async Task CheckLobbyDataForNewRelayHost(ILobbyChanges changes)
         {
@@ -548,9 +548,9 @@ namespace Samples.HelloNetcode
                     return;
                 }
 
-                // Upon host migration, the lobby updates immediately before the new lobby host has updated
-                // the relay join code. In this update, the (now stale) relay information from the previous lobby
-                // host needs to be ignored.
+                // 主机迁移后，大厅会在新大厅主机更新之前立即更新
+                // 中继加入代码。在此更新中，（现已过时）来自先前大厅的中继信息
+                // 主机需要被忽略。
                 if (relayHost != CurrentHostId)
                 {
                     Debug.Log($"[HostMigration] Ignoring stale relay join code from host {relayHost}; current host is {CurrentHostId}.");
@@ -570,12 +570,12 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Sanity check on the current world status before a client becomes as host during
-        /// a host migration event.
-        /// - Can't already have a server world as we'll be creating a new one
-        /// - Thin clients are not supported
-        /// - Client world must exist, it will switch from relay connection setup (old host)
-        ///   to an IPC to the local server world
+        /// 在 client 成为主机之前，对当前 world 状态进行健全性检查
+        /// 主机迁移事件。
+        /// - 不能已有 server world，因为我们将创建一个新的
+        /// - 不支持薄 clients
+        /// - Client world 必须存在，它将从中继连接设置切换（旧主机）
+        ///   至 IPC 至本地 server world
         /// </summary>
         static bool ValidateWorldsForMigration()
         {
@@ -611,10 +611,10 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// The host migration routine for clients who remain as clients.
-        ///   - No new client world is created but the current one kept intact
-        ///   - Reset the client driver store with the new relay allocation/joincode
-        ///   - Connect to the new host
+        /// clients 的主机迁移例程仍为 clients。
+        ///   - 没有创建新的 client world，但当前的 world 保持不变
+        ///   - 使用新的继电器分配/加入代码重置 client 驱动程序存储
+        ///   - 连接到新主机
         /// </summary>
         async Task ConnectWithRelayAsClient(string joinCode)
         {
@@ -629,9 +629,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// The host migration routine for the new host.
-        ///   - Create a new relay allocation and join code
-        ///   - Create a new server world and deploy the migration data there.
+        /// 新主机的主机迁移例程。
+        ///   - 创建新的中继分配和加入代码
+        ///   - 创建新的 server world 并在其中部署迁移数据。
         /// </summary>
         async Task<bool> ListenAndConnectWithRelayAsHost(byte[] migrationData)
         {
@@ -666,9 +666,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Update the relay allocation ID for the local player in the lobby. This needs to be done every time the
-        /// allocation changes so the lobby and relay can identify this endpoint reliably (for example if the player
-        /// times out in the relay the lobby will know as well).
+        /// 为大厅中的本地玩家更新中继分配 ID。每次都需要执行此操作
+        /// 分配发生变化，因此大厅和中继可以可靠地识别此端点（例如，如果玩家
+        /// 中继超时，大厅也会知道）。
         /// </summary>
         /// <param name="allocationId"></param>
         public async Task UpdatePlayerAllocationId(Guid allocationId)
@@ -679,8 +679,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Send a heartbeat to the current lobby at intervals specified by <see cref="k_HeartbeatIntervalSeconds"/>.
-        /// Only the server needs to send the heartbeat (keeps the lobby alive).
+        /// 按照 <see cref="k_HeartbeatIntervalSeconds"/> 指定的时间间隔向当前大厅发送心跳。
+        /// 只有 server 需要发送心跳（保持大厅活动）。
         /// </summary>
         /// <returns></returns>
         IEnumerator HeartbeatLobbyCoroutine()
@@ -706,12 +706,12 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initial lobby creation. The same lobby will be kept throughout host migrations so it will only need to be
-        /// created once.
+        /// 初始大厅创建。在整个主机迁移过程中将保留相同的大厅，因此只需要
+        /// 创建一次。
         /// </summary>
         public async Task CreateLobbyAsync(string joinCode, string allocationId)
         {
-            // TODO: Handle potentially hitting rate limit, wait until this succeeds
+            // TODO: 处理可能达到速率限制的情况，等待成功
 
             RelayJoinCode = joinCode;
             var playerId = AuthenticationService.Instance.PlayerId;
@@ -731,13 +731,13 @@ namespace Samples.HelloNetcode
             m_MigrationConfig = await LobbyService.Instance.GetMigrationDataInfoAsync(m_CurrentLobby.Id);
             Debug.Log($"[HostMigration] Migration Data Information: Expires:{m_MigrationConfig.Expires} (Now:{DateTime.Now}) MaxSize:{m_MigrationConfig.MaxSize} ReadUrl:{m_MigrationConfig.Read} WriteUrl:{m_MigrationConfig.Write}");
 
-            // Host is responsible for heartbeating the lobby to keep it alive
+            // 主机负责对大厅进行心跳以保持其活力
             StartHeartbeat();
         }
 
         /// <summary>
-        /// Initial subscription to lobby events. We need this to get notifications about host migration events. This
-        /// only needs to happen once as the lobby is kept intact throughout host migrations.
+        /// 大厅活动的初始订阅。我们需要它来获取有关主机迁移事件的通知。这
+        /// 只需要发生一次，因为大厅在主机迁移过程中保持完整。
         /// </summary>
         public async Task SubscribeToLobbyEvents()
         {
@@ -762,9 +762,9 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initial join handling for a specific lobby name. The clients will only need to join the lobby once during
-        /// a game session as the host migration will keep using the same lobby. This will fail if the exact lobby
-        /// name is not found.
+        /// 特定大厅名称的初始加入处理。clients 期间只需要加入大厅一次
+        /// 主机迁移时的游戏会话将继续使用相同的大厅。如果确切的大厅，这将会失败
+        /// 未找到名称。
         /// </summary>
         public async Task JoinLobbyByNameAsync(string lobbyName)
         {
@@ -793,8 +793,8 @@ namespace Samples.HelloNetcode
                     return;
                 }
 
-                // Host ID needs to be set before joining as during join operation you could get a host migration event for this host
-                // (owner of lobby) but we're already connecting to him so this event needs to be ignored
+                // 主机 ID 需要在加入之前设置，因为在加入操作期间您可以获取该主机的主机迁移事件
+                // （大厅所有者）但我们已经连接到他，因此需要忽略此事件
                 m_PrevHostId = foundLobby.HostId;
                 m_CurrentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(foundLobby.Id);
             }
@@ -810,7 +810,7 @@ namespace Samples.HelloNetcode
                     Debug.LogWarning($"[HostMigration] Hit lobby query rate limit while trying to join lobby '{lobbyName}', try again.");
                     return;
                 }
-                // TODO: This is mostly debugging info in case this exception is unexpectedly hit (remove later)
+                // TODO: 这主要是调试信息，以防意外发生此异常（稍后删除）
                 if (m_CurrentLobby == null)
                     Debug.Log("DEBUG: No lobby instance found.");
                 var joinedLobbies = await LobbyService.Instance.GetJoinedLobbiesAsync();

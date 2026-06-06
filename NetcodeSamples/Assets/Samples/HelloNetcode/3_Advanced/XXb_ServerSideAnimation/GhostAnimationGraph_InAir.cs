@@ -54,7 +54,7 @@ namespace Samples.HelloNetcode.Hybrid
             var inAirData = m_controller.GetPlayableData<InAirAnimationData>();
             m_clip.SetTime(inAirData.Phase * m_clip.GetDuration());
 
-            // Update aim
+            // 更新目标
             float aimPitchFraction = inAirData.aimPitch / 180.0f;
             m_clipAim.SetTime(aimPitchFraction * m_clipAim.GetDuration());
 
@@ -71,7 +71,7 @@ namespace Samples.HelloNetcode.Hybrid
             //m_clipAim.Pause();
             m_clipAim.SetDuration(aimClip.length);
 
-            // Setup other additive mixer
+            // 设置其他添加剂混合器
             var additiveMixer = AnimationLayerMixerPlayable.Create(graph);
             var locoMixerPort = additiveMixer.AddInput(m_clip, 0);
             additiveMixer.SetInputWeight(locoMixerPort, 1);
@@ -95,7 +95,7 @@ namespace Samples.HelloNetcode.Hybrid
         {
             var behaviourPlayable = ScriptPlayable<InAirGhostPlayableBehaviour>.Create(graph);
             var behaviour = behaviourPlayable.GetBehaviour();
-            // This registers the behaviour for receiving PreparePredictedData, skip this if predicted data is updated by a system (PrepareFrame is still called)
+            // 这注册了接收 PreparePredictedData 的行为，如果 predicted 数据由 system 更新（PrepareFrame 仍然被调用），则跳过此操作
             behaviours.Add(behaviour);
 
             behaviour.Initialize(controller, graph, behaviourPlayable, Clip, AimClip);

@@ -1,33 +1,33 @@
-# HelloNetcode Server Side Animation sample
+# HelloNetcode Server 侧面动画示例
 
-## Requirements
+## 要求
 
-The spawn player sample is used to trigger the auto spawning of the player when establishing connection.
-The character controller is used to move and rotate the player around using the keyboard and mouse input.
-The character model from client side animation is reused in this sample.
+生成播放器示例用于 trigger 建立连接时自动生成播放器。
+角色控制器用于使用键盘和鼠标输入来移动和旋转玩家。
+本示例中重复使用了 client 侧面动画中的角色模型。
 
 * GoInGame
 * SpawnPlayer
 * CharacterController
 * ClientSideAnimation
 
-## Sample description
+## 示例描述
 
-This sample shows how to add animation to the spawned player. The animation is created using the built-in animation system known as [Mecanim](https://docs.unity3d.com/Manual/AnimationOverview.html).
-The animation is running on the server side and is replicated on each client.
+此示例展示了如何向生成的播放器添加动画。该动画是使用称为 [Mecanim](https://docs.unity3d.com/Manual/AnimationOverview.html) 的内置动画 system 创建的。
+该动画在 server 端运行，并在每个 client 上复制。
 
-The scene comprises a plane on which the character can move around and a spawner as mentioned in the sample SpawnPlayer. You will see the character in the gameview when entering playmode. The camera will follow the character around.
-To move the character you must use the arrow keys. You can also turn the character by pressing the mouse button and dragging to the sides to change the viewpoint. Notice the character following the camera view.
+scene 包含角色可以在其上移动的平面和示例 SpawnPlayer 中提到的生成器。进入游戏模式时，您将在游戏视图中看到该角色。摄像机将跟随角色四处移动。
+要移动角色，您必须使用箭头键。您还可以通过按下鼠标按钮并拖动到两侧来改变视角来转动角色。注意跟随摄像机视图的角色。
 
-The prefab named ServerAnimatedCharacter is the entity assigned to the 'Spawner' in the subscene.
-It is setup to handle character controllers as the CharacterController sample.
+名为 ServerAnimatedCharacter 的 prefab 是分配给 subscene 中“Spawner”的 entity。
+它被设置为处理字符控制器作为 CharacterController 示例。
 
-We use the Ghost Presentation Game Object Authoring to spawn the Terraformer_Client prefab as a client side representation of the character. The server side representation is set to the Terraformer_Server prefab. If you open the server side prefab you will notice that the geometry is disabled and only the skeleton is left enabled.
-The animation is applying the motion to the skeleton, which will then be replicated to the client's version of the model where the geometry is enabled.
+我们使用 Ghost 演示游戏对象 Authoring 来生成 Terraformer_Client prefab 作为角色的 client 侧面表示。server 侧面表示设置为 Terraformer_Server prefab。如果打开 server 侧 prefab，您会注意到几何体被禁用，只有骨架保持启用状态。
+动画将运动应用到骨架，然后将其复制到启用几何图形的 client 模型版本。
 
-When entering playmode and during the baking step, the presentation objects will be spawned and assigned an entity. You will see them as Terraformer_[Server/Client] (Clone) in the scene hierarchy view.
+当进入播放模式并在 baking 步骤期间，将生成演示对象并分配一个 entity。您将在 scene 层次视图中将它们视为 Terraformer_[Server/Client]（克隆）。
 
-The Terraformer prefab make use the GhostAnimationController from the Netcode package. These require that we assign a GhostAnimationGraph asset to the field named Animation Graph Asset.
-In this sample one of those is called StateSelector, four more are created containing logic for Jump, Run, Stand and InAir.
+Terraformer prefab 使用来自 Netcode package 的 GhostAnimationController。这些要求我们将 GhostAnimationGraph 资源分配给名为“Animation Graph Asset”的字段。
+在此示例中，其中一个称为 StateSelector，另外创建了四个包含 Jump、Run、Stand 和 InAir 的逻辑。
 
-The StateSelector is responsible for deciding the current state in the animation logic. This is done by querying the character controller logic and deciding whether the character should be moving, jumping, etc.
+StateSelector 负责决定动画逻辑中的当前状态。这是通过查询角色控制器逻辑并决定角色是否应该移动、跳跃等来完成的。

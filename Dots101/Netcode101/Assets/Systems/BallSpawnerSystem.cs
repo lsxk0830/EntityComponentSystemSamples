@@ -22,13 +22,13 @@ namespace KickBall
             var prefabs = SystemAPI.GetSingleton<EntityPrefabs>();
             var ballConfig = SystemAPI.GetSingleton<BallConfig>();
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
-            
-            // avoid repeating spawns
+
+            // 避免重复生成
             if (!networkTime.IsFirstTimeFullyPredictingTick)
             {
                 return;
             }
-            
+
             foreach (var (input, playerTransform, color) in
                      SystemAPI.Query<RefRO<PlayerInput>, RefRO<LocalTransform>, RefRO<Color>>()
                          .WithAll<Player, Simulate>())

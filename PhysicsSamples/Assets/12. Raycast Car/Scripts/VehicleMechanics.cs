@@ -140,12 +140,12 @@ namespace Demos
                 {
                     var wheelEntity = wheel.Wheel;
 
-                    // Assumed hierarchy:
-                    // - chassis
-                    //  - mechanics
-                    //   - suspension
-                    //    - wheel (rotates about yaw axis and translates along suspension up)
-                    //     - graphic (rotates about pitch axis)
+                    // 假设的层次结构：
+                    // - 底盘
+                    //  - 力学
+                    //   - 暂停
+                    //    - 轮（绕偏航轴旋转并沿悬架向上平移）
+                    //     - 图形（绕俯仰轴旋转）
 
                     RigidTransform worldFromSuspension = wheel.WorldFromSuspension;
 
@@ -156,8 +156,8 @@ namespace Demos
                     commandBuffer.AddComponent(wheelEntity, new Wheel
                     {
                         Vehicle = vehicleEntity,
-                        GraphicalRepresentation = wheel.GraphicalRepresentation, // assume wheel has a single child with rotating graphic
-                        // TODO assume for now that driving/steering wheels also appear in this list
+                        GraphicalRepresentation = wheel.GraphicalRepresentation, // 假设轮子有一个带有旋转图形的子项
+                        // TODO 现在假设驱动/方向盘也出现在该列表中
                         UsedForSteering = (byte)(m.ValueRO.steeringWheels.Contains(wheelEntity) ? 1 : 0),
                         UsedForDriving = (byte)(m.ValueRO.driveWheels.Contains(wheelEntity) ? 1 : 0),
                         ChassisFromSuspension = chassisFromSuspension
@@ -169,7 +169,7 @@ namespace Demos
         }
     }
 
-    // configuration properties of the vehicle mechanics, which change with low frequency at run-time
+    // 车辆力学的配置属性，在 run 时间以低频变化
     struct VehicleConfiguration : IComponentData
     {
         public float wheelBase;
@@ -184,7 +184,7 @@ namespace Demos
         public byte drawDebugInformation;
     }
 
-    // physics properties of the vehicle rigid body, which change with high frequency at run-time
+    // 车辆刚体的物理属性，在 run 时间高频变化
     struct VehicleBody : IComponentData
     {
         public float SlopeSlipFactor;
@@ -217,7 +217,7 @@ namespace Demos
             {
                 vehicleBody.WorldCenterOfMass = mass.GetCenterOfMassWorldSpace(localTransform.Position, localTransform.Rotation);
 
-                // calculate a simple slip factor based on chassis tilt
+                // 根据底盘倾斜计算简单的滑动系数
                 float3 worldUp = math.mul(localTransform.Rotation, math.up());
 
                 vehicleBody.SlopeSlipFactor = math.pow(math.abs(math.dot(worldUp, math.up())), 4f);
@@ -227,17 +227,17 @@ namespace Demos
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // update vehicle properties first
+            // 首先更新车辆属性
             state.Dependency = new PrepareVehiclesJob().ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
 
-            // this sample makes direct modifications to impulses between PhysicsInitializeGroup and PhysicsSimulationGroup
-            // we thus use PhysicsWorldExtensions rather than modifying component data, since they have already been consumed by BuildPhysicsWorld
+            // 该示例对 PhysicsInitializeGroup 和 PhysicsSimulationGroup 之间的脉冲进行直接修改
+            // 因此，我们使用 PhysicsWorldExtensions 而不是修改 component 数据，因为它们已经被 BuildPhysicsWorld 消耗
             PhysicsWorld world = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>().ValueRW.PhysicsWorld;
             state.EntityManager.CompleteDependencyBeforeRW<PhysicsWorldSingleton>();
 
-            // update each wheel
+            // 更新每个轮子
             var commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
 
@@ -293,7 +293,7 @@ namespace Demos
                 RigidTransform chassisFromWheel = math.mul(wheel.ValueRO.ChassisFromSuspension, suspensionFromWheel);
                 RigidTransform worldFromLocal = math.mul(worldFromChassis, chassisFromWheel);
 
-                // create a raycast from the suspension point on the chassis
+                // 从底盘上的悬挂点创建一个 raycast
                 var worldFromSuspension = math.mul(worldFromChassis, wheel.ValueRO.ChassisFromSuspension);
                 float3 rayStart = worldFromSuspension.pos;
                 float3 rayEnd = (-ceUp * (mechanics.suspensionLength + mechanics.wheelBase)) + rayStart;
@@ -312,7 +312,7 @@ namespace Demos
 
                 var invWheelCount = mechanics.invWheelCount;
 
-                // Calculate a simple slip factor based on chassis tilt.
+                // 根据底盘倾斜计算简单的滑动系数。
                 float slopeSlipFactor = vehicleBody.SlopeSlipFactor;
 
                 float3 wheelPos = math.select(raycastInput.End, rayResult.Position, hit);
@@ -324,16 +324,16 @@ namespace Demos
                 float3 weRight = ceRight;
                 float3 weForward = ceForward;
 
-                // Assumed hierarchy:
-                // - chassis
-                //  - mechanics
-                //   - suspension
-                //    - wheel (rotates about yaw axis and translates along suspension up)
-                //     - graphic (rotates about pitch axis)
+                // 假设的层次结构：
+                // - 底盘
+                //  - 力学
+                //   - 暂停
+                //    - 轮（绕偏航轴旋转并沿悬架向上平移）
+                //     - 图形（绕俯仰轴旋转）
 
                 #region handle wheel steering
                 {
-                    // update yaw angle if wheel is used for steering
+                    // 如果使用车轮进行转向，则更新偏航角
                     if (wheel.ValueRO.UsedForSteering != 0)
                     {
                         quaternion wRotation = quaternion.AxisAngle(ceUp, desiredSteeringAngle);
@@ -352,7 +352,7 @@ namespace Demos
 
                 #region handle wheel rotation
                 {
-                    // update rotation of graphical representation about axle
+                    // 更新图形表示绕轴的旋转
                     bool isDriven = driveEngaged && wheel.ValueRO.UsedForDriving != 0;
                     float weRotation = isDriven
                         ? (driveDesiredSpeed / mechanics.wheelBase)
@@ -360,7 +360,7 @@ namespace Demos
 
                     weRotation = math.radians(weRotation);
 
-                    newLocalTransform.ValueRW.Rotation = math.mul(localTransform.ValueRO.Rotation, quaternion.AxisAngle(new float3(1f, 0f, 0f), weRotation));         // TODO Should this use newLocalTransform to read from?
+                    newLocalTransform.ValueRW.Rotation = math.mul(localTransform.ValueRO.Rotation, quaternion.AxisAngle(new float3(1f, 0f, 0f), weRotation));         // TODO 这应该使用 newLocalTransform 来读取吗？
                 }
                 #endregion
 
@@ -369,17 +369,17 @@ namespace Demos
                 {
                     float3 wheelDesiredPos = (-ceUp * mechanics.suspensionLength) + rayStart;
                     var worldPosition = math.lerp(worldFromLocal.pos, wheelDesiredPos, mechanics.suspensionDamping / mechanics.suspensionStrength);
-                    // update translation of wheels along suspension column
+                    // 更新车轮沿悬架柱的平移
 
                     newLocalTransform.ValueRW.Position = math.mul(parentFromWorld, new float4(worldPosition, 1f)).xyz;
                 }
                 else
                 {
-                    // remove the wheelbase to get wheel position.
+                    // 拆下轴距以获得车轮位置。
                     float fraction = rayResult.Fraction - (mechanics.wheelBase) / (mechanics.suspensionLength + mechanics.wheelBase);
 
                     float3 wheelDesiredPos = math.lerp(rayStart, rayEnd, fraction);
-                    // update translation of wheels along suspension column
+                    // 更新车轮沿悬架柱的平移
                     var worldPosition = math.lerp(worldFromLocal.pos, wheelDesiredPos, mechanics.suspensionDamping / mechanics.suspensionStrength);
 
 
@@ -387,7 +387,7 @@ namespace Demos
 
                     #region Suspension
                     {
-                        // Calculate and apply the impulses
+                        // 计算并应用脉冲
                         var posA = rayEnd;
                         var posB = rayResult.Position;
                         var lvA = currentSpeedUp * weUp;
@@ -397,7 +397,7 @@ namespace Demos
                         impulse = impulse * invWheelCount;
                         float impulseUp = math.dot(impulse, weUp);
 
-                        // Suspension shouldn't necessarily pull the vehicle down!
+                        // 悬架不一定会使车辆下降！
                         float downForceLimit = -0.25f;
                         if (downForceLimit < impulseUp)
                         {

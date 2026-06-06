@@ -7,7 +7,7 @@ namespace Blender
     public class BladeAuthoring : MonoBehaviour
     {
         public Vector3 AngularVelocity;
-        
+
         public class Baker : Baker<BladeAuthoring>
         {
             public override void Bake(BladeAuthoring authoring)

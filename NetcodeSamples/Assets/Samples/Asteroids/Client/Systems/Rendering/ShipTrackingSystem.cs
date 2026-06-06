@@ -157,7 +157,7 @@ namespace Asteroids.Client
                 teleport = teleport,
             }.Schedule(JobHandle.CombineDependencies(Dependency, levelHandle));
 
-            // The one frame latency for updating hte camera position can cause stutter, so do a sync update of the offset of now
+            // 更新相机位置的一帧延迟可能会导致卡顿，因此请同步更新现在的偏移量
             trackJob.Complete();
             curOffset = renderOffset[0];
             camera.transform.position = new Vector3(curOffset.x + screenWidthHalf, curOffset.y + screenHeightHalf, -0.5f);

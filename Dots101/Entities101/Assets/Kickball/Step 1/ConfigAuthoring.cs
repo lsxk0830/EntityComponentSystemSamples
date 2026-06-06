@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Tutorials.Kickball.Step1
 {
-    // The Config component will be used as a singleton (meaning only one entity will have this component).
-    // It stores a grab bag of game parameters plus the entity prefabs that we'll instantiate at runtime.
+    // 配置 component 将用作单例（意味着只有一个 entity 将具有此 component）。
+    // 它存储了一堆游戏参数以及我们将在运行时实例化的 entity prefab。
 
     public class ConfigAuthoring : MonoBehaviour
     {
-        // Most of these fields are unused in Step 1, but they will be used in later steps.
+        // 其中大部分字段在步骤 1 中未使用，但将在后续步骤中使用。
         public int ObstaclesNumRows;
         public int ObstaclesNumColumns;
         public float ObstacleGridCellSize;
@@ -30,7 +30,7 @@ namespace Tutorials.Kickball.Step1
             {
                 var entity = GetEntity(TransformUsageFlags.None);
 
-                // Each authoring field corresponds to a component field of the same name.
+                // 每个 authoring 字段对应一个同名的 component 字段。
                 AddComponent(entity, new Config
                 {
                     NumRows = authoring.ObstaclesNumRows,
@@ -55,16 +55,16 @@ namespace Tutorials.Kickball.Step1
 
     public struct Config : IComponentData
     {
-        public int NumRows; // obstacles and players spawns in a grid, one obstacle and player per cell
+        public int NumRows; // 障碍物和玩家在网格中生成，每个单元格一个障碍物和玩家
         public int NumColumns;
         public float ObstacleGridCellSize;
         public float ObstacleRadius;
         public float ObstacleOffset;
         public float PlayerOffset;
-        public float PlayerSpeed; // meters per second
+        public float PlayerSpeed; // 米每秒
         public float BallStartVelocity;
         public float BallVelocityDecay;
-        public float BallKickingRangeSQ; // square distance of how close a player must be to a ball to kick it
+        public float BallKickingRangeSQ; // 球员必须离球多近才能踢球的平方距离
         public float BallKickForce;
         public Entity ObstaclePrefab;
         public Entity PlayerPrefab;

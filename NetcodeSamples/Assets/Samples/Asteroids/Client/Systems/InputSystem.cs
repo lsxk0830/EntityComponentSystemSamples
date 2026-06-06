@@ -18,7 +18,7 @@ namespace Asteroids.Client
             m_Barrier = World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>();
             RequireForUpdate<NetworkStreamInGame>();
             RequireForUpdate<NetworkId>();
-            // Just to make sure this system does not run in other scenes
+            // 只是为了确保这个 system 不会在其他 scenes 中出现 run
             RequireForUpdate<LevelComponent>();
         }
 
@@ -43,7 +43,7 @@ namespace Asteroids.Client
                 }
                 else
                 {
-                    // If ship, store commands in network command buffer
+                    // 如果发货，则将命令存储在网络命令缓冲区中
                     if (inputFromEntity.HasBuffer(targetEntity))
                     {
                         var input = inputFromEntity[targetEntity];
@@ -72,7 +72,7 @@ namespace Asteroids.Client
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
             var inputTargetTick = networkTime.InputTargetTick;
 
-            // singleton and enableable don't mix well.
+            // 单例和启用不能很好地混合。
             // https://jira.unity3d.com/browse/DOTS-9695
             // https://unity.slack.com/archives/CE7DZN2H1/p1699385984519549
             // SystemAPI.TryGetSingletonEntity<GhostOwnerIsLocal>(out var targetEntity); // <-- doesn't work, enableable not supported for singletons.
@@ -109,10 +109,10 @@ namespace Asteroids.Client
         {
             m_Barrier = World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>();
             RequireForUpdate<NetworkStreamInGame>();
-            // Just to make sure this system does not run in other scenes
+            // 只是为了确保这个 system 不会在其他 scenes 中出现 run
             RequireForUpdate<LevelComponent>();
 
-            // Give every thin client some randomness.
+            // 给每一个瘦 client 一些随机性。
             var rand = Unity.Mathematics.Random.CreateFromIndex((uint) Stopwatch.GetTimestamp());
             m_FrameCount = rand.NextInt(100);
         }
@@ -128,12 +128,12 @@ namespace Asteroids.Client
             {
                 if (shoot != 0)
                 {
-                    // Special handling for thin clients since we can't tell if the ship is spawned or not
+                    // 对薄 clients 进行特殊处理，因为我们无法判断船舶是否已生成
                     var req = commandBuffer.CreateEntity();
                     commandBuffer.AddComponent<PlayerSpawnRequest>(req);
                     commandBuffer.AddComponent(req, new SendRpcCommandRequest());
                 }
-                // If ship, store commands in network command buffer
+                // 如果发货，则将命令存储在网络命令缓冲区中
                 if (inputFromEntity.HasBuffer(targetEntity))
                 {
                     var input = inputFromEntity[targetEntity];
@@ -148,8 +148,8 @@ namespace Asteroids.Client
             {
                 if (commandTarget.targetEntity == Entity.Null)
                 {
-                    // No ghosts are spawned, so we need to create a placeholder input component to store commands in.
-                    // If the thin client timed out, and reconnected, we need to ensure this is not already created.
+                    // 没有生成 ghosts，因此我们需要创建一个占位符输入 component 来存储命令。
+                    // 如果瘦 client 超时并重新连接，我们需要确保尚未创建它。
                     if (!SystemAPI.TryGetSingletonEntity<ShipCommandData>(out var ent))
                     {
                         ent = EntityManager.CreateEntity();
@@ -162,7 +162,7 @@ namespace Asteroids.Client
             byte left, right, thrust, shoot;
             left = right = thrust = shoot = 0;
 
-            // Spawn and generate some random inputs
+            // 生成并生成一些随机输入
             var state = (int) SystemAPI.Time.ElapsedTime % 3;
             if (state == 0)
                 left = 1;

@@ -1,19 +1,19 @@
-# Submesh
+# 子网格
 
-This sample demonstrates using a Mesh with multiple sub-meshes with Entities Graphics.
+此示例演示了如何通过 Entities Graphics 使用具有多个子网格的网格。
 
 <img src="../../../../READMEimages/Submesh.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains a single GameObject which has a Mesh with three sub-meshes, and three separate Materials, one
-for each sub-mesh. As Entities support only a single Material per Entity, these kinds of GameObjects will be baked
-into several separate Entities, one per Material.
+scene 包含一个 GameObject，该 scene 具有一个带有三个子网格的网格和三个独立的材质，一个
+对于每个子网格。由于 Entities 仅支持每个 Entity 的单一材质，因此这些类型的 GameObjects 将被烘焙
+分成几个单独的 Entities，每种材料一个。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, make sure the Subscene is closed
-2. Go to: **Window > Entities > Hierarchy**
-3. Navigate to the Subscene
-4. Expand the Entity that has a hierarchy under it
-5. Observe that there are three Entities, all of which were baked from the same authoring GameObject
+1. 在 Hierarchy 中，确保子场景已关闭
+2. 转至：**窗口 > Entities > Hierarchy**
+3. 导航至子场景
+4. 展开下面有层次结构的 Entity
+5. 观察有 3 个 Entities，都是由同一个 authoring GameObject 烘焙而成

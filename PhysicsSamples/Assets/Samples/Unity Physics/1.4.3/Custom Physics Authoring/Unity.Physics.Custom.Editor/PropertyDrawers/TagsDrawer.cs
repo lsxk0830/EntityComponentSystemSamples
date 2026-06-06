@@ -23,7 +23,7 @@ namespace Unity.Physics.Editor
 
         protected abstract int MaxNumCategories { get; }
         protected abstract string DefaultCategoryName { get; }
-        internal string FirstChildPropertyPath { get; set; } // TODO: remove when all usages of bool[] are migrated
+        internal string FirstChildPropertyPath { get; set; } // TODO: 当 bool[] 的所有用法都迁移时删除
 
         string DefaultFormatString => L10n.Tr($"(Undefined {DefaultCategoryName})");
 
@@ -85,7 +85,7 @@ namespace Unity.Physics.Editor
 
         T[] m_NamesAssets;
 
-        // TODO: remove when all usages of bool[] are migrated
+        // TODO: 当 bool[] 的所有用法都迁移时删除
         SerializedProperty GetFirstChildProperty(SerializedProperty property)
         {
             if (!string.IsNullOrEmpty(FirstChildPropertyPath))
@@ -118,7 +118,7 @@ namespace Unity.Physics.Editor
                 everything |= 1 << i;
                 sp.NextVisible(false);
             }
-            // in case size is smaller than 32
+            // 如果尺寸小于 32
             if (value == everything)
                 value = ~0;
 

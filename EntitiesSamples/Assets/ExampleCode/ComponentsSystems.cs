@@ -16,49 +16,49 @@ namespace ExampleCode.Components
 
     public struct OnFire : IComponentData
     {
-        // An empty component is called a "tag component".
-        // Tag components take no storage space, but they can be
-        // queried, added, and removed like any other component.
+        // 空的 component 称为“标签 component”。
+        // 标签 components 不占用存储空间，但可以
+        // 像任何其他 component 一样查询、添加和删除。
     }
 }
 
 namespace ExampleCode.SystemsAndSystemGroups
 {
-    // An example system that creates and destroys entities.
-    // This system will be added to the system group called MySystemGroup.
-    // The ISystem methods are made Burst 'entry points' by marking
-    // them with the BurstCompile attribute.
+    // 创建和销毁 entities 的示例 system。
+    // 此 system 将添加到名为 MySystemGroup 的 system 组。
+    // ISystem 方法通过标记为 Burst “入口点”
+    // 它们具有 BurstCompile 属性。
     [UpdateInGroup(typeof(MySystemGroup))]
     public partial struct MySystem : ISystem
     {
-        // Called once when the system is created.
-        // Can be omitted when empty.
+        // 创建 system 时调用一次。
+        // 空时可以省略。
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
         }
 
-        // Called once when the system is destroyed.
-        // Can be omitted when empty.
+        // 当 system 被销毁时调用一次。
+        // 空时可以省略。
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
         }
 
-        // Usually called every frame. When exactly a system is updated
-        // is determined by the system group to which it belongs.
-        // Can be omitted when empty.
+        // 通常称为每一帧。当 system 被更新时
+        // 由其所属的 system 组确定。
+        // 空时可以省略。
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
         }
     }
 
-    // An example system group.
+    // system 组示例。
     public partial class MySystemGroup : ComponentSystemGroup
     {
-        // A system group is left empty unless you want
-        // to override OnUpdate, OnCreate, or OnDestroy.
+        // system 组留空，除非您想要
+        // 覆盖 OnUpdate、OnCreate 或 OnDestroy。
     }
 }
 
@@ -74,66 +74,66 @@ namespace ExampleCode.Queries
             ComponentTypeHandle<Bar> barHandle = SystemAPI.GetComponentTypeHandle<Bar>();
             EntityTypeHandle entityHandle = SystemAPI.GetEntityTypeHandle();
 
-            // Getting array copies of component values and entity ID's:
+            // 获取 component 值和 entity ID 的数组副本：
             {
-                // Remember that Temp allocations do not need to be manually disposed.
+                // 请记住，临时分配不需要手动处置。
 
-                // Get an array of the Apple component values of all
-                // entities that match the query.
-                // This array is a *copy* of the data stored in the chunks.
+                // 获取所有 Apple component 值的数组
+                // entities 与 query 匹配。
+                // 该数组是 chunks 中存储的数据的“副本”。
                 NativeArray<Apple> apples = myQuery.ToComponentDataArray<Apple>(Allocator.Temp);
 
-                // Get an array of the ID's of all entities that match the query.
-                // This array is a *copy* of the data stored in the chunks.
+                // 获取与 query 匹配的所有 entities 的 ID 的数组。
+                // 该数组是 chunks 中存储的数据的“副本”。
                 NativeArray<Entity> entities = myQuery.ToEntityArray(Allocator.Temp);
             }
 
-            // Getting the chunks matching a query and accessing the chunk data:
+            // 获取与 query 匹配的 chunks 并访问 chunk 数据：
             {
-                // Get an array of all chunks matching the query.
+                // 获取与 query 匹配的所有 chunks 的数组。
                 NativeArray<ArchetypeChunk> chunks = myQuery.ToArchetypeChunkArray(Allocator.Temp);
 
-                // Loop over all chunks matching the query.
+                // 循环遍历所有与 query 匹配的 chunks。
                 for (int i = 0, chunkCount = chunks.Length; i < chunkCount; i++)
                 {
                     ArchetypeChunk chunk = chunks[i];
 
-                    // The arrays returned by `GetNativeArray` are the very same arrays
-                    // stored within the chunk, so you should not attempt to dispose of them.
+                    // `GetNativeArray` 返回的数组是完全相同的数组
+                    // 存储在 chunk 中，因此您不应尝试丢弃它们。
                     NativeArray<Foo> foos = chunk.GetNativeArray(ref fooHandle);
                     NativeArray<Bar> bars = chunk.GetNativeArray(ref barHandle);
 
-                    // Unlike component values, entity ID's should never be
-                    // modified, so the array of entity ID's is always read only.
+                    // 与 component 值不同，entity ID 不应该是
+                    // 已修改，因此 entity ID 的数组始终是只读的。
                     NativeArray<Entity> entities = chunk.GetNativeArray(entityHandle);
 
-                    // Loop over all entities in the chunk.
+                    // 循环 chunk 中的所有 entities。
                     for (int j = 0, entityCount = chunk.Count; j < entityCount; j++)
                     {
-                        // Get the entity ID and Foo component of the individual entity.
+                        // 获取个体 entity 的 entity ID 和 Foo component。
                         Entity entity = entities[j];
                         Foo foo = foos[j];
                         Bar bar = bars[j];
 
-                        // Set the Foo value.
+                        // 设置 Foo 值。
                         foos[j] = new Foo { };
                     }
                 }
             }
 
-            // SystemAPI.Query:
+            // SystemAPI.Query：
             {
-                // SystemAPI.Query provides a more convenient way to loop
-                // through the entities matching a query. Source generation
-                // translates this foreach into the functional equivalent
-                // of the prior section. Understand that SystemAPI.Query
-                // should ONLY be called as the 'in' clause of a foreach.
+                // SystemAPI.Query 提供了更方便的循环方式
+                // 通过 entities 匹配 query。源码生成
+                // 将这个 foreach 翻译成等价的功能
+                // 上一节的内容。了解 SystemAPI.Query
+                // 是否应该将 ONLY 称为 foreach 的“in”子句。
 
-                // Each iteration processes one entity matching a query
-                // that includes Foo, Bar, Apple and excludes Banana:
-                // - 'foo' is assigned a read-write reference to the Foo component
-                // - 'bar' is assigned a read-only reference to the Bar component
-                // - 'entity' is assigned the entity ID
+                // 每次迭代处理一个与 query 匹配的 entity
+                // 包括 Foo、Bar、Apple，不包括 Banana：
+                // - 'foo' 被分配了对 Foo component 的读写引用
+                // - 'bar' 被分配了对 Bar component 的只读引用
+                // -“entity”被分配为 entity ID
                 foreach (var (foo, bar, entity) in
                          SystemAPI.Query<RefRW<Foo>, RefRO<Bar>>()
                              .WithAll<Apple>()
@@ -149,16 +149,16 @@ namespace ExampleCode.Queries
 
 namespace ExampleCode.EntityCommandBufferSystems
 {
-    // Define a new EntityCommandBufferSystem that will update
-    // in the InitializationSystemGroup before FooSystem.
+    // 定义一个新的 EntityCommandBufferSystem 将更新
+    // 在 InitializationSystemGroup 之前的 FooSystem 中。
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateBefore(typeof(FooSystem))]
     public partial class MyEntityCommandBufferSystem : EntityCommandBufferSystem
     {
-        // There's not usually any reason to override the methods of `EntityCommandBufferSystem`,
-        // so an empty class is the norm. In fact, needing to define your own `EntityCommandBufferSystem`
-        // is uncommon in the first place because the default world already includes
-        // several, such as `BeginSimulationEntityCommandBufferSystem`.
+        // 通常没有任何理由重写 `EntityCommandBufferSystem` 的方法，
+        // 所以空类是常态。其实需要定义自己的 `EntityCommandBufferSystem`
+        // 首先是不常见的，因为默认的 world 已经包含
+        // 几个，例如 `BeginSimulationEntityCommandBufferSystem`。
     }
 
     public partial struct FooSystem : ISystem
@@ -168,17 +168,17 @@ namespace ExampleCode.EntityCommandBufferSystems
 
 namespace ExampleCode.DynamicBuffers
 {
-    // Defines a DynamicBuffer<Waypoint> component type,
-    // which is a growable array of Waypoint elements.
-    // InternalBufferCapacity is the number of elements per
-    // entity stored directly in the chunk (defaults to 8).
+    // 定义一个 DynamicBuffer<Waypoint> component 类型，
+    // 这是一个可增长的 Waypoint 元素数组。
+    // InternalBufferCapacity 是每个元素的数量
+    // entity 直接存储在 chunk 中（默认为 8）。
     [InternalBufferCapacity(20)]
     public struct Waypoint : IBufferElementData
     {
         public float3 Value;
     }
 
-    // Example of creating and accessing a DynamicBuffer in a system.
+    // 在 system 中创建和访问 DynamicBuffer 的示例。
     public partial struct MySystem : ISystem
     {
         [BurstCompile]
@@ -186,74 +186,74 @@ namespace ExampleCode.DynamicBuffers
         {
             Entity entity = state.EntityManager.CreateEntity();
 
-            // Adds the Waypoint component type to the entity
-            // and returns the new buffer.
+            // 将 Waypoint component 类型添加到 entity
+            // 并返回新的缓冲区。
             DynamicBuffer<Waypoint> waypoints = state.EntityManager.AddBuffer<Waypoint>(entity);
 
-            // Setting the length to a value greater than its current capacity resizes the buffer.
+            // 将长度设置为大于其当前容量的值可调整缓冲区的大小。
             waypoints.Length = 100;
 
-            // Loop through the buffer to set its values.
+            // 循环遍历缓冲区以设置其值。
             for (int i = 0; i < waypoints.Length; i++)
             {
                 waypoints[i] = new Waypoint { Value = new float3() };
             }
 
-            // DynamicBuffers are invalidated by structural change operations
+            // DynamicBuffers 因结构变更操作而失效
             {
-                // Even though this structural change doesn't touch 'waypoints' or its entity,
-                // this operation invalidates 'waypoints' and all other DynamicBuffers
+                // 尽管这种结构变化没有触及“航点”或其 entity，
+                // 此操作会使“航点”和所有其他 DynamicBuffers 无效
                 state.EntityManager.CreateEntity();
 
 #if true
-                // Because 'waypoints' has been invalidated, any read or write of
-                // its content throws a safety check exception.
-                var w = waypoints[0]; // exception!
+                // 由于“waypoints”已失效，任何读取或写入
+                // 其内容引发安全检查异常。
+                var w = waypoints[0]; // 例外！
 #else
-                // Re-acquire the DynamicBuffer instance.
+                // 重新获取 DynamicBuffer 实例。
                 waypoints = state.EntityManager.GetBuffer<Waypoint>(entity);
                 var w = waypoints[0]; // OK
 #endif
             }
 
-            // EntityCommandBuffer methods for DynamicBuffers
+            // DynamicBuffers 的 EntityCommandBuffer 方法
             {
                 EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-                // Records a command to remove the MyElement dynamic buffer from an entity.
+                // 记录用于从 entity 中删除 MyElement 动态缓冲区的命令。
                 ecb.RemoveComponent<Waypoint>(entity);
 
-                // Records a command to add a MyElement dynamic buffer to an existing entity.
-                // The data of the returned DynamicBuffer is stored in the EntityCommandBuffer,
-                // so changes to the returned buffer are also recorded changes.
+                // 记录将 MyElement 动态缓冲区添加到现有 entity 的命令。
+                // 返回的 DynamicBuffer 的数据存储在 EntityCommandBuffer 中，
+                // 因此对返回缓冲区的更改也被记录为更改。
                 DynamicBuffer<Waypoint> myBuff = ecb.AddBuffer<Waypoint>(entity);
 
-                // After playback, the entity will have a MyElement buffer with
-                // Length 20 and these recorded values.
+                // 播放后，entity 将有一个 MyElement 缓冲区，其中
+                // 长度 20 和这些记录值。
                 myBuff.Length = 20;
                 myBuff[0] = new Waypoint { Value = new float3() };
                 myBuff[3] = new Waypoint { Value = new float3() };
 
-                // SetBuffer is like AddBuffer, but safety checks will throw an exception at playback if
-                // the entity doesn't already have a MyElement buffer.
+                // SetBuffer 类似于 AddBuffer，但安全检查将在播放时抛出异常，如果
+                // entity 尚未具有 MyElement 缓冲区。
                 DynamicBuffer<Waypoint> otherBuf = ecb.SetBuffer<Waypoint>(entity);
 
-                // Records a Waypoint value that will be appended to the buffer. Safety checks throw
-                // an exception at playback if the entity doesn't already have a MyElement buffer.
+                // 记录将附加到缓冲区的航点值。安全检查投掷
+                // 如果 entity 尚无 MyElement 缓冲区，则播放时出现异常。
                 ecb.AppendToBuffer<Waypoint>(entity, new Waypoint { Value = new float3() });
 
                 ecb.Playback(state.EntityManager);
                 ecb.Dispose();
             }
 
-            // re-interpreting a DynamicBuffer
+            // 重新解释 DynamicBuffer
             {
                 DynamicBuffer<Waypoint> myBuff = state.EntityManager.GetBuffer<Waypoint>(entity);
 
-                // Valid because each float3 and each Waypoint struct are both 12 bytes in size.
+                // 有效，因为每个 float3 和每个 Waypoint 结构的大小都是 12 字节。
                 DynamicBuffer<float3> floatsBuffer = myBuff.Reinterpret<float3>();
 
-                // 'floatsBuffer' and 'myBuff' represent the same content, so these two assignments have the same effect
+                // 'floatsBuffer' 和 'myBuff' 代表相同的内容，因此这两个赋值具有相同的效果
 #if true
                 floatsBuffer[2] = new float3(1, 2, 3);
 #else
@@ -266,64 +266,64 @@ namespace ExampleCode.DynamicBuffers
 
 namespace ExampleCode.EnableableComponents
 {
-    // An example enableable component type.
-    // Structs implementing IComponentData or IBufferElementData
-    // can also implement IEnableableComponent.
-    // `EntityManager`, `ComponentLookup<T>`, and `ArchetypeChunk` all have methods
-    //for checking and setting the enabled state of components.
+    // 可启用的 component 类型示例。
+    // 实现 IComponentData 或 IBufferElementData 的结构
+    // 也可以实现 IEnableableComponent。
+    // `EntityManager`、`ComponentLookup<T>` 和 `ArchetypeChunk` 都有方法
+    //用于检查和设置 components 的使能状态。
     public struct Health : IComponentData, IEnableableComponent
     {
         public float Value;
     }
 
-    // A system demonstrating use of an enableable component type.
+    // system 演示了可启用的 component 类型的使用。
     [BurstCompile]
     public partial struct MySystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Check and set the enabled state.
+            // 检查并设置启用状态。
             {
                 EntityManager em = state.EntityManager;
 
-                // Create a single entity and add the Health component.
+                // 创建单个 entity 并添加运行状况 component。
                 Entity myEntity = em.CreateEntity();
                 em.AddComponent<Health>(myEntity);
 
-                // Components begin life enabled, so this returns true.
+                // Components 开始启用生命周期，因此返回 true。
                 bool b = em.IsComponentEnabled<Health>(myEntity);
 
-                // Disable the Health component of myEntity
+                // 禁用 myEntity 的健康状况 component
                 em.SetComponentEnabled<Health>(myEntity, false);
 
                 ComponentLookup<Health> healthLookup = SystemAPI.GetComponentLookup<Health>();
 
-                // Though disabled, the component can still be read and modified.
+                // 尽管禁用，component 仍然可以读取和修改。
                 Health h = healthLookup[myEntity];
 
-                // We can also check and set the enabled state through the ComponentLookup.
+                // 我们还可以通过 ComponentLookup 来检查和设置启用状态。
                 b = healthLookup.IsComponentEnabled(myEntity);
                 healthLookup.SetComponentEnabled(myEntity, false);
             }
 
             EntityQuery myQuery = SystemAPI.QueryBuilder().WithAll<Health>().Build();
 
-            // Query methods.
+            // Query 方法。
             {
-                // The disabled entities will NOT be included in the results.
+                // 禁用的 entities 将会在结果中包含 NOT。
                 var entities = myQuery.ToEntityArray(Allocator.Temp);
                 var healths = myQuery.ToComponentDataArray<Health>(Allocator.Temp);
 
                 EntityQuery myQueryIgnoreEnabled = SystemAPI.QueryBuilder().WithAll<Health>()
                     .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build();
 
-                // The disabled entities WILL be included in the results.
+                // 禁用的 entities WILL 将包含在结果中。
                 entities = myQueryIgnoreEnabled.ToEntityArray(Allocator.Temp);
                 healths = myQueryIgnoreEnabled.ToComponentDataArray<Health>(Allocator.Temp);
             }
 
-            // Check and set the enabled state of each entity in a chunk.
+            // 检查并设置 chunk 中每个 entity 的启用状态。
             {
                 ComponentTypeHandle<Health> healthHandle = SystemAPI.GetComponentTypeHandle<Health>();
 
@@ -332,14 +332,14 @@ namespace ExampleCode.EnableableComponents
                 {
                     var chunk = chunks[i];
 
-                    // Loop through the entities of the chunk.
+                    // 循环遍历 chunk 的 entities。
                     for (int entityIdx = 0, entityCount = chunk.Count; entityIdx < entityCount; entityIdx++)
                     {
-                        // Read the enabled state of the
-                        // entity's Health component.
+                        // 读取启用状态
+                        // entity 的健康状况 component。
                         bool enabled = chunk.IsComponentEnabled(ref healthHandle, entityIdx);
 
-                        // Disable the entity's Health component.
+                        // 禁用 entity 的运行状况 component。
                         chunk.SetComponentEnabled(ref healthHandle, entityIdx, false);
                     }
                 }
@@ -350,28 +350,28 @@ namespace ExampleCode.EnableableComponents
 
 namespace ExampleCode.Aspects
 {
-    // An example aspect which wraps a Foo component
-    // and the enabled state of a Bar component.
+    // 包装 Foo component 的示例方面
+    // 以及 Bar component 的启用状态。
     public readonly partial struct MyAspect : IAspect
     {
-        // The aspect includes the entity ID.
-        // Because it's a readonly value type,
-        // there's no danger in making the field public.
+        // 该方面包括 entity ID。
+        // 因为它是只读值类型，
+        // 将该领域公开并没有危险。
         public readonly Entity Entity;
 
-        // The aspect includes the Foo component,
-        // with read-write access.
+        // 该方面包括 Foo component，
+        // 具有读写权限。
         readonly RefRW<Foo> foo;
 
-        // A property which gets and sets the Foo component.
+        // 获取和设置 Foo component 的属性。
         public float3 Foo
         {
             get => foo.ValueRO.Value;
             set => foo.ValueRW.Value = value;
         }
 
-        // The aspect includes the enabled state of
-        // the Bar component.
+        // 该方面包括启用状态
+        // 酒吧 component。
         public readonly EnabledRefRW<Bar> BarEnabled;
     }
 
@@ -386,18 +386,18 @@ namespace ExampleCode.Aspects
     }
 
     /*
-     * These methods return instances of an aspect:
+     * 这些方法返回一个方面的实例：
 
         - `SystemAPI.GetAspectRW<T>(Entity)`
         - `SystemAPI.GetAspectRO<T>(Entity)`
         - `EntityManager.GetAspect<T>(Entity)`
         - `EntityManager.GetAspectRO<T>(Entity)`
 
-        These methods throw if the `Entity` passed doesn't have all the components included in aspect `T`.
+        如果传递的 `Entity` 没有包含在方面 `T` 中的所有 components，则这些方法将抛出。
 
-        Aspects returned by `GetAspectRO()` will throw if you use any method or property that attempts to modify the underlying components.
+        如果您使用任何尝试修改底层 components 的方法或属性，则由 `GetAspectRO()` 返回的 Aspects 将抛出异常。
 
-        You can also get aspect instances by including them as parameters of an `IJobEntity`'s `Execute` method or as type parameters of `SystemAPI.Query`.
+        您还可以通过将方面实例包含为 `IJobEntity` 的 `Execute` 方法的参数或 `SystemAPI.Query` 的类型参数来获取方面实例。
      */
 }
 #endif

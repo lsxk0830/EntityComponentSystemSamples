@@ -12,9 +12,9 @@ using Hash128 = Unity.Entities.Hash128;
 
 public class LevelManager : MonoBehaviour
 {
-    // TODO: subscene names are printed via entity names, which works in debug builds, we could
-    //       save the names during conversion to get a more permanent place for them
-    // TODO: is using ghost sync on/off instead of ingame on/off, should probably be changed...
+    // TODO: subscene 名称通过 entity 名称打印，该名称在调试版本中工作，我们可以
+    //       在转换过程中保存名称，以便为它们获得更永久的位置
+    // TODO: 正在使用 ghost 同步开/关而不是游戏内开/关，可能应该更改。..
 
     public Text ServerStatus;
     public Text ClientStatus;
@@ -82,7 +82,7 @@ public class LevelManager : MonoBehaviour
         if (ClientServerBootstrap.ClientWorld.EntityManager.HasComponent<NetworkStreamInGame>(cons[0]))
             toggleOn = true;
 
-        // When switching all clients off the server sync on their connections must be disabled as well or bad things happen
+        // 当关闭所有 clients 时，其连接上的 server 同步也必须被禁用，否则会发生不好的事情
         if (!toggleOn)
         {
             conQuery = ClientServerBootstrap.ServerWorld.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<NetworkId>());

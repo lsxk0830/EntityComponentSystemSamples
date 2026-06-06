@@ -1,45 +1,45 @@
-# Tornado sample
+# 龙卷风示例
 
-In this Tornado simulation, a tornado travels in a figure-8 pattern and tears apart buildings made of bars connected at their end points. The tornado is depicted as a swarm of swirling cubes. The bars and cubes collide with the ground but not with each other.
+在这个龙卷风模拟中，龙卷风以 8 字形模式行进，并撕裂由端点相连的钢筋制成的建筑物。龙卷风被描绘成一群旋转的立方体。条形和立方体与地面碰撞，但彼此不碰撞。
 
-## Code
+## 代码
 
-- `BuildingSpawnSystem`: spawns the points and bars that make up the
-- `BuildingSystem`: simulates the points and bars. (Updated in the `FixedStepSimulationSystemGroup`.)
-- `BuildingRenderSystem`: updates the bar transforms for rendering.
- buildings.
-- `CameraSystem`: moves the camera to follow the tornado.
-- `ConfigAuthoring`: contains all sim parameters plus prefabs for the bars and particles.
-- `TornadoSpawnSystem`: spawns the cube particles that make up the tornado.
-- `TornadoSystem`: simulates the cube particles. (Updated in the `FixedStepSimulationSystemGroup`.)
+- `BuildingSpawnSystem`：生成构成
+- `BuildingSystem`：模拟点和条。（在 `FixedStepSimulationSystemGroup` 中更新。）
+- `BuildingRenderSystem`：更新渲染的条形变换。
+ 建筑物。
+- `CameraSystem`：移动相机跟随龙卷风。
+- `ConfigAuthoring`：包含所有模拟参数以及条形和粒子的prefab。
+- `TornadoSpawnSystem`：生成构成龙卷风的立方体粒子。
+- `TornadoSystem`：模拟立方体粒子。（在 `FixedStepSimulationSystemGroup` 中更新。）
 
-## Notes
+## 笔记
 
-- The bars are stored as unmanaged lists and structs.
-- The key logic is implemented as Burst-compiled jobs.
-- The bars are rendered as entities.
-- No physics engine is used.
-- The simulation runs at a fixed rate of 50 ticks a second. (This explains the oscillating frame times measured in the profiler when running at higher framerates.)
-- The stability of a constraint simulation depends a lot on the order in which constraints are solved. A fully parallel solution that maintains consistent order may be possible, but for simplicity, we avoided full parallelism.
-- For the duration of the simulation, the number of bars remains constant, but the number of end points increases as the bars get disconnected: two connected bars share the same point, so an additional point is needed when they separate.
-- The scene initially only contains the ground plane, a light, the camera, and a config GameObject. All the bars and cubes are instantiated in the `TornadoSpawnSystem` and `BuildingSpawnSystem` at runtime.
-- Each point is updated independently, so they can be updated in parallel in an `IJobParallelFor`.
-- The bar simulation solves the distance constraints by moving the points and eventually breaking the connections. When a connection breaks, the shared point gets split into two separate points. 
-- Each bar's rendering transform matrix is computed from its two points.
-- The tornado's position and intensity is computed each frame from the elapsed time. 
-- When a bar is disconnected, its two points are not shared with other bars, and it occupies 250 bytes: 200 bytes for the bar itself and 25 bytes each for two points. If we assume a maximum memory bandwidth of 60 GB/s (representative of a modern gaming PC), the theoretical absolute maximum scale of this simulation is 4 billion bars at 60hz. In practice, we'll be lucky to achieve a tenth of that scale, but knowing the theoretical limit helps set our expectations.
-- A point's number of connected bars and whether the point is anchored is combined into one value (each byte stored in the 'connectivity' array). This makes it cheaper to check whether a point is connected to anything.
-- In experimentation, the building generation code never seems to create buildings with more than about 50 bars. As long as this is true, it's safe to store the number of connected bars in a single byte.
+- 这些条存储为非托管列表和结构。
+- 关键逻辑实现为 Burst 编译的 jobs。
+- 条形呈现为 entities。
+- 不使用物理引擎。
+- 模拟以每秒 50 个刻度的固定速率运行。（这解释了以较高帧速率运行时在分析器中测量到的振荡帧时间。）
+- constraint 仿真的稳定性在很大程度上取决于约束求解的顺序。保持一致顺序的完全并行解决方案可能是可能的，但为了简单起见，我们避免了完全并行。
+- 在模拟过程中，条形数量保持不变，但端点数量随着条形断开而增加：两个连接的条形共享同一点，因此在它们分离时需要一个附加点。
+- scene 最初仅包含地平面、灯光、相机和配置 GameObject。所有条形和立方体均在运行时在 `TornadoSpawnSystem` 和 `BuildingSpawnSystem` 中实例化。
+- 每个点都是独立更新的，因此它们可以在 `IJobParallelFor` 中并行更新。
+- 条形模拟通过移动点并最终断开连接来解决距离约束。当连接中断时，共享点将分成两个单独的点。
+- 每个条的渲染变换矩阵都是根据其两个点计算的。
+- 龙卷风的位置和强度是根据每帧经过的时间计算的。
+- 当一个柱断开时，它的两个点不与其他柱共享，并且它占用 250 个字节：柱本身 200 个字节，两个点各 25 个字节。如果我们假设最大内存带宽为 60 GB/s（代表现代游戏 PC），则该模拟的理论绝对最大规模为 60hz 时的 40 亿条。在实践中，我们很幸运能够达到这个规模的十分之一，但了解理论极限有助于设定我们的期望。
+- 一个点的连接条数以及该点是否锚定被组合成一个值（每个字节存储在“connectivity”数组中）。这使得检查一个点是否连接到任何东西变得更便宜。
+- 在实验中，建筑生成代码似乎永远不会创建具有超过 50 个栏的建筑。只要这是正确的，就可以安全地将连接的条形数量存储在单个字节中。
 
-## Entities vs. arrays
+## Entities 与数组
 
-The advantage of an entity is flexibility: entities can be independently created and destroyed, their components can be added and removed, and a reference to an entity will remain valid for the entity's lifetime. All entities sharing a subset of component types can be processed together in a single query. On the downside, a reference to an entity is composed of two ints (index and version numbers), and looking up an entity _via_ reference is costlier than if we could just follow a pointer.
+entity 的优点是灵活性：entities 可以独立创建和销毁，它们的 components 可以添加和删除，并且对 entity 的引用将在 entity 的生命周期内保持有效。所有共享 component 类型子集的 entities 可以在单个 query 中一起处理。不利的一面是，对 entity 的引用由两个整数（索引号和版本号）组成，查找 entity _via_ 引用的成本比我们仅跟踪指针的成本更高。
 
-The advantage of using arrays instead of entities is that items can be looked up directly by their index. Not only is the lookup cheaper, a reference to an item can be stored as just a single int. On the downside, elements in an array cannot be independently added and removed without also shifting the other elements within the array, thereby changing their indexes.
+使用数组而不是 entities 的优点是可以通过索引直接查找项目。不仅查找成本更低，对项目的引用也可以存储为单个 int。缺点是，如果不移动数组中的其他元素，从而更改其索引，则无法独立添加和删除数组中的元素。
 
-In this sample, we use entities to render the bars and cubes, but what about the points? The points never change in structure and are never reordered nor deleted, only created (when bars disconnect), so the advantages of entities don't apply here. Storing the points in an array also allows for cheaper lookups, of which we'll need to do many per frame.
+在此示例中，我们使用 entities 渲染条形和立方体，但是点呢？这些点的结构永远不会改变，也不会重新排序或删除，只会创建（当条形图断开时），因此 entities 的优点在这里不适用。将点存储在数组中还可以实现更便宜的查找，其中我们需要在每帧中进行多次查找。
 
-Furthermore, the simulation has a large number of bars, each of which must reference its two points. Were the points stored as entities, each bar would require 16 bytes for these references (2 ints per point). By storing the points in an array, each bar requires only 8 bytes for these references (1 int per point). Smaller data is always a good thing, as it leas to less memory access.
+此外，模拟具有大量条形图，每个条形图都必须参考其两个点。如果点存储为 entities，则每个条形将需要 16 个字节用于这些引用（每个点 2 个整数）。通过将点存储在数组中，每个条仅需要 8 个字节来用于这些引用（每个点 1 个 int）。较小的数据总是一件好事，因为它可以减少内存访问。
 
 
 

@@ -1,5 +1,5 @@
-// This script is used in the 5g1. Change Collision Filter - Boxes demo.
-// Baker for the ColliderGridSpawner where the component is used in the ColliderGridCreationSystem.
+// 该脚本用于 5g1。更改碰撞过滤器 - 盒子演示。
+// Baker 用于 ColliderGridSpawner，其中 component 用于 ColliderGridCreationSystem。
 using System;
 using Unity.Entities;
 using Unity.Mathematics;

@@ -33,20 +33,20 @@ namespace Samples.HelloNetcode
         public Toggle EnableHostMigration;
 
         /// <summary>
-        /// Stores the old name of the local world (create by initial bootstrap).
-        /// It is reused later when the local world is created when coming back from game to the menu.
+        /// 存储本地 world 的旧名称（由初始引导程序创建）。
+        /// 当从游戏返回菜单时创建本地 world 时，稍后会重复使用它。
         /// </summary>
         internal static string OldFrontendWorldName = string.Empty;
 
         /// <summary>
-        /// Store the name of this frontend scene, this is then used later when going from the game scene back to the
-        /// main menu scene (frontend). Other frontends can then overwrite this.
+        /// 存储此前端的名称 scene，稍后从游戏 scene 返回到游戏时会使用该名称
+        /// 主菜单 scene（前端）。其他前端可以覆盖它。
         /// </summary>
         public static string SceneName;
 
         /// <summary>
-        /// This is set to true by <see cref="GetAndSaveSceneSelection"/> when the ConnectionApproval scene is loaded. Can
-        /// then be set on the network driver before calling <see cref="NetworkDriver.Listen"/> to enable the feature as appropriate.
+        /// 当加载 ConnectionApproval scene 时，<see cref="GetAndSaveSceneSelection"/> 将其设置为 true。能
+        /// 然后在调用 <see cref="NetworkDriver.Listen"/> 之前在网络驱动程序上进行设置以根据需要启用该功能。
         /// </summary>
         protected bool m_RequireConnectionApproval;
 
@@ -191,7 +191,7 @@ namespace Samples.HelloNetcode
         async Task SetHudSessionName()
         {
             var frontendHud = FindFirstObjectByType<FrontendHUD>();
-            // HUD scene might not be loaded yet so we'll need to poll for it
+            // HUD scene 可能尚未加载，因此我们需要对其进行轮询
             while (frontendHud == null)
             {
                 await Task.Delay(100);
@@ -201,29 +201,29 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// When the session host changes notify the HUD to print the relay/migration status (waiting for join code).
+        /// 当会话主机更改时，通知 HUD 打印中继/迁移状态（等待加入代码）。
         /// </summary>
         void OnHostChanged(string obj)
         {
-// Skip UI/HUD interactions when running as dedicated server
+// 作为专用 server 运行时，跳过 UI/HUD 交互
 #if !UNITY_SERVER
             HostMigrationHUD.SetWaitForRelayConnection(new WaitForRelayConnection() { WaitForJoinCode = true, OldJoinCode = m_Session.Code, IsHostMigration = true, StartTime = Time.realtimeSinceStartup});
 #endif
         }
 
         /// <summary>
-        /// When host migration is completed cleanup and reset the migration HUD elements.
+        /// 主机迁移完成后，清理并重置迁移 HUD 元素。
         /// </summary>
         void OnSessionMigrated()
         {
 #if !UNITY_SERVER
             if (m_Session.IsHost)
             {
-                // Connect the server migration stats HUD
+                // 连接 server 迁移统计信息 HUD
                 var statsText = FindFirstObjectByType<HostMigrationHUD>().StatsText;
                 ClientServerBootstrap.ServerWorld.GetExistingSystemManaged<ServerHostMigrationHUDSystem>().StatsText = statsText;
 
-                // Disable the client status HUD
+                // 禁用 client 状态 HUD
                 ClientServerBootstrap.ClientWorld.GetOrCreateSystemManaged<ClientHostMigrationHUDSystem>().Enabled = false;
             }
             else
@@ -260,7 +260,7 @@ namespace Samples.HelloNetcode
 
         protected string GetAndSaveSceneSelection()
         {
-            // Check whether Samples(0) or HelloNetcodeSamples(1) are selected in the sample picker
+            // 检查示例选择器中是否选择了 Samples(0) 或 HelloNetcodeSamples(1)
             LastSamplePickerDropdownValue = SamplePicker.value;
             string sceneName = Sample.options[Sample.value].text;
             m_RequireConnectionApproval = sceneName.Contains("ConnectionApproval", StringComparison.OrdinalIgnoreCase);
@@ -286,7 +286,7 @@ namespace Samples.HelloNetcode
             try
             {
                 var options = new JoinSessionOptions();
-                // When joining the session network type will automatically be used (relay/direct)
+                // 加入会话时将自动使用网络类型（中继/直接）
                 if (EnableHostMigration.isOn)
                     options = options.WithHostMigration().WithNetworkHandler(new CustomNetcodeNetworkHandler());
                 else
@@ -328,9 +328,9 @@ namespace Samples.HelloNetcode
             if (EnableHostMigration != null && EnableHostMigration.isOn)
                 SceneManager.LoadScene("HostMigrationHUD", LoadSceneMode.Additive);
 
-            // Destroy the local simulation world to avoid the game scene to be loaded into it
-            // This prevents rendering (rendering from multiple world with presentation is not greatly supported)
-            // and other issues.
+            // 销毁本地模拟 world 以避免游戏 scene 加载到其中
+            // 这会阻止渲染（不太支持从多个 world 进行渲染）
+            // 以及其他问题。
             DestroyLocalSimulationWorld();
 
             if (World.DefaultGameObjectInjectionWorld == null)
@@ -340,8 +340,8 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Populate the scene dropdown depending on if samples/hellonetcode selection is picked in the first
-        /// dropdown. Always skip frontend scene since that's the one which is showing this menu and makes no sense to
+        /// 根据是否在第一个中选择示例/hellonetcode 选择来填充 scene 下拉列表
+        /// 下拉菜单。始终跳过前端 scene 因为它是显示此菜单的，并且没有任何意义
         /// load (as well as HUD scenes since they are additively loaded on top of sample scenes)
         /// </summary>
         public void PopulateSampleDropdown(int value)
@@ -405,8 +405,8 @@ namespace Samples.HelloNetcode
             }
         }
 
-        // Tries to parse a port, returns true if successful, otherwise false
-        // The port will be set to whatever is parsed, otherwise the default port of k_NetworkPort
+        // 尝试解析端口，如果成功则返回 true，否则返回 false
+        // 端口将设置为解析的任何内容，否则为 k_NetworkPort 的默认端口
         private UInt16 ParsePortOrDefault(string s)
         {
             if (!UInt16.TryParse(s, out var port))

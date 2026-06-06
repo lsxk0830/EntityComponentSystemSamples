@@ -17,7 +17,7 @@ namespace Streaming.PrefabAndSceneReferences
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, new SceneReference
                 {
-                    // The EntitySceneReferences stores the GUID of the scene.
+                    // EntitySceneReferences 存储 scene 的 GUID。
                     Value = new EntitySceneReference(authoring.SceneAsset)
                 });
             }

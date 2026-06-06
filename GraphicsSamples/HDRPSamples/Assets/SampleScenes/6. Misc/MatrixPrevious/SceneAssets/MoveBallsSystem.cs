@@ -31,7 +31,7 @@ public partial class MoveBallsSystem : SystemBase
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            // This job is not written to support queries with enableable component types.
+            // 此 job 不是为了支持可启用 component 类型的查询而编写的。
             Assert.IsFalse(useEnabledMask);
 
             var chunkLocalTransform = chunk.GetNativeArray(ref LocalTransformType);

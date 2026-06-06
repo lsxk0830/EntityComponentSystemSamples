@@ -4,9 +4,9 @@ using Unity.Entities;
 using Unity.Physics;
 using Unity.Physics.Systems;
 
-// This system applies an impulse to any dynamic that collides with a Repulsor.
-// A Repulsor is defined by a PhysicsShapeAuthoring with the `Raise Collision Events` flag ticked and a
-// CollisionEventImpulse behaviour added.
+// 该 system 对任何与排斥器碰撞的动态施加脉冲。
+// 排斥器由 PhysicsShapeAuthoring 定义，其中 `Raise Collision Events` 标志被勾选，并且
+// 添加了 CollisionEventImpulse 行为。
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]

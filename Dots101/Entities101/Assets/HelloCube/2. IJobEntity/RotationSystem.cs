@@ -30,9 +30,9 @@ namespace HelloCube.JobEntity
         public float DeltaTime;
         public float ElapsedTime;
 
-        // In source generation, a query is created from the parameters of Execute().
-        // Here, the query will match all entities having a LocalTransform, PostTransformMatrix, and RotationSpeed component.
-        // (In the scene, the root cube has a non-uniform scale, so it is given a PostTransformMatrix component in baking.)
+        // 在源生成中，根据 Execute() 的参数创建 query。
+        // 此处，query 将匹配所有具有 LocalTransform、PostTransformMatrix 和 RotationSpeed component 的 entities。
+        // （在 scene 中，根立方体具有不均匀的比例，因此在 baking 中赋予它 PostTransformMatrix component。）
         void Execute(ref LocalTransform transform, ref PostTransformMatrix postTransform, in RotationSpeed speed)
         {
             transform = transform.RotateY(speed.RadiansPerSecond * DeltaTime);

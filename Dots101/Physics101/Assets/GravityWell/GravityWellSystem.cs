@@ -24,11 +24,11 @@ namespace GravityWell
             var config = SystemAPI.GetSingleton<Config>();
             var dt = SystemAPI.Time.DeltaTime;
 
-            // move the gravity wells
+            // 移动重力井
             foreach (var (wellTransform, well) in
                      SystemAPI.Query<RefRW<LocalTransform>, RefRW<GravityWell>>())
             {
-                // orbit the origin in a circle
+                // 以原点为中心绕一圈
                 well.ValueRW.OrbitPos += config.WellOrbitSpeed * dt;
                 math.sincos(well.ValueRW.OrbitPos, out var s, out var c);
                 wellTransform.ValueRW.Position = new float3(c, 0, s) * config.WellOrbitRadius;
@@ -47,15 +47,15 @@ namespace GravityWell
                     var wellTransform = wellTransforms[i];
 
                     velocity.ValueRW.ApplyExplosionForce(
-                        mass.ValueRO,       
-                        collider.ValueRO,   
-                        ballTransform.ValueRO.Position,  // position of the body
-                        ballTransform.ValueRO.Rotation,    // the rotation of the body
-                        -config.WellStrength, // negative strength makes this an implosion 
-                        wellTransform.Position,   // position of the explosion
-                        // an explosion radius of 0 means the reach is infinite
-                        // and strength does not diminish with distance
-                        0, 
+                        mass.ValueRO,
+                        collider.ValueRO,
+                        ballTransform.ValueRO.Position,  // 身体的位置
+                        ballTransform.ValueRO.Rotation,    // 身体的旋转
+                        -config.WellStrength, // 负面力量使这成为内爆
+                        wellTransform.Position,   // 爆炸位置
+                        // 爆炸半径为 0 意味着影响范围是无限的
+                        // 并且力量不会随着距离而减弱
+                        0,
                         dt,
                         math.up());
                 }

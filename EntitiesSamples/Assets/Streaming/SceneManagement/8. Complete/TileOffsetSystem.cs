@@ -6,7 +6,7 @@ using Unity.Transforms;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // System that will move/orient all the entities in the tile to the right position/rotation.
+    // System 会将图块中的所有 entities 移动/定向到正确的位置/旋转。
     [WorldSystemFilter(WorldSystemFilterFlags.ProcessAfterLoad)]
     public partial struct TileOffsetSystem : ISystem
     {
@@ -28,7 +28,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 var rotation = quaternion.AxisAngle(new float3(0f, 1f, 0f), offset.Rotation);
                 var offsetTransform = LocalTransform.FromPositionRotation(offset.Offset, rotation);
 
-                // Apply the offset and rotation to all dynamic entities
+                // 将偏移和旋转应用于所有动态 entities
                 foreach (var transform in
                          SystemAPI.Query<RefRW<LocalTransform>>()
                              .WithNone<Parent>())
@@ -38,7 +38,7 @@ namespace Streaming.SceneManagement.CompleteSample
 
                 var offsetMatrix = float4x4.TRS(offset.Offset, rotation, new float3(1f, 1f, 1f));
 
-                // Apply the offset and rotation to all non-dynamic entities
+                // 将偏移和旋转应用于所有非动态 entities
                 foreach (var transform in
                          SystemAPI.Query<RefRW<LocalToWorld>>()
                              .WithNone<Parent, LocalTransform>())

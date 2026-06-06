@@ -60,10 +60,10 @@ namespace Unity.Physics.Tests
                     verifyRestitution.ValueRW.MaxY = math.max(verifyRestitution.ValueRW.MaxY, localTransform.ValueRO.Position.y);
                 }
 
-                // the ball shall have reached its apex after a certain amount of time has passed
+                // 经过一定时间后，球应到达其顶点
                 if (elapsedSeconds > kCheckSeconds)
                 {
-                    // Biggest bounce should be near the original height, which is 1
+                    // 最大弹跳应该接近原始高度，即 1
                     Assert.IsTrue(verifyRestitution.ValueRW.MaxY > 0.9f);
                 }
             }

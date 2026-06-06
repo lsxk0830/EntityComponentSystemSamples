@@ -8,7 +8,7 @@ namespace Baking.AutoAuthoring
     public class BufferSpawnerAuthoring : BufferAutoAuthoring<BufferSpawner>
     {
         // Defining OnEnable() makes the inspector show the enabled component checkbox.
-        // Disabled components are not baked.
+        // 禁用的 components 不会被烘焙。
         void OnEnable() {}
     }
 

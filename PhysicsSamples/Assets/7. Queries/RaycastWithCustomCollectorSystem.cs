@@ -46,7 +46,7 @@ namespace Query
                 var rayLocalTransform = LocalTransforms[entity];
                 var raycastLength = visualizedRaycast.RayLength;
 
-                // Perform the Raycast
+                // 执行 Raycast
                 var raycastInput = new RaycastInput
                 {
                     Start = rayLocalTransform.Position,
@@ -60,8 +60,8 @@ namespace Query
                 var hit = collector.ClosestHit;
                 var hitDistance = raycastLength * hit.Fraction;
 
-                // position the entities and scale based on the ray length and hit distance
-                // visualization elements are scaled along the z-axis aka math.forward
+                // 根据光线长度和命中距离定位 entities 和缩放
+                // 可视化元素沿 z 轴缩放，即 math.forward
                 var newFullRayPosition = new float3(0, 0, raycastLength * 0.5f);
                 var newHitPosition = new float3(0, 0, hitDistance);
                 var newHitRayPosition = new float3(0, 0, hitDistance * 0.5f);

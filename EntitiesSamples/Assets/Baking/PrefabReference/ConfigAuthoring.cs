@@ -14,9 +14,9 @@ namespace Baking.PrefabReference
         {
             public override void Bake(ConfigAuthoring authoring)
             {
-                // Create an EntityPrefabReference from a GameObject.
-                // By using a reference, we only need one baked prefab entity instead of
-                // duplicating the prefab entity everywhere it is used.
+                // 从 GameObject 创建 EntityPrefabReference。
+                // 通过使用引用，我们只需要一个烘焙的 prefab entity 而不是
+                // 在使用 prefab entity 的地方复制它。
                 var prefabEntity = new EntityPrefabReference(authoring.Prefab);
 
                 var entity = GetEntity(TransformUsageFlags.None);

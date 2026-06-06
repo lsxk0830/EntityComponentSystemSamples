@@ -34,7 +34,7 @@ namespace Unity.Physics.Tests.Authoring
 
         const float k_OrientationTolerance = 0.001f;
 
-        // following are slow tests used for local regression testing only
+        // 以下是仅用于局部回归测试的慢速测试
         /*
         [Test]
         public void GetBakedBoxProperties_WhenNoShear_ReturnsInputOrientation(

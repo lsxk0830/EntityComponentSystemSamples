@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Generics = System.Collections.Generic;
 
-// Class for base Havok Visual Debugger tests. It just loads the the Hello World scene and ensures that Havok physics is used.
+// 用于基本 Havok Visual Debugger 测试的类。它只是加载 Hello World scene 并确保使用 Havok 物理。
 class HavokPhysicsVDBTest : UnityPhysicsSamplesTest
 {
     protected static IEnumerable GetVDBScenes()
@@ -32,7 +32,7 @@ class HavokPhysicsVDBTest : UnityPhysicsSamplesTest
 
     private IEnumerator SetupAndLoadScene(World world, HavokConfiguration havokConfig, string scenePath)
     {
-        // Ensure Havok simulation
+        // 确保 Havok 模拟
         ConfigureSimulation(world, SimulationType.HavokPhysics);
 
         var system = world.GetOrCreateSystemManaged<SimulationConfigurationSystem>();
@@ -54,7 +54,7 @@ class HavokPhysicsVDBTest : UnityPhysicsSamplesTest
 
         var vdbProcess = new System.Diagnostics.Process();
 
-        // Close any existing instances of the VDB and make a new one
+        // 关闭 VDB 的所有现有实例并创建一个新实例
         {
             string vdbExe = System.IO.Path.GetFullPath("Packages/com.havok.physics/Tools/VisualDebugger/HavokVisualDebugger.exe");
             string vdbProcessName = System.IO.Path.GetFileNameWithoutExtension(vdbExe);
@@ -71,31 +71,31 @@ class HavokPhysicsVDBTest : UnityPhysicsSamplesTest
             vdbProcess.StartInfo.Arguments = "";
             vdbProcess.Start();
             vdbProcess.WaitForInputIdle();
-            // How do we ensure the VDB is ready to connect?
+            // 我们如何确保 VDB 已准备好连接？
             yield return new WaitForSeconds(2);
             vdbProcess.Refresh();
         }
 
         var havokConfig = HavokConfiguration.Default;
 
-        // Enabled VDB
+        // 已启用 VDB
         havokConfig.VisualDebugger.Enable = 1;
         yield return SetupAndLoadScene(World.DefaultGameObjectInjectionWorld, havokConfig, scenePath);
 
-        // Disabled VDB
+        // 已禁用 VDB
         havokConfig.VisualDebugger.Enable = 0;
         yield return SetupAndLoadScene(World.DefaultGameObjectInjectionWorld, havokConfig, scenePath);
 
-        // Enabled VDB with zero Timer memory
+        // 启用 VDB 且计时器内存为零
         havokConfig.VisualDebugger.Enable = 1;
         havokConfig.VisualDebugger.TimerBytesPerThread = 0;
         yield return SetupAndLoadScene(World.DefaultGameObjectInjectionWorld, havokConfig, scenePath);
 
-        // Close VDB client
+        // 关闭 VDB client
         vdbProcess.CloseMainWindow();
         vdbProcess.Close();
 
-        // Enabled VDB with no Client running.
+        // 启用 VDB，但未运行 Client。
         havokConfig = HavokConfiguration.Default;
         havokConfig.VisualDebugger.Enable = 1;
         yield return SetupAndLoadScene(World.DefaultGameObjectInjectionWorld, havokConfig, scenePath);

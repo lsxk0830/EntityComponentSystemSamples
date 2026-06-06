@@ -35,51 +35,51 @@ public partial class InvalidPhyiscsJointDemoSystem : SceneCreationSystem<Invalid
         });
         CreatedColliders.Add(collider);
 
-        // Add a dynamic body constrained to the world that will die
-        // Once the dynamic body is destroyed the joint will be invalid
+        // 添加动态体约束到会死的 world
+        // 一旦动体被破坏 joint 将失效
         {
-            // Create a dynamic body
+            // 创造动态的身体
             float3 pivotWorld = new float3(-2f, 0, 0);
             Entity body = CreateDynamicBody(pivotWorld, quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
-            // create extra dynamic body to trigger Havok sync after the first one is destroyed
+            // 在第一个被销毁后，为 trigger Havok 同步创建额外的动态主体
             CreateDynamicBody(pivotWorld * 2.0f, quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
-            // add timeout on dynamic body after 15 frames.
+            // 在 15 帧后为动态主体添加超时。
             EntityManager.AddComponentData(body, new LifeTime { Value = 15 });
 
-            // Create the joint
+            // 创建 joint
             float3 pivotLocal = float3.zero;
             var joint = PhysicsJoint.CreateBallAndSocket(pivotLocal, pivotWorld);
             var jointEntity = CreateJoint(joint, body, Entity.Null);
 
-            // add timeout on joint entity after 30 frames.
+            // 在 30 帧后在 joint entity 上添加超时。
             EntityManager.AddComponentData(jointEntity, new LifeTime { Value = 30 });
         }
 
-        // Add two static bodies constrained together
-        // The joint is invalid immediately
+        // 添加两个约束在一起的静态实体
+        // joint 立即无效
         {
-            // Create a body
+            // 创建一个身体
             Entity bodyA = CreateStaticBody(new float3(0, 0.0f, 0), quaternion.identity, collider);
             Entity bodyB = CreateStaticBody(new float3(0, 1.0f, 0), quaternion.identity, collider);
 
-            // Create the joint
+            // 创建 joint
             float3 pivotLocal = float3.zero;
             var joint = PhysicsJoint.CreateBallAndSocket(pivotLocal, pivotLocal);
             var jointEntity = CreateJoint(joint, bodyA, bodyB);
 
-            // add timeout on joint entity after 15 frames.
+            // 在 15 帧后在 joint entity 上添加超时。
             EntityManager.AddComponentData(jointEntity, new LifeTime { Value = 15 });
         }
 
-        // Add two dynamic bodies constrained together with 0 dimension
+        // 添加两个以 0 维度约束在一起的动态实体
         {
-            // Create a body
+            // 创建一个身体
             Entity bodyA = CreateDynamicBody(new float3(0, 5.0f, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
             Entity bodyB = CreateDynamicBody(new float3(0, 6.0f, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
-            // Create the joint
+            // 创建 joint
             var joint = PhysicsJoint.CreateLimitedDOF(RigidTransform.identity, new bool3(false), new bool3(false));
             CreateJoint(joint, bodyA, bodyB);
         }

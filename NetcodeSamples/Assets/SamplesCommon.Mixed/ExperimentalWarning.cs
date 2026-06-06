@@ -12,9 +12,9 @@ public class ExperimentalWarning : MonoBehaviour
 
     void OnGUI()
     {
-        // With experimental defines, samples are just doing nothing. It could appear as a bug to users inspecting those. Giving them a warning they are missing key pieces
-        // to make the sample work.
-        // This lives outside specific sample assemblies, since those whole assemblies could have a define constraint
+        // 根据实验定义，示例什么也没做。对于检查这些内容的用户来说，它可能会显示为错误。警告他们缺少关键部分
+        // 使示例工作。
+        // 这位于特定示例程序集之外，因为这些整个程序集可能有一个定义 constraint
         bool isU6 = false;
         bool ghostBridgeEnabled = false;
         #if UNITY_6000_3_OR_NEWER

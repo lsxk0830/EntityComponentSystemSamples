@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
-    /// <summary>   The physics body authoring. This class cannot be inherited. </summary>
+    /// <summary> 物理体 authoring。该类不能被继承。</summary>
 #if UNITY_2021_2_OR_NEWER
     [Icon(k_IconPath)]
 #endif
@@ -101,7 +101,7 @@ namespace Unity.Physics.Authoring
         EulerAngles m_Orientation = EulerAngles.Default;
 
         [SerializeField]
-        // Default value to solid unit sphere : https://en.wikipedia.org/wiki/List_of_moments_of_inertia
+        // 实体单位球体的默认值：https://en.wikipedia.org/wiki/List_of_moments_of_inertia
         float3 m_InertiaTensor = new float3(2f / 5f);
 
         public uint WorldIndex { get => m_WorldIndex; set => m_WorldIndex = value; }
@@ -115,7 +115,7 @@ namespace Unity.Physics.Authoring
 
         void OnEnable()
         {
-            // included so tick box appears in Editor
+            // 包含，因此勾选框出现在 Editor 中
         }
 
         void OnValidate()

@@ -13,13 +13,13 @@ using Unity.Services.Core;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Responsible for contacting relay server and setting up <see cref="RelayServerData"/> and <see cref="JoinCode"/>.
-    /// Steps include:
-    /// 1. Initializing services
-    /// 2. Logging in
-    /// 3. Allocating number of players that are allowed to join.
-    /// 4. Retrieving join code
-    /// 5. Getting relay server information. I.e. IP-address, etc.
+    /// 负责接触继电器 server 和设置<see cref="RelayServerData"/>和<see cref="JoinCode"/>。
+    /// 步骤包括：
+    /// 1. 初始化服务
+    /// 2. 登录
+    /// 3.分配允许加入的玩家数量。
+    /// 4. 检索加入代码
+    /// 5.获取继电器 server 信息。I.e。IP-地址等
     /// </summary>
     [DisableAutoCreation]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -144,8 +144,8 @@ namespace Samples.HelloNetcode
                 return HostStatus.FailedToHost;
             }
 
-            // Request an allocation to the Relay service
-            // with a maximum of 5 peer connections, for a maximum of 6 players.
+            // 请求分配 Relay 服务
+            // 最多 5 个对等连接，最多 6 名玩家。
             allocationTask = RelayService.Instance.CreateAllocationAsync(RelayMaxConnections);
             return HostStatus.Allocating;
         }
@@ -178,7 +178,7 @@ namespace Samples.HelloNetcode
             }
         }
 
-        // Bind and listen to the Relay server
+        // 绑定并监听 Relay server
         static HostStatus BindToHost(Task<Allocation> allocationTask, out RelayServerData relayServerData)
         {
             var allocation = allocationTask.Result;
@@ -189,7 +189,7 @@ namespace Samples.HelloNetcode
 #endif
             try
             {
-                // Format the server data, based on desired connectionType
+                // 根据所需的 connectionType 格式化 server 数据
                 relayServerData = HostRelayData(allocation, connectionType);
             }
             catch (Exception e)
@@ -201,7 +201,7 @@ namespace Samples.HelloNetcode
             return HostStatus.Ready;
         }
 
-        // Get the Join Code, you can then share it with the clients so they can join
+        // 获取加入代码，然后您可以与 clients 分享，以便他们可以加入
         static HostStatus WaitForJoin(Task<string> joinCodeTask, out string joinCode)
         {
             joinCode = null;
@@ -237,23 +237,23 @@ namespace Samples.HelloNetcode
                 return HostStatus.FailedToHost;
             }
 
-            // Request the join code to the Relay service
+            // 向 Relay 服务请求加入代码
             var allocation = allocationTask.Result;
             joinCodeTask = RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             return HostStatus.GettingJoinCode;
         }
 
-        // connectionType also supports udp, but this is not recommended
+        // connectionType 也支持 udp，但不推荐这样做
         static RelayServerData HostRelayData(Allocation allocation, string connectionType = "dtls")
         {
-            // Select endpoint based on desired connectionType
+            // 根据所需的 connectionType 选择端点
             var endpoint = RelayUtilities.GetEndpointForConnectionType(allocation.ServerEndpoints, connectionType);
             if (endpoint == null)
             {
                 throw new InvalidOperationException($"endpoint for connectionType {connectionType} not found");
             }
-            // Prepare the Relay server data and compute the nonce value
-            // The host passes its connectionData twice into this function
+            // 准备 Relay server 数据并计算随机数值
+            // 主机将其 connectionData 两次传递到此函数中
             var isWebSocket = connectionType == "wss" || connectionType == "ws";
             var relayServerData = new RelayServerData(endpoint.Host, (ushort)endpoint.Port,
                 allocation.AllocationIdBytes, allocation.ConnectionData, allocation.ConnectionData,

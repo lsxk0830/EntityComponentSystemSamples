@@ -15,12 +15,12 @@ namespace LaserSight
             state.RequireForUpdate<PhysicsWorldSingleton>();
         }
 
-        // we cannot Burst compile this update because it accesses managed objects
+        // 我们无法 Burst 编译此更新，因为它访问托管对象
         public void OnUpdate(ref SystemState state)
         {
             var config = SystemAPI.GetSingleton<Config>();
 
-            // move the player
+            // 移动玩家
             {
                 float3 input = new float3(Input.GetAxis($"Horizontal"), 0, Input.GetAxis($"Vertical"));
                 var speed = config.PlayerMoveSpeed * SystemAPI.Time.DeltaTime;
@@ -31,46 +31,46 @@ namespace LaserSight
                     playerTransform.ValueRW.Position += input * speed;
                 }
             }
-            
+
             float laserLength = 0;
 
-            // raycast to determine the laser length
+            // raycast 确定激光长度
             {
-                // to perform raycasts or other collision queries, we need the collision world
+                // 要执行光线投射或其他碰撞查询，我们需要碰撞 world
                 var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
-                
+
                 foreach (var playerTransform in
                          SystemAPI.Query<RefRO<LocalTransform>>()
                              .WithAll<Player>())
                 {
                     var raycast = new RaycastInput
                     {
-                        // specify starting and end points of the raycast (which together imply direction)
+                        // 指定 raycast 的起点和终点（它们一起表示方向）
                         Start = playerTransform.ValueRO.Position,
                         End = playerTransform.ValueRO.Position + new float3(0, 0, config.MaxLaserLength),
-                        // don't forget to set a filter or else you'll get no hits!
+                        // 别忘了设置过滤器，否则你将得不到任何点击！
                         Filter = CollisionFilter.Default
                     };
 
                     if (collisionWorld.CastRay(raycast, out var closestHit))
                     {
-                        // set laser length to the distance of the closest hit
+                        // 将激光长度设置为最近命中的距离
                         laserLength = math.distance(playerTransform.ValueRO.Position, closestHit.Position);
                     }
                     else
                     {
-                        // no hit detected, so just set the laser to max length
+                        // 未检测到命中，因此只需将激光设置为最大长度
                         laserLength = config.MaxLaserLength;
                     }
                 }
             }
 
-            // set the laser endpoints
+            // 设置激光端点
             {
                 foreach (var (playerTransform, player) in
                          SystemAPI.Query<RefRW<LocalTransform>, RefRW<Player>>())
                 {
-                    // init the laser ref
+                    // 初始化激光参考
                     if (!player.ValueRW.Laser.IsValid())
                     {
                         player.ValueRW.Laser = GameObject.FindFirstObjectByType<LineRenderer>();

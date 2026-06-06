@@ -51,18 +51,18 @@ namespace Unity.Physics.Tests
                     var motionData = MotionDatas[i];
                     var motionVelocity = MotionVelocities[i];
 
-                    // Clip velocities using a simple heuristic:
-                    // zero out velocities that are smaller than gravity in one step
+                    // 使用简单的启发式剪辑速度：
+                    // 一步将小于重力的速度归零
                     if (math.length(motionVelocity.LinearVelocity) < motionVelocity.GravityFactor * gravityLengthInOneStep)
                     {
-                        // Revert integration
+                        // 恢复集成
                         Integrator.Integrate(ref motionData.WorldFromMotion, motionVelocity, -TimeStep);
 
-                        // Clip velocity
+                        // 剪辑速度
                         motionVelocity.LinearVelocity = float3.zero;
                         motionVelocity.AngularVelocity = float3.zero;
 
-                        // Write back
+                        // 回信
                         MotionDatas[i] = motionData;
                         MotionVelocities[i] = motionVelocity;
                     }
@@ -80,7 +80,7 @@ namespace Unity.Physics.Tests
 
             //var world = GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
             var world = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>().ValueRW.PhysicsWorld;
-            // No need for clipping if Havok is used
+            // 如果使用 Havok 则不需要裁剪
             if (physicsStep.SimulationType == SimulationType.UnityPhysics)
             {
                 state.Dependency = new ClipVelocitiesJob

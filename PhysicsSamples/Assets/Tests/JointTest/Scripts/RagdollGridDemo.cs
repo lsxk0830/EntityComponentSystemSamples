@@ -35,14 +35,14 @@ public partial class RagdollGridDemoSceneSystem : SceneCreationSystem<RagdollGri
         });
         CreatedColliders.Add(collider);
 
-        // Make some ragdoll joints
+        // 制作一些布娃娃关节
         for (int i = 0; i < 10; i++)
         {
-            // Create a body
+            // 创建一个身体
             Entity body = CreateDynamicBody(
                 new float3((i - 4.5f) * 1.0f, 0, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
-            // Create the ragdoll joint
+            // 创建布娃娃 joint
             float3 pivotLocal = new float3(0, 0.5f, 0);
             float3 pivotInWorld = math.transform(GetBodyTransform(body), pivotLocal);
             float3 axisLocal = new float3(0, 1, 0);

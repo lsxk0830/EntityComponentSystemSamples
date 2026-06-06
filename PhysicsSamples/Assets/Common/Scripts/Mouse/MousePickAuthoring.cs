@@ -11,7 +11,7 @@ using static Unity.Physics.Math;
 
 namespace Unity.Physics.Extensions
 {
-    // A mouse pick collector which stores every hit. Based off the ClosestHitCollector
+    // 一个鼠标拾取收集器，可存储每次点击。基于 ClosestHitCollector
     [BurstCompile]
     public struct MousePickCollector : ICollector<RaycastHit>
     {
@@ -79,7 +79,7 @@ namespace Unity.Physics.Extensions
         public bool IgnoreStatic = true;
         public bool DeleteEntityOnClick = false;
 
-        // Note: override OnEnable to be able to disable the component in the editor
+        // Note: 覆盖 OnEnable 以便能够在编辑器中禁用 component
         protected void OnEnable() {}
     }
 
@@ -97,7 +97,7 @@ namespace Unity.Physics.Extensions
         }
     }
 
-    // Attaches a virtual spring to the picked entity
+    // 将虚拟弹簧附加到选取的 entity
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial class MousePickSystem : SystemBase
     {
@@ -183,7 +183,7 @@ namespace Unity.Physics.Extensions
 
                 var world = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
                 var mousePick = SystemAPI.GetSingleton<MousePick>();
-                // Schedule picking job, after the collision world has been built
+                // Schedule 拾取 job，碰撞后 world 已建成
                 Dependency = new Pick
                 {
                     CollisionWorld = world.CollisionWorld,
@@ -214,7 +214,7 @@ namespace Unity.Physics.Extensions
         }
     }
 
-    // Applies any mouse spring as a change in velocity on the entity's motion component
+    // 将任何鼠标弹簧应用为 entity 运动 component 的速度变化
     [UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
     public partial class MouseSpringSystem : SystemBase
     {
@@ -234,13 +234,13 @@ namespace Unity.Physics.Extensions
             ComponentLookup<PhysicsMass> Masses = GetComponentLookup<PhysicsMass>(true);
             ComponentLookup<PhysicsMassOverride> MassOverrides = GetComponentLookup<PhysicsMassOverride>(true);
 
-            // If there's a pick job, wait for it to finish
+            // 如果有选择 job，请等待它完成
             if (m_PickSystem.PickJobHandle != null)
             {
                 JobHandle.CombineDependencies(Dependency, m_PickSystem.PickJobHandle.Value).Complete();
             }
 
-            // If there's a picked entity, drag it
+            // 如果有选中的 entity，请将其拖动
             MousePickSystem.SpringData springData = m_PickSystem.SpringDataRef.Value;
             if (springData.Picked)
             {
@@ -249,7 +249,7 @@ namespace Unity.Physics.Extensions
                 {
                     EntityManager.DestroyEntity(springData.Entity);
 
-                    // reset spring data
+                    // 重置弹簧数据
                     m_PickSystem.SpringDataRef.Value = new MousePickSystem.SpringData();
                     return;
                 }
@@ -264,8 +264,8 @@ namespace Unity.Physics.Extensions
                 PhysicsMass massComponent = Masses[entity];
                 PhysicsVelocity velocityComponent = Velocities[entity];
 
-                // if body is kinematic
-                // TODO: you should be able to rotate a body with infinite mass but finite inertia
+                // 如果身体是运动学的
+                // TODO: 你应该能够旋转质量无限但惯性有限的物体
                 if (massComponent.HasInfiniteMass || MassOverrides.HasComponent(entity) && MassOverrides[entity].IsKinematic != 0)
                 {
                     return;
@@ -275,21 +275,21 @@ namespace Unity.Physics.Extensions
                 var worldFromBody = new MTransform(LocalTransforms[entity].Rotation, LocalTransforms[entity].Position);
 
 
-                // Body to motion transform
+                // 身体到动作的变换
                 var bodyFromMotion = new MTransform(Masses[entity].InertiaOrientation, Masses[entity].CenterOfMass);
                 MTransform worldFromMotion = Mul(worldFromBody, bodyFromMotion);
 
-                // TODO: shouldn't damp where inertia mass or inertia
-                // Damp the current velocity
+                // TODO: 不应在惯性质量或惯性处阻尼
+                // 阻尼当前速度
                 const float gain = 0.95f;
                 velocityComponent.Linear *= gain;
                 velocityComponent.Angular *= gain;
 
-                // Get the body and mouse points in world space
+                // 获取 world 空间中的主体和鼠标点
                 float3 pointBodyWs = Mul(worldFromBody, springData.PointOnBody);
                 float3 pointSpringWs = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, springData.MouseDepth));
 
-                // Calculate the required change in velocity
+                // 计算所需的速度变化
                 float3 pointBodyLs = Mul(Inverse(bodyFromMotion), springData.PointOnBody);
                 float3 deltaVelocity;
                 {
@@ -301,9 +301,9 @@ namespace Unity.Physics.Extensions
                     deltaVelocity = -pointDiff * (elasticity / SystemAPI.Time.DeltaTime) - damping * relativeVelocityInWorld;
                 }
 
-                // Build effective mass matrix in world space
-                // TODO how are bodies with inf inertia and finite mass represented
-                // TODO the aggressive damping is hiding something wrong in this code if dragging non-uniform shapes
+                // 在 world 空间中构建有效质量矩阵
+                // TODO 如何表示具有 inf 惯性和有限质量的物体
+                // TODO 如果拖动不均匀的形状，激进的阻尼会隐藏此代码中的错误
                 float3x3 effectiveMassMatrix;
                 {
                     float3 arm = pointBodyWs - worldFromMotion.Translation;
@@ -313,7 +313,7 @@ namespace Unity.Physics.Extensions
                         new float3(arm.y, -arm.x, 0.0f)
                     );
 
-                    // world space inertia = worldFromMotion * inertiaInMotionSpace * motionFromWorld
+                    // world 空间惯量 = worldFromMotion * inertiaInMotionSpace * motionFromWorld
                     var invInertiaWs = new float3x3(
                         massComponent.InverseInertia.x * worldFromMotion.Rotation.c0,
                         massComponent.InverseInertia.y * worldFromMotion.Rotation.c1,
@@ -329,15 +329,15 @@ namespace Unity.Physics.Extensions
                     effectiveMassMatrix = math.inverse(invEffMassMatrix);
                 }
 
-                // Calculate impulse to cause the desired change in velocity
+                // 计算引起所需速度变化的冲量
                 float3 impulse = math.mul(effectiveMassMatrix, deltaVelocity);
 
-                // Clip the impulse
+                // 抑制冲动
                 const float maxAcceleration = 250.0f;
                 float maxImpulse = math.rcp(massComponent.InverseMass) * SystemAPI.Time.DeltaTime * maxAcceleration;
                 impulse *= math.min(1.0f, math.sqrt((maxImpulse * maxImpulse) / math.lengthsq(impulse)));
 
-                // Apply the impulse
+                // 施加冲动
                 {
                     velocityComponent.Linear += impulse * massComponent.InverseMass;
 
@@ -346,7 +346,7 @@ namespace Unity.Physics.Extensions
                     velocityComponent.Angular += angularImpulseLs * massComponent.InverseInertia;
                 }
 
-                // Write back velocity
+                // 回写速度
                 Velocities[entity] = velocityComponent;
             }
         }

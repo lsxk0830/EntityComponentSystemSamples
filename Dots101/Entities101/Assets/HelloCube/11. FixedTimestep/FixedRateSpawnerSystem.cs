@@ -5,8 +5,8 @@ using Unity.Transforms;
 
 namespace HelloCube.FixedTimestep
 {
-    // This system is virtually identical to DefaultRateSpawner; the key difference is that it updates in the
-    // FixedStepSimulationSystemGroup instead of the default SimulationSystemGroup.
+    // 该 system 与 DefaultRateSpawner 几乎相同；关键的区别在于它更新在
+    // FixedStepSimulationSystemGroup 而不是默认的 SimulationSystemGroup。
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     public partial struct FixedRateSpawnerSystem : ISystem
     {

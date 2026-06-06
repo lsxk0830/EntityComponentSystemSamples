@@ -18,13 +18,13 @@ namespace Blender
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // disable buoyancy for all cubes
+            // 禁用所有立方体的浮力
             var buoyancyQuery = SystemAPI.QueryBuilder().WithAll<Buoyancy>().Build();
             state.EntityManager.SetComponentEnabled<Buoyancy>(buoyancyQuery, false);
-                
-            // for buoyant cubes inside the buoyancy zone, copy the buoyancy properties and enabled the buoyancy
+
+            // 对于浮力区内的浮力立方体，复制浮力属性并启用浮力
             {
-                // get trigger events
+                // 获取 trigger 事件
                 var sim = SystemAPI.GetSingleton<SimulationSingleton>().AsSimulation();
                 sim.FinalJobHandle.Complete();
 
@@ -33,7 +33,7 @@ namespace Blender
                     Entity cubeEntity;
                     Entity zoneEntity;
 
-                    // determine which body is a buoyant cube and which is a zone 
+                    // 确定哪个物体是有浮力的立方体，哪个是区域
                     if (SystemAPI.HasComponent<Buoyancy>(triggerEvent.EntityA) &&
                         SystemAPI.HasComponent<BuoyancyZone>(triggerEvent.EntityB))
                     {
@@ -48,17 +48,17 @@ namespace Blender
                     }
                     else
                     {
-                        // skip because this event is not for a cube and a zone
+                        // 跳过，因为此事件不适用于立方体和区域
                         continue;
                     }
 
                     var zone = SystemAPI.GetComponentRW<BuoyancyZone>(zoneEntity);
                     var cubeBuoyancy = SystemAPI.GetComponentRW<Buoyancy>(cubeEntity);
 
-                    // copy the zone's Buoyancy data to the cube
+                    // 将区域的浮力数据复制到立方体
                     cubeBuoyancy.ValueRW = zone.ValueRO.Buoyancy;
-                    
-                    // enable the cube's Buoyancy so that it will be made to float by the BuoyancySystem
+
+                    // 启用立方体的浮力，使其通过 BuoyancySystem 漂浮
                     SystemAPI.SetComponentEnabled<Buoyancy>(cubeEntity, true);
                 }
             }

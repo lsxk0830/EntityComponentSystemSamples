@@ -17,7 +17,7 @@ namespace Samples.HelloNetcode
         SnapshotDataLookupHelper m_SnapshotDataLookupHelper;
         BufferLookup<PredictedGhostSpawn> m_PredictedGhostSpawnLookup;
         ComponentLookup<GrenadeData> m_GrenadeDataLookup;
-        // The ghost type (grenade) this classification system will process
+        // ghost 型（手榴弹）此分类 system 将处理
         int m_GhostType;
 
         [BurstCompile]
@@ -40,7 +40,7 @@ namespace Samples.HelloNetcode
         {
             if (m_GhostType == -1)
             {
-                // Lookup the grenade prefab entity in the ghost prefab list, from there we can find the ghost type for this prefab
+                // 在 ghost prefab 列表中查找手榴弹 prefab entity，从那里我们可以找到该 prefab 的 ghost 类型
                 var prefabEntity = SystemAPI.GetSingleton<GrenadeSpawner>().Grenade;
                 var collectionEntity = SystemAPI.GetSingletonEntity<GhostCollection>();
                 var ghostPrefabTypes = state.EntityManager.GetBuffer<GhostCollectionPrefab>(collectionEntity);
@@ -85,21 +85,21 @@ namespace Samples.HelloNetcode
                 {
                     var newGhostSpawn = newSpawns[i];
                     if (newGhostSpawn.GhostType != ghostType)
-                        continue; // Not a grenade.
+                        continue; // 不是手榴弹。
 
                     if (newGhostSpawn.SpawnType != GhostSpawnBuffer.Type.Predicted || newGhostSpawn.PredictedSpawnEntity != Entity.Null)
                         continue;
 
-                    // Mark all the grenade spawns as classified even if not our own predicted spawns
-                    // otherwise spawns from other players might be picked up by the default classification system when
-                    // it runs when we happen to have a predicted spawn in the predictedSpawnList not yet classified here
+                    // 将所有手榴弹生成标记为机密，即使不是我们自己的 predicted 生成
+                    // 否则，当其他玩家生成时，默认分类 system 可能会被拾取
+                    // 当我们碰巧在尚未分类的 predictedSpawnList 中生成 predicted 时，它就会运行
                     newGhostSpawn.HasClassifiedPredictedSpawn = true;
 
-                    // Find new ghost spawns (from ghost snapshot) which match the predict spawned ghost type handled by
-                    // this classification system. Match the spawn ID data from the new spawn (by lookup it up in
-                    // snapshot data) with the spawn IDs of ghosts in the predicted spawn list. When matched we replace
-                    // the ghost entity of that new spawn with our predict spawned entity (so the spawn will not result
-                    // in a new instantiation).
+                    // 查找新的 ghost 生成（来自 ghost snapshot），其与由处理的预测生成的 ghost 类型匹配
+                    // 此分类为 system。匹配来自新生成的生成 ID 数据（通过在
+                    // snapshot 数据）与 predicted 生成列表中 ghosts 的生成 IDs。当匹配时我们替换
+                    // 该新生成的 ghost entity 与我们预测生成的 entity （因此生成不会导致
+                    // 在新的实例中）。
                     for (int j = 0; j < predictedSpawnList.Length; ++j)
                     {
                         if (newGhostSpawn.GhostType == predictedSpawnList[j].ghostType)

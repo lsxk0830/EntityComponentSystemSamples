@@ -37,7 +37,7 @@ namespace Samples.HelloNetcode
         public Text HostConnectionLabel;
         public Text ClientConnectionLabel;
 
-        // The time, in seconds, we'll wait for a host join code when doing the initial connect
+        // 执行初始连接时等待主机加入代码的时间（以秒为单位）
         const int k_InitialHostJoinWaitTimeout = 30;
         ConnectionState m_State;
 
@@ -81,7 +81,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initial setup for the host of the game session.
+        /// 游戏会话主机的初始设置。
         /// </summary>
         public async void SetupRelayAndLobbyAsHost()
         {
@@ -113,11 +113,11 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initial service initialization. This only needs to be done once. When running in a standalone player
-        /// we need to use a different player profile or else the lobby will treat this player as the same identity
-        /// as the editor or other players (would remove everyone from the lobby for example when one player instance
-        /// disconnects/leaves). A random profile name will be generated unless the -userprofile argument is passed
-        /// to the process in which case the given name will be used.
+        /// 初始服务初始化。这只需要完成一次。在独立播放器中运行时
+        /// 我们需要使用不同的玩家资料，否则大厅会将此玩家视为相同的身份
+        /// 作为编辑者或其他玩家（会将所有人从大厅中删除，例如当一个玩家实例
+        /// 断开连接/离开）。除非传递 -userprofile 参数，否则将生成随机配置文件名称
+        /// 在这种情况下将使用给定名称的进程。
         /// </summary>
         async Task InitializeServices()
         {
@@ -146,7 +146,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Initial setup for clients joining a game session.
+        /// clients 加入游戏会话的初始设置。
         /// </summary>
         public async void JoinLobbyAndConnectWithRelayAsClient()
         {
@@ -178,9 +178,9 @@ namespace Samples.HelloNetcode
                     return;
                 }
 
-                // If the lobby data has invalid joincode (probably the previous host) then it has not
-                // been updated by the current host. A migration is likely taking place and we should wait for
-                // the proper join code as normally clients do during a host migration
+                // 如果大厅数据具有无效的加入代码（可能是前一个主机），那么它就没有
+                // 已由当前主机更新。迁移可能正在发生，我们应该等待
+                // 主机迁移期间 clients 通常执行的正确加入代码
                 if (hostMigrationController.CurrentLobby.Data[LobbyKeys.RelayHost].Value !=
                     hostMigrationController.CurrentLobby.HostId)
                 {
@@ -217,13 +217,13 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Collect relay server end point from completed systems. Set up server with relay support and connect client
-        /// to hosted server through relay server.
-        /// Both client and server world is manually created to allow us to override the <see cref="DriverConstructor"/>.
+        /// 从已完成的 systems 收集中继 server 端点。设置带有中继支持的 server 并连接 client
+        /// 通过中继 server 到托管 server。
+        /// client 和 server world 都是手动创建的，允许我们覆盖 <see cref="DriverConstructor"/>。
         ///
-        /// Two singleton entities are constructed with listen and connect requests. These will be executed asynchronously.
-        /// Connecting to relay server will not be bound immediately. The Request structs will ensure that we
-        /// continuously poll until the connection is established.
+        /// 两个单例 entities 是通过监听和连接请求构造的。这些将异步执行。
+        /// 连接到继电器 server 不会立即绑定。Request 结构将确保我们
+        /// 不断轮询，直到建立连接。
         /// </summary>
         void SetupRelayHostedServerAndConnect(RelayServerData relayServerData)
         {
@@ -249,7 +249,7 @@ namespace Samples.HelloNetcode
                     return;
                 }
 
-                // Update the UI with the status of connecting to the relay
+                // 更新 UI 与继电器的连接状态
                 var relayEntity = ClientServerBootstrap.ServerWorld.EntityManager.CreateEntity(ComponentType.ReadOnly<WaitForRelayConnection>());
                 ClientServerBootstrap.ServerWorld.EntityManager.SetComponentData(relayEntity, new WaitForRelayConnection() { StartTime = Time.realtimeSinceStartup });
 
@@ -265,7 +265,7 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Connect to the relay server and the given server endpoint.
+        /// 连接到中继 server 和给定的 server 端点。
         /// </summary>
         void ConnectToServerWithRelay(RelayServerData relayServerData)
         {
@@ -277,15 +277,15 @@ namespace Samples.HelloNetcode
 
                 LoadScenes(client);
 
-                // Update the UI with the status of connecting to the relay
+                // 更新 UI 与继电器的连接状态
                 var relayEntity = client.EntityManager.CreateEntity(ComponentType.ReadOnly<WaitForRelayConnection>());
                 client.EntityManager.SetComponentData(relayEntity, new WaitForRelayConnection() { StartTime = Time.realtimeSinceStartup });
 
                 var networkStreamEntity = client.EntityManager.CreateEntity(ComponentType.ReadWrite<NetworkStreamRequestConnect>());
                 client.EntityManager.SetName(networkStreamEntity, "NetworkStreamRequestConnect");
 
-                // For IPC this will not work and give an error in the transport layer. For this sample we force the client to connect through the relay service.
-                // For a locally hosted server, the client would need to connect to NetworkEndpoint.AnyIpv4, and the relayClientData.Endpoint in all other cases.
+                // 对于 IPC 这将不起作用并在传输层中给出错误。对于此示例，我们强制 client 通过中继服务进行连接。
+                // 对于本地托管的 server，client 需要连接到 NetworkEndpoint.AnyIpv4，在所有其他情况下需要连接到 relayClientData.Endpoint。
                 client.EntityManager.SetComponentData(networkStreamEntity, new NetworkStreamRequestConnect { Endpoint = relayServerData.Endpoint });
             }
             finally

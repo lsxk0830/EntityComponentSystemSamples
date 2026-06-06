@@ -6,8 +6,8 @@ using Unity.Entities;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Receives <see cref="Unity.NetCode.Samples.PlayerList.PlayerListEntry" /> RPC's, notifying this client of the UPDATE NOTIFICATIONS to other clients.
-    ///     Raises <see cref="PlayerListNotificationBuffer"/> entries in a singleton buffer.
+    ///     接收<see cref="Unity.NetCode.Samples.PlayerList.PlayerListEntry" /> RPC 的，将 UPDATE NOTIFICATIONS 的 client 通知给其他 clients。
+    ///     在单例缓冲区中引发 <see cref="PlayerListNotificationBuffer"/> 条目。
     /// </summary>
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
@@ -52,7 +52,7 @@ namespace Unity.NetCode.Samples.PlayerList
                 return;
             }
 
-            // Clear stale events:
+            // 清除陈旧事件：
             for (var i = 0; i < eventList.Length; i++)
             {
                 var element = eventList[i];
@@ -65,7 +65,7 @@ namespace Unity.NetCode.Samples.PlayerList
                 else eventList[i] = element;
             }
 
-            // Add new:
+            // 添加新内容：
             if (!m_PlayerListEntryChangedRpc.IsEmptyIgnoreFilter)
             {
                 var netDebug = SystemAPI.GetSingleton<NetDebug>();

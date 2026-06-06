@@ -7,8 +7,8 @@ using Unity.Transforms;
 
 namespace Streaming.SceneManagement.SubsceneInstancing
 {
-    // After a subscene instance is loaded, this system moves its entities by the instance's offset.
-    // This system runs in a separate world before the loaded entities are moved to the main world.
+    // 加载 subscene 实例后，此 system 将其 entities 移动该实例的偏移量。
+    // 在加载的 entities 移动到主 world 之前，此 system 在单独的 world 中运行。
     [WorldSystemFilter(WorldSystemFilterFlags.ProcessAfterLoad)]
     public partial struct OffsetSystem : ISystem
     {
@@ -27,14 +27,14 @@ namespace Streaming.SceneManagement.SubsceneInstancing
 
             foreach (var offset in offsets)
             {
-                // Apply the offset to all the dynamic entities
+                // 将偏移应用于所有动态 entities
                 foreach (var transform in
                          SystemAPI.Query<RefRW<LocalTransform>>())
                 {
                     transform.ValueRW.Position += offset.Value;
                 }
 
-                // Apply the offset to all non-dynamic entities
+                // 将偏移量应用于所有非动态 entities
                 var offsetMatrix = float4x4.Translate(offset.Value);
                 foreach (var transform in
                          SystemAPI.Query<RefRW<LocalToWorld>>()
@@ -43,7 +43,7 @@ namespace Streaming.SceneManagement.SubsceneInstancing
                     transform.ValueRW.Value = math.mul(offsetMatrix, transform.ValueRW.Value);
                 }
 
-                // Apply the offset to the center of oscillation
+                // 将偏移应用到振荡中心
                 foreach (var oscillating in
                          SystemAPI.Query<RefRW<Oscillating>>())
                 {

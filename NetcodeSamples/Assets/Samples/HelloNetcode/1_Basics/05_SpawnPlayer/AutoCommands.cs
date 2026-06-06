@@ -6,8 +6,8 @@ using Unity.NetCode;
 
 namespace Samples.HelloNetcode
 {
-    // Sample keypress inputs every frame and add them to the input component for
-    // processing later.
+    // 每帧采样按键输入并将它们添加到输入 component
+    // 稍后处理。
     [UpdateInGroup(typeof(HelloNetcodeInputSystemGroup))]
     [AlwaysSynchronizeSystem]
     public partial class GatherAutoCommandsSystem : SystemBase
@@ -27,11 +27,11 @@ namespace Samples.HelloNetcode
             bool up = UnityEngine.Input.GetKey("up") || TouchInput.GetKey(TouchInput.KeyCode.Up);
             bool jump = UnityEngine.Input.GetKeyDown("space");
 
-            // When multiple players are spawned this input gathering step could all
-            // of them since they have the PlayerInput, so this restricts the query to
-            // only players with a ghost owner component and with an ID which matches the
-            // local connection. For that we are using the GhostOwnerIsLocal tag, that is added
-            // automatically to all entities owned by the users.
+            // 当产生多个玩家时，此输入收集步骤可能全部
+            // 因为它们有 PlayerInput，所以这将 query 限制为
+            // 仅拥有 ghost 所有者 component 且 ID 与
+            // 本地连接。为此，我们使用添加的 GhostOwnerIsLocal 标签
+            // 自动分配给用户拥有的所有 entities。
             Dependency = new GatherAutoCommandJob()
             {
                 left = left,
@@ -69,7 +69,7 @@ namespace Samples.HelloNetcode
         }
     }
 
-    // Apply the inputs stored in the input component for all player entities
+    // 将存储在输入 component 中的输入应用于所有玩家 entities
     [UpdateInGroup(typeof(HelloNetcodePredictedSystemGroup))]
     public partial class ProcessAutoCommandsSystem : SystemBase
     {
@@ -85,7 +85,7 @@ namespace Samples.HelloNetcode
             SystemAPI.TryGetSingleton<ClientServerTickRate>(out var tickRate);
             tickRate.ResolveDefaults();
 
-            // Make the jump arc look the same regardless of simulation tick rate
+            // 使跳跃弧看起来相同，无论模拟滴答率如何
             var velocityDecrementStep = 60 / tickRate.SimulationTickRate;
 
             foreach (var (input, transRef, movementRef) in SystemAPI.Query<PlayerInput, RefRW<LocalTransform>, RefRW<PlayerMovement>>())
@@ -95,9 +95,9 @@ namespace Samples.HelloNetcode
                 if (input.Jump.IsSet)
                     movement.JumpVelocity = 10;
 
-                // Simple jump mechanism, when jump event is set the jump velocity is set to 10
-                // then on each tick it is decremented. It results in an input value being set either
-                // in the upward or downward direction (just like left/right movement).
+                // 简单的跳跃机制，当设置跳跃事件时跳跃速度设置为 10
+                // 然后在每个刻度上它都会递减。它导致输入值被设置
+                // 向上或向下（就像向左/向右移动一样）。
                 var verticalMovement = 0f;
                 if (movement.JumpVelocity > 0)
                 {
@@ -113,7 +113,7 @@ namespace Samples.HelloNetcode
                 var moveInput = new float3(input.Horizontal, verticalMovement, input.Vertical);
                 moveInput = math.normalizesafe(moveInput) * movementSpeed;
 
-                // Ensure we don't go through the ground when landing (and stick to it when close)
+                // 确保着陆时我们不会穿过地面（并在接近时坚持下去）
 
                 if (movement.JumpVelocity <= 0 && (trans.Position.y + moveInput.y < 0 || trans.Position.y + moveInput.y < 0.05))
                     moveInput.y = trans.Position.y = 0;

@@ -28,13 +28,13 @@ namespace Samples.HelloNetcode
         }
 
         /// <summary>
-        /// Set up the component for tracking the relay connection status during the host migration, the HUD UI then prints the information
+        /// 设置 component 用于跟踪主机迁移过程中的中继连接状态，然后 HUD UI 打印信息
         /// </summary>
         public static Entity SetWaitForRelayConnection(WaitForRelayConnection waitComponent)
         {
             using var relayEntityQuery = ClientServerBootstrap.ClientWorld.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<WaitForRelayConnection>());
             var relayEntity = Entity.Null;
-            // There could already be a WaitForRelayConnection if we got a host migration event but the host failed and another one was picked
+            // 如果我们收到主机迁移事件，但主机发生故障并选择了另一台主机，则可能已经存在 WaitForRelayConnection
             if (!relayEntityQuery.IsEmptyIgnoreFilter)
                 relayEntity = relayEntityQuery.ToEntityArray(Allocator.Temp)[0];
             else
@@ -79,7 +79,7 @@ namespace Samples.HelloNetcode
                         StatsText.text = $"{prefix} ";
                     var connectionTime = UnityEngine.Time.realtimeSinceStartup - waitData.StartTime;
 
-                    // If we're waiting for relay but don't have a join code yet, we're still waiting for the lobby to send it to us
+                    // 如果我们正在等待中继但还没有加入代码，我们仍在等待大厅将其发送给我们
                     if (waitData.WaitForJoinCode)
                     {
                         StatsText.text += $"Waiting for new join code ({connectionTime:F2} s)";
@@ -98,7 +98,7 @@ namespace Samples.HelloNetcode
                         return;
                     }
 
-                    // TODO: Seems this catches the old relay connection when a host migration happens, so immediately sees Established
+                    // TODO: 当主机迁移发生时，这似乎捕获了旧的中继连接，因此立即看到已建立
                     var relayEntity = m_RelayQuery.GetSingletonEntity();
                     CheckRelayStatus(StatsText, World, relayEntity, prefix, connectionTime);
                 }
@@ -125,7 +125,7 @@ namespace Samples.HelloNetcode
                 case RelayConnectionStatus.AllocationInvalid:
                     statusText.text += "Relay connection failed; allocation is invalid";
                     break;
-                // During client migration from old host to the new there will be some time where it's not connected to anything and waiting for the new join code
+                // 在 client 从旧主机迁移到新主机的过程中，会有一段时间它没有连接到任何东西并等待新的加入代码
                 case RelayConnectionStatus.NotUsingRelay:
                     break;
                 default:
@@ -139,7 +139,7 @@ namespace Samples.HelloNetcode
             using var drvQuery = world.EntityManager.CreateEntityQuery(ComponentType.ReadWrite<NetworkStreamDriver>());
             var networkStreamDriver =drvQuery.GetSingleton<NetworkStreamDriver>();
 
-            // Get the server driver with the UDPNetworkInterface and with relay enabled
+            // 获取带有 UDPNetworkInterface 并启用继电器的 server 驱动程序
             RelayConnectionStatus status = RelayConnectionStatus.NotUsingRelay;
             for (var i = networkStreamDriver.DriverStore.FirstDriver;
                  status == RelayConnectionStatus.NotUsingRelay && i < networkStreamDriver.DriverStore.LastDriver;

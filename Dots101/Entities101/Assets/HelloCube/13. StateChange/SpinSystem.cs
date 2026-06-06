@@ -42,7 +42,7 @@ namespace HelloCube.StateChange
             var after = ProfilerUnsafeUtility.Timestamp;
 
 #if UNITY_EDITOR
-            // profiling
+            // 剖析
             var conversionRatio = ProfilerUnsafeUtility.TimestampToNanosecondsConversionRatio;
             var elapsed = (after - before) * conversionRatio.Numerator / conversionRatio.Denominator;
             SystemAPI.GetSingletonRW<StateChangeProfilerModule.FrameData>().ValueRW.SpinPerf = elapsed;

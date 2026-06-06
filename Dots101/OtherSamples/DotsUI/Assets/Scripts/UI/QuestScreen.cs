@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.DotsUISample
 {
-    //  Shows the quest title and the collectables required to complete the quest
+    //  显示任务标题和完成任务所需的收藏品
     public class QuestScreen : UIScreen
     {
         QuestData m_QuestData;
@@ -14,18 +14,18 @@ namespace Unity.DotsUISample
         const string k_QuestTitleUssClassName = "quest-title";
         const string k_QuestCollectableUssClassName = "quest-collectable";
         const string k_QuestCollectableCompletedUssClassName = "quest-collectable-completed";
-        
+
         public static QuestScreen Instantiate(VisualElement parentElement)
         {
             var screen = ScriptableObject.CreateInstance<QuestScreen>();
             screen.RootElement = parentElement;
-            
+
             screen.m_ChecklistPanel = screen.RootElement.Q<VisualElement>("quest__checklist-panel");
-            
+
             screen.Hide();
             return screen;
         }
-        
+
         public void SetQuestData(QuestData questData, DynamicBuffer<CollectableCount> buf, CollectablesData collectables)
         {
             m_QuestData = questData;
@@ -39,13 +39,13 @@ namespace Unity.DotsUISample
                 m_CollectableLabels[i].AddToClassList(k_QuestCollectableUssClassName);
                 m_ChecklistPanel.Add(m_CollectableLabels[i]);
             }
-            
+
             UpdateMessage(buf, collectables, false);
 
             Show();
         }
 
-        // todo ideally we would avoid / minimize string allocations
+        // todo 理想情况下，我们会避免/最小化字符串分配
         public void UpdateMessage(DynamicBuffer<CollectableCount> buf, CollectablesData collectables, bool hasAllItems)
         {
             if (hasAllItems)
@@ -59,15 +59,15 @@ namespace Unity.DotsUISample
 
                 return;
             }
-            
+
             for (int i = 0; i < m_QuestData.Items.Length; i++)
             {
-                var collectableName = collectables.Collectables[i].Name.ToUpper();   
+                var collectableName = collectables.Collectables[i].Name.ToUpper();
                 var currentCount = buf[i].Count;
                 var targetCount = m_QuestData.Items[i].GoalCount;
-                
+
                 m_CollectableLabels[i].text = $"{collectableName}  ({currentCount}/{targetCount})";
-                
+
                 if (currentCount >= targetCount)
                 {
                     m_CollectableLabels[i].AddToClassList(k_QuestCollectableCompletedUssClassName);

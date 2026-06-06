@@ -7,11 +7,11 @@ using Unity.Jobs;
 #if false
 namespace ExampleCode.IJobs
 {
-    // An example job which increments all the numbers of an array.
+    // 示例 job 递增数组的所有数字。
     public struct IncrementJob : IJob
     {
-        // The data which a job needs to use should all
-        // be included as fields of the struct.
+        // job 需要使用的数据应该都是
+        // 作为结构体的字段包含在内。
         public NativeArray<float> Nums;
         public float Increment;
 
@@ -25,7 +25,7 @@ namespace ExampleCode.IJobs
         }
     }
 
-    // A system that schedules the IJob.
+    // 调度 IJob 的 system。
     public partial struct MySystem : ISystem
     {
         [BurstCompile]
@@ -45,11 +45,11 @@ namespace ExampleCode.IJobs
 
 namespace ExampleCode.IJobParallelFors
 {
-    // An example job which increments all the numbers of an array in parallel.
+    // 示例 job 并行递增数组的所有数字。
     public struct IncrementParallelJob : IJobParallelFor
     {
-        // The data which a job needs to use must all
-        // be included as fields of the struct.
+        // job 需要使用的数据必须全部
+        // 作为结构体的字段包含在内。
         public NativeArray<float> Nums;
         public float Increment;
 
@@ -60,7 +60,7 @@ namespace ExampleCode.IJobParallelFors
         }
     }
 
-    // A system that schedules the IJobParallelFor.
+    // 调度 IJobParallelFor 的 system。
     public partial struct MySystem : ISystem
     {
         [BurstCompile]
@@ -73,8 +73,8 @@ namespace ExampleCode.IJobParallelFors
             };
 
             JobHandle handle = job.Schedule(
-                job.Nums.Length, // number of times to call Execute
-                64); // split the calls into batches of 64
+                job.Nums.Length, // 调用执行的次数
+                64); // 将调用分成 64 个批次
             handle.Complete();
         }
     }
@@ -82,100 +82,100 @@ namespace ExampleCode.IJobParallelFors
 
 namespace ExampleCode.IJobChunks
 {
-    // An example IJobChunk.
+    // 示例 IJobChunk。
     [BurstCompile]
     public struct MyIJobChunk : IJobChunk
     {
-        // The job needs type handles for each component type
-        // it will access from the chunks.
+        // job 需要每个 component 类型的类型句柄
+        // 它将从 chunks 访问。
         public ComponentTypeHandle<Foo> FooHandle;
 
-        // Handles for components that will only be read should be
-        // marked with [ReadOnly].
+        // 只能读取的 components 的句柄应该是
+        // 标有 [ReadOnly]。
         [ReadOnly] public ComponentTypeHandle<Bar> BarHandle;
 
-        // The entity type handle is needed if we
-        // want to read the entity ID's.
+        // 如果我们需要 entity 类型句柄
+        // 想读 entity ID 的。
         public EntityTypeHandle EntityHandle;
 
-        // Jobs should not use an EntityManager to create and modify
-        // entities directly. Instead, a job can record commands into
-        // an EntityCommandBuffer to be played back later on the
-        // main thread at some point after the job has been completed.
-        // If the job will be scheduled with ScheduleParallel(),
-        // we must use an EntityCommandBuffer.ParallelWriter.
+        // Jobs 不应使用 EntityManager 来创建和修改
+        // 直接 entities。相反，job 可以将命令记录到
+        // 稍后播放的 EntityCommandBuffer
+        // job 完成后的某个时刻的主线程。
+        // 如果 job 将与 ScheduleParallel() 一起安排，
+        // 我们必须使用 EntityCommandBuffer.ParallelWriter。
         public EntityCommandBuffer.ParallelWriter Ecb;
 
-        // When this job runs, Execute() will be called once for each
-        // chunk matching the query that was passed to Schedule().
+        // 当这个 job 运行时，Execute() 将被调用一次
+        // chunk 与传递给 Schedule() 的 query 匹配。
 
-        // The useEnableMask param is true if any of the
-        // entities in the chunk have disabled components
-        // of the query. In other words, this param is true
-        // if any entities in the chunk should be skipped over.
+        // 如果满足以下任一条件，则 useEnableMask 参数为 true
+        // entities 中的 chunk 已禁用 components
+        // query 的。换句话说，这个参数是 true
+        // 如果 chunk 中的任何 entities 应被跳过。
 
-        // The chunkEnabledMask identifies which entities
-        // have all components of the query enabled, i.e. which entities
-        // should be processed:
-        //   - A set bit indicates the entity should be processed.
-        //   - A cleared bit indicates the entity has one or more
-        //     disabled components and so should be skipped.
+        // chunkEnabledMask 标识哪个 entities
+        // 启用 query 的所有 components，i.e。其中 entities
+        // 应处理：
+        //   - 设置位指示应处理 entity。
+        //   - 清除位表示 entity 有一个或多个
+        //     已禁用 components，因此应跳过。
 
-        // The `unfilteredChunkIndex` is the index of the chunk in the sequence of all chunks matching the query: the first
-        // chunk matching the query is index 0, the second is index 1, and so forth. This value is mainly useful as
-        // a *sort key* passed to the methods of `EntityCommandBuffer.ParallelWriter`. Each recorded command includes
-        // a sortKey, and in playback, the commands are sorted by these keys before the commands are executed.
-        // This sorting effectively guarantees the commands will execute in a deterministic order even though the
-        // original recorded order of the commands was non-deterministic.
+        // `unfilteredChunkIndex` 是 chunk 在所有与 query 匹配的 chunks 的序列中的索引：第一个
+        // 与 query 匹配的 chunk 是索引 0，第二个是索引 1，依此类推。该值主要用作
+        // 传递给 `EntityCommandBuffer.ParallelWriter` 方法的*排序键*。每个记录的命令包括
+        // a sortKey，在播放时，命令在执行之前会按这些键排序。
+        // 这种排序有效地保证了命令将以确定的顺序执行，即使
+        // 原始记录的命令顺序是不确定的。
         [BurstCompile]
         public void Execute(in ArchetypeChunk chunk,
             int unfilteredChunkIndex,
             bool useEnableMask,
             in v128 chunkEnabledMask)
         {
-            // Get the entity ID and component arrays from the chunk.
+            // 从 chunk 获取 entity ID 和 component 数组。
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityHandle);
             NativeArray<Foo> foos = chunk.GetNativeArray(ref FooHandle);
             NativeArray<Bar> bars = chunk.GetNativeArray(ref BarHandle);
 
-            // The ChunkEntityEnumerator helps us loop over
-            // the entities of the chunk, but only those that
-            // match the query (accounting for disabled components).
+            // ChunkEntityEnumerator 帮助我们循环
+            // entities 的 chunk，但仅限于那些
+            // 匹配 query（占禁用的 components）。
             var enumerator = new ChunkEntityEnumerator(useEnableMask, chunkEnabledMask, chunk.Count);
 
-            // Loop over all entities in the chunk that match the query.
+            // 循环遍历 chunk 中与 query 匹配的所有 entities。
             while (enumerator.NextEntityIndex(out var i))
             {
-                // Read the entity ID and component values.
+                // 读取 entity ID 和 component 值。
                 var entity = entities[i];
                 var foo = foos[i];
                 var bar = bars[i];
 
-                // If the Bar value meets a criteria, we
-                // record a command in the ECB to remove it.
+                // 如果 Bar 值满足标准，我们
+                // 在 ECB 中记录命令以将其删除。
                 if (bar.Value < 0)
                 {
                     Ecb.RemoveComponent<Bar>(unfilteredChunkIndex, entity);
                 }
 
-                // Set the Foo value.
+                // 设置 Foo 值。
                 foos[i] = new Foo { };
             }
         }
     }
 
-    // A system that schedules and completes the above IJobChunk.
+    // 一个 system，调度并完成上述 IJobChunk。
     public partial struct MySystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Get an EntityCommandBuffer from
-            // the BeginSimulationEntityCommandBufferSystem.
+            // 从以下位置获取 EntityCommandBuffer
+            // BeginSimulationEntityCommandBufferSystem。
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // Create the job.
+            // 创建 job。
             var job = new MyIJobChunk
             {
                 FooHandle = state.GetComponentTypeHandle<Foo>(false),
@@ -185,15 +185,15 @@ namespace ExampleCode.IJobChunks
 
             var myQuery = SystemAPI.QueryBuilder().WithAll<Foo, Bar, Apple>().WithNone<Banana>().Build();
 
-            // Schedule the job.
-            // By calling ScheduleParallel() instead of Schedule(),
-            // the chunks matching the job's query will be split up
-            // into batches, and these batches may be processed
-            // in parallel by the worker threads.
-            // We pass state.Dependency to ensure that this job depends upon
-            // any overlapping jobs scheduled in prior system updates.
-            // We assign the returned handle to state.Dependency to ensure
-            // that this job is passed as a dependency to other systems.
+            // Schedule job。
+            // 通过调用 ScheduleParallel() 而不是 Schedule()，
+            // 与 job 的 query 匹配的 chunks 将被拆分
+            // 分成批次，并且这些批次可以被处理
+            // 由工作线程并行执行。
+            // 我们通过 state.Dependency 来确保这个 job 取决于
+            // 之前的 system 更新中安排的任何重叠的 jobs。
+            // 我们将返回的句柄分配给 state.Dependency 以确保
+            // 该 job 作为依赖项传递给其他 systems。
             state.Dependency = job.ScheduleParallel(myQuery, state.Dependency);
         }
     }
@@ -201,71 +201,71 @@ namespace ExampleCode.IJobChunks
 
 namespace ExampleCode.IJobEntitys
 {
-    // An example IJobEntity that is functionally equivalent to the IJobChunk above.
-    // An `IJobEntity` is more concise than its `IJobChunk` equivalent because
-    // its source generation takes care of some boilerplate.
+    // 示例 IJobEntity 在功能上等同于上面的 IJobChunk。
+    // `IJobEntity` 比其等效的 `IJobChunk` 更简洁，因为
+    // 它的源代码生成处理一些样板文件。
 
-    // Only entities having the Apple component type will match the job's implicit query
-    // even though the job does not access the Apple component values.
+    // 只有具有 Apple component 类型的 entities 才会匹配 job 的隐式 query
+    // 即使 job 不访问 Apple component 值。
     [WithAll(typeof(Apple))]
-    // Only entities NOT having the Banana component type will match the job's implicit query.
+    // 只有具有 Banana component 类型的 entities NOT 才会匹配 job 的隐式 query。
     [WithNone(typeof(Banana))]
     [BurstCompile]
     public partial struct MyIJobEntity : IJobEntity
     {
-        // Thanks to source generation, an IJobEntity gets the type handles
-        // it needs automatically, so we do not include them manually.
+        // 由于源生成，IJobEntity 获得类型句柄
+        // 它需要自动添加，因此我们不手动添加它们。
 
-        // EntityCommandBuffers and other fields still must
-        // be included manually.
+        // EntityCommandBuffers 等字段仍需
+        // 手动包含。
         public EntityCommandBuffer.ParallelWriter Ecb;
 
-        // Source generation will create an EntityQuery based on the
-        // parameters of Execute(). In this case, the generated query will
-        // match all entities having a Foo and Bar component.
-        //   - When this job runs, Execute() will be called once
-        //     for each entity matching the query.
-        //   - Any entity with a disabled Foo or Bar will be skipped.
-        //   - 'ref' param components are read-write
-        //   - 'in' param components are read-only
-        //   - We need to pass the chunk index as a sortKey to methods of
-        //     the EntityCommandBuffer.ParallelWriter, so we include an
-        //     int parameter with the [ChunkIndexInQuery] attribute.
+        // 源生成将根据以下内容创建 EntityQuery
+        // Execute() 的参数。在这种情况下，生成的 query 将
+        // 匹配所有具有 Foo 和 Bar component 的 entities。
+        //   - 当这个 job 运行时，Execute() 将被调用一次
+        //     对于每个与 ​​query 匹配的 entity。
+        //   - 任何带有禁用 Foo 或 Bar 的 entity 将被跳过。
+        //   - 'ref' 参数 components 是可读写的
+        //   -“in”参数 components 是只读的
+        //   - 我们需要将 chunk 索引作为 sortKey 传递给方法
+        //     EntityCommandBuffer.ParallelWriter，所以我们包括一个
+        //     具有 [ChunkIndexInQuery] 属性的 int 参数。
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref Foo foo, in Bar bar)
         {
-            // If the Bar value meets this criteria, we
-            // record a command in the ECB to remove it.
+            // 如果 Bar 值满足此标准，我们
+            // 在 ECB 中记录命令以将其删除。
             if (bar.Value < 0)
             {
                 Ecb.RemoveComponent<Bar>(chunkIndex, entity);
             }
 
-            // Set the Foo value.
+            // 设置 Foo 值。
             foo = new Foo { };
         }
     }
 
-    // A system that schedules and completes the above IJobEntity.
+    // 一个 system，调度并完成上述 IJobEntity。
     public partial struct MySystem : ISystem
     {
-        // We don't need to create the query manually because source generation
-        // creates one inferred from the IJobEntity's attributes and Execute params.
+        // 我们不需要手动创建 query 因为源生成
+        // 创建一个从 IJobEntity 的属性和执行参数推断的值。
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Get an EntityCommandBuffer from the BeginSimulationEntityCommandBufferSystem.
+            // 从 BeginSimulationEntityCommandBufferSystem 获取 EntityCommandBuffer。
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // Create the job.
+            // 创建 job。
             var job = new MyIJobEntity
             {
                 Ecb = ecb.AsParallelWriter()
             };
 
-            // Schedule the job. Source generation creates and passes the query implicitly.
+            // Schedule job。源生成隐式创建并传递 query。
             state.Dependency = job.Schedule(state.Dependency);
         }
     }

@@ -7,7 +7,7 @@ using Unity.Transforms;
 namespace Tutorials.Tornado
 {
     /*
-     * Updates the transforms of the bars.
+     * 更新条形图的变换。
      */
     public partial struct BuildingRenderSystem : ISystem
     {

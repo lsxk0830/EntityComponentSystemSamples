@@ -27,14 +27,14 @@ namespace Tutorials.Firefighters
             var config = SystemAPI.GetSingleton<Config>();
             DynamicBuffer<Heat> heatBuffer = SystemAPI.GetSingletonBuffer<Heat>(false);
 
-            // simulate the heat spreading
+            // 模拟热扩散
             {
                 //HeatSpread_MainThread(ref state, heatBuffer, config);
                 //state.Dependency = HeatSpread_SingleThreadedJob(state.Dependency, ref state, heatBuffer, config);
                 state.Dependency = HeatSpread_ParallelJob(state.Dependency, ref state, heatBuffer, config);
             }
 
-            // update the colors and heights of the ground cells from the heat data
+            // 根据热量数据更新地面单元的颜色和高度
             {
                 //GroundCellUpdate_MainThread(ref state, heatBuffer, config);
                 //state.Dependency = GroundCellUpdate_SingleThreadedJob(state.Dependency, ref state, heatBuffer, config);
@@ -243,11 +243,11 @@ namespace Tutorials.Firefighters
             {
                 var heat = heatBuffer[idx].Value;
 
-                // oscillate the displayed heat so that the fire looks a little more organic
+                // 振荡显示的热量，使火看起来更有机
                 {
                     var radians = Random.CreateFromIndex((uint)idx).NextFloat(math.PI * 2) + elapsedTime;
                     var oscillationOffset =
-                        math.sin(radians) * heat * config.HeatOscillationScale; // the more heat, the more oscillation
+                        math.sin(radians) * heat * config.HeatOscillationScale; // 热量越多，振荡越多
                     heat += oscillationOffset;
                 }
 
@@ -304,11 +304,11 @@ namespace Tutorials.Firefighters
             {
                 var heat = HeatBuffer[entityIdx].Value;
 
-                // oscillate the displayed heat so that the fire looks a little more organic
+                // 振荡显示的热量，使火看起来更有机
                 {
                     var radians = Random.CreateFromIndex((uint)entityIdx).NextFloat(math.PI * 2) + ElapsedTime;
                     var oscillationOffset =
-                        math.sin(radians) * heat * Config.HeatOscillationScale; // the more heat, the more oscillation
+                        math.sin(radians) * heat * Config.HeatOscillationScale; // 热量越多，振荡越多
                     heat += oscillationOffset;
                 }
 
@@ -319,7 +319,7 @@ namespace Tutorials.Firefighters
             }
         }
 
-        // douse a cell and all surrounding cells
+        // 浇灭一个细胞和所有周围的细胞
         public static void DouseFire(float2 location, DynamicBuffer<Heat> heatBuffer, int numRows, int numCols)
         {
             int col = (int)location.x;
@@ -352,12 +352,12 @@ namespace Tutorials.Firefighters
             var closestFirePos = new float2(0.5f, 0.5f);
             var closestDistSq = float.MaxValue;
 
-            // check every cell
+            // 检查每个细胞
             for (int col = 0; col < numCols; col++)
             {
                 for (int row = 0; row < numRows; row++)
                 {
-                    if (heatBuffer[row * numCols + col].Value > minHeat) // is cell on fire
+                    if (heatBuffer[row * numCols + col].Value > minHeat) // 电池着火了吗
                     {
                         var firePos = new float2(col + 0.5f, row + 0.5f);
                         var distSq = math.distancesq(location, firePos);

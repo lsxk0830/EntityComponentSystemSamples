@@ -1,5 +1,5 @@
-// An representation of the trunk of a tree. This is a MonoBehaviour component that is on the Tree prefabs, so that
-// less prefab modifications are needed during re-growth.
+// 树干的表示。这是树prefab上的 MonoBehaviour component，因此
+// 再生长期间需要较少的 prefab 修改。
 using Unity.Entities;
 using UnityEngine;
 
@@ -15,7 +15,7 @@ namespace Unity.Physics
                 AddComponent(entity, TreeState.Default);
                 AddComponent(entity, new TreeTrunkTag());
                 AddComponent(entity, new EnableTreeDeath());
-                SetComponentEnabled<EnableTreeDeath>(entity, false); //always bake as disabled
+                SetComponentEnabled<EnableTreeDeath>(entity, false); //始终将烘焙设置为禁用
             }
         }
     }

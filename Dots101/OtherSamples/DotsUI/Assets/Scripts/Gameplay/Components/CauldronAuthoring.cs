@@ -14,7 +14,7 @@ namespace Unity.DotsUISample
             }
         }
     }
-    
+
     public struct Cauldron : IComponentData
     {
     }

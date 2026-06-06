@@ -30,7 +30,7 @@ namespace Samples.HelloNetcode
         public NetworkTick JumpStart;
     }
 
-#pragma warning disable CS0618 // Disable Aspects obsolete warnings
+#pragma warning disable CS0618 // 禁用 Aspects 过时警告
     public readonly partial struct CharacterAspect : IAspect
     {
         public readonly Entity Self;
@@ -118,7 +118,7 @@ namespace Samples.HelloNetcode
                 var controllerConfig = SystemAPI.GetComponent<CharacterControllerConfig>(character.Character.ControllerConfig);
                 var controllerCollider = SystemAPI.GetComponent<PhysicsCollider>(character.Character.ControllerConfig);
 
-                // Character step input
+                // 字符步进输入
                 CharacterControllerUtilities.CharacterControllerStepInput stepInput = new CharacterControllerUtilities.CharacterControllerStepInput
                 {
                     PhysicsWorldSingleton = physicsWorldSingleton,
@@ -136,9 +136,9 @@ namespace Samples.HelloNetcode
                     MaxMovementSpeed = k_DefaultMaxMovementSpeed
                 };
 
-                //Using local position here is fine, because the character controller does not have any parent.
-                //Using the Position is wrong because it is not up to date. (the LocalTransform is synchronized but
-                //the world transform isn't).
+                //在这里使用本地位置很好，因为角色控制器没有任何父级。
+                //使用该职位是错误的，因为它不是最新的。（LocalTransform 已同步，但
+                //world 变换不是）。
                 RigidTransform ccTransform = new RigidTransform()
                 {
                     pos = character.Transform.ValueRO.Position,
@@ -160,10 +160,10 @@ namespace Samples.HelloNetcode
                 float3 wantedMove = new float3(input.x, 0, input.y) * controllerConfig.MoveSpeed * SystemAPI.Time.DeltaTime;
 
                 var characterRotation = quaternion.RotateY(character.Input.Yaw);
-                // The character controllers yaw rotation can always be set, even when in the air:
+                // 即使在空中，角色控制器的偏航旋转始终可以设置：
                 character.Transform.ValueRW.Rotation = characterRotation;
 
-                // Wanted movement is relative to camera
+                // 想要的运动是相对于相机的
                 wantedMove = math.rotate(characterRotation, wantedMove);
 
                 float3 wantedVelocity = wantedMove / SystemAPI.Time.DeltaTime;
@@ -174,7 +174,7 @@ namespace Samples.HelloNetcode
                     character.Character.JumpStart = NetworkTick.Invalid;
                     character.Character.OnGround = 1;
                     character.Character.Velocity = wantedVelocity;
-                    // Allow jump and stop falling when grounded
+                    // 允许跳跃并在接地时停止坠落
                     if (character.Input.Jump.IsSet)
                     {
                         character.Character.Velocity.y = controllerConfig.JumpSpeed;
@@ -186,27 +186,27 @@ namespace Samples.HelloNetcode
                 else
                 {
                     character.Character.OnGround = 0;
-                    // Free fall
+                    // 自由落体
                     character.Character.Velocity.y -= controllerConfig.Gravity * SystemAPI.Time.DeltaTime;
                 }
 
                 m_MarkerStep.Begin();
-                // Ok because affect bodies is false so no impulses are written
+                // 好的，因为影响体是假的，所以没有写出脉冲
                 NativeStream.Writer deferredImpulseWriter = default;
                 CharacterControllerUtilities.CollideAndIntegrate(stepInput, k_DefaultMass, false, ref controllerCollider, ref ccTransform, ref character.Character.Velocity, ref deferredImpulseWriter);
                 m_MarkerStep.End();
 
-                // Set the physics velocity and let physics move the kinematic object based on that
+                // 设置物理速度并让物理根据该速度移动运动对象
                 character.Velocity.Linear = (ccTransform.pos - character.Transform.ValueRO.Position) / SystemAPI.Time.DeltaTime;
             }
             commandBuffer.Playback(state.EntityManager);
         }
 
         /// <summary>
-        /// As we run before <see cref="PhysicsInitializeGroup"/> it is possible to execute before any physics bodies
-        /// has been initialized.
+        /// 由于我们 run 在 <see cref="PhysicsInitializeGroup"/> 之前，因此可以在任何物理体之前执行
+        /// 已初始化。
         ///
-        /// There may be a better way to do this.
+        /// 可能有更好的方法来做到这一点。
         /// </summary>
         static bool HasPhysicsWorldBeenInitialized(PhysicsWorldSingleton physicsWorldSingleton)
         {

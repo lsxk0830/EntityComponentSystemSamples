@@ -17,14 +17,14 @@ namespace Samples.HelloNetcode
     public partial struct ClientConnectionApprovalSystem : ISystem
     {
         FixedString4096Bytes m_Payload;
-        // Mark when we're in approval state but payload isn't ready yet to be sent
+        // 当我们处于批准状态但有效负载尚未准备好发送时进行标记
         bool m_SendApprovalWhenReady;
-        // This is just used to detect if we've fully connected without approval being triggered (so connection approval feature is turned off)
+        // 这仅用于检测我们是否已完全连接而没有触发批准（因此连接批准功能已关闭）
         bool m_ApprovalIsRequired;
 
         bool AuthenticationIsEnabled(ref SystemState state)
         {
-            // Thin clients should always use the dummy payload as they can't use the player authentication service
+            // Thin clients 应始终使用虚拟有效负载，因为它们无法使用玩家身份验证服务
             if (state.WorldUnmanaged.IsThinClient())
                 return false;
             return ConnectionApprovalData.PlayerAuthenticationEnabled.Data;
@@ -33,7 +33,7 @@ namespace Samples.HelloNetcode
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // Enable use of the player authentication service, when disabled a dummy payload is used
+            // 启用玩家身份验证服务，禁用时使用虚拟负载
             ConnectionApprovalData.PlayerAuthenticationEnabled.Data = false;
 
             ConnectionApprovalData.ApprovalPayload.Data = default;
@@ -45,25 +45,25 @@ namespace Samples.HelloNetcode
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Complain if we've connected without approval, as that's what this sample is demonstrating
+            // 如果我们未经批准就连接，请投诉，因为这就是此示例所演示的内容
             if (!m_ApprovalIsRequired && SystemAPI.HasSingleton<NetworkId>())
             {
                 UnityEngine.Debug.LogError($"[{state.WorldUnmanaged.Name}] Connection Approval system ran without connection approval enabled. To test approvals properly you need to load the sample via the Frontend menu as it ensures the feature is enabled.");
                 state.Enabled = false;
             }
 
-            // Check connections which have not yet fully connected and send connection approval message
+            // 检查尚未完全连接的连接并发送连接批准消息
             foreach (var evt in SystemAPI.GetSingleton<NetworkStreamDriver>().ConnectionEventsForTick)
             {
-                // Note: It's actually harmless to send your approval even after entering the Handshake state (don't strictly have
-                // to wait for Approval state). It's also ok to send this even when connection approval is turned off.
+                // Note: 即使进入握手状态后发送您的批准实际上也是无害的（严格来说不
+                // 等待批准状态）。即使连接批准已关闭，也可以发送此信息。
                 if (evt.State == ConnectionState.State.Approval)
                     m_ApprovalIsRequired = m_SendApprovalWhenReady = true;
                 else if (evt.State == ConnectionState.State.Disconnected)
                     m_SendApprovalWhenReady = false;
             }
 
-            // If player authentication service is enabled wait until the auth data for the approval payload has been set
+            // 如果启用了玩家身份验证服务，请等待，直到设置了批准有效负载的身份验证数据
             if (AuthenticationIsEnabled(ref state))
             {
                 if (ConnectionApprovalData.ApprovalPayload.Data.Payload.Length == 0)
@@ -71,7 +71,7 @@ namespace Samples.HelloNetcode
                 m_Payload = ConnectionApprovalData.ApprovalPayload.Data.Payload;
             }
 
-            // Now we're ready to send the payload, reset the ready state for reconnects (re-use current payload)
+            // 现在我们准备发送有效负载，重置重新连接的就绪状态（重新使用当前有效负载）
             if (m_SendApprovalWhenReady)
             {
                 UnityEngine.Debug.Log($"[{state.WorldUnmanaged.Name}] Client sending approval message to server once...");
@@ -109,10 +109,10 @@ namespace Samples.HelloNetcode
         {
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-            // Check connections which have not yet fully connected and send connection approval message
+            // 检查尚未完全连接的连接并发送连接批准消息
             foreach (var (receiveRpc, approvalMsg, entity) in SystemAPI.Query<RefRO<ReceiveRpcCommandRequest>, RefRW<ClientRequestApproval>>().WithEntityAccess())
             {
-                // Always clean-up RPC message entity.
+                // 始终清理 RPC 消息 entity。
                 ecb.DestroyEntity(entity);
 
                 var connectionEntity = receiveRpc.ValueRO.SourceConnection;
@@ -126,11 +126,11 @@ namespace Samples.HelloNetcode
 
                 var payload = approvalMsg.ValueRO.Payload;
 
-                // We'll allow the dummy payload if it matches or validate the player if given player id/token
+                // 如果虚拟有效负载匹配，我们将允许它；如果给定玩家 ID/令牌，我们将验证玩家
                 if (payload.Equals(m_DummyPayload))
                 {
                     UnityEngine.Debug.Log($"[{state.WorldUnmanaged.Name}] Approved with dummy payload {conn.Value.ToFixedString()} on {connectionEntity.ToFixedString()}!");
-                    // Mark the connection of the message sender as approved
+                    // 将消息发送者的连接标记为已批准
                     ecb.AddComponent<ConnectionApproved>(connectionEntity);
                 }
                 else
@@ -153,11 +153,11 @@ namespace Samples.HelloNetcode
                 }
                 else
                 {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD // Don't log this in prod, to avoid leaking real auth tokens, and to prevent malicious users causing log-spam.
+#if UNITY_EDITOR || DEVELOPMENT_BUILD // 不要将其记录在产品中，以避免泄漏真正的身份验证令牌，并防止恶意用户导致日志垃圾邮件。
                     UnityEngine.Debug.LogError($"[{state.WorldUnmanaged.Name}] Disconnecting {connData.ValueRO.Value.ToFixedString()} on {approvalResult.ConnectionEntity.ToFixedString()} as sent incorrect approval payload '{approvalResult.Payload}'!");
 #endif
-                    // TODO - Note that this reason is not currently transmitted to the client as part of the close,
-                    // but at least the server can query (and log) it.
+                    // TODO - 请注意，此原因当前未作为关闭的一部分传输到 client，
+                    // 但至少 server 可以 query （并记录）它。
                     ecb.AddComponent(approvalResult.ConnectionEntity, new NetworkStreamRequestDisconnect
                     {
                         Reason = NetworkStreamDisconnectReason.ApprovalFailure,
@@ -169,16 +169,16 @@ namespace Samples.HelloNetcode
         }
     }
 
-    /// <summary> Data for an incoming approval request from a client, needs to be validated via service </summary>
+    /// <summary> 来自 client 的传入审批请求的数据需要通过服务 </summary> 进行验证
     public struct PendingApproval
     {
         public FixedString64Bytes PlayerId;
         public FixedString4096Bytes AccessToken;
-        public FixedString4096Bytes Payload;    // Store intact payload data for debug purposes
+        public FixedString4096Bytes Payload;    // 存储完整的有效负载数据以用于调试目的
         public Entity ConnectionEntity;
     }
 
-    /// <summary> Data with the result of player account validation </summary>
+    /// <summary> 玩家账户验证结果的数据 </summary>
     public struct ApprovalResult
     {
         public bool Success;
@@ -187,19 +187,19 @@ namespace Samples.HelloNetcode
     }
 
     /// <summary>
-    /// Communication bridge between DOTS and GameObjects, when data is ready on either side it will be queued and dequeued on the
-    /// other side. As there will only ever be one client authenticating a single container for each type of message is enough.
+    /// DOTS 和 GameObjects 之间的通信桥梁，当任何一方的数据准备好时，它将在
+    /// 对方。因为只有一个 client 为每种类型的消息验证单个容器就足够了。
     /// </summary>
     public abstract class ConnectionApprovalData
     {
         public static readonly SharedStatic<bool> PlayerAuthenticationEnabled = SharedStatic<bool>.GetOrCreate<PlayerAuthenticationEnabledKey>();
-        /// <summary> Pending and validated approval requests on the server, as there could be multiple clients connecting at the same time these are queued </summary>
+        /// <summary> server 上待处理且已验证的批准请求，因为可能有多个 clients 同时连接，这些请求已排队 </summary>
         public static readonly SharedStatic<UnsafeRingQueue<PendingApproval>> PendingApprovals = SharedStatic<UnsafeRingQueue<PendingApproval>>.GetOrCreate<PendingApprovalDataKey>();
         public static readonly SharedStatic<UnsafeRingQueue<ApprovalResult>> ApprovalResults = SharedStatic<UnsafeRingQueue<ApprovalResult>>.GetOrCreate<ApprovalResultDataKey>();
-        /// <summary> Client payload ready to be sent to server, there should only be one of these as the client will not authenticate multiple times </summary>
+        /// <summary> Client 有效负载准备发送到 server，应该只有其中之一，因为 client 不会多次验证 </summary>
         public static readonly SharedStatic<ClientRequestApproval> ApprovalPayload = SharedStatic<ClientRequestApproval>.GetOrCreate<ApprovalPayloadDataKey>();
 
-        // Identifier for the shared static fields
+        // 共享静态字段的标识符
         class PendingApprovalDataKey {}
         class ApprovalResultDataKey {}
         class ApprovalPayloadDataKey {}

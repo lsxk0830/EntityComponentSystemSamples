@@ -16,8 +16,8 @@ namespace Baking.BakingTypes
         }
     }
 
-    // This component is added to the parent of the entities within a bounding box and
-    // stores the bounding box that encompasses them all.
+    // 该 component 被添加到边界框内的 entities 的父级，并且
+    // 存储包围它们的边界框。
     public struct CompoundBBComponent : IComponentData
     {
         public float3 MinBBVertex;

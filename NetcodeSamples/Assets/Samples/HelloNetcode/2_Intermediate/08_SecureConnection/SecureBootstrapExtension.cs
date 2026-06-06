@@ -1,4 +1,4 @@
-//#define ENABLE_NETCODE_SAMPLE_SECURE
+//#定义 ENABLE_NETCODE_SAMPLE_SECURE
 
 using Unity.NetCode;
 
@@ -15,12 +15,12 @@ namespace Samples.HelloNetcode
 #elif !UNITY_EDITOR && !NETCODE_DEBUG
             UnityEngine.Debug.LogError(">>>>>>>>>> SAMPLE CODE: Don't ship the certificates as a part of your build <<<<<<<<<<");
 #endif
-            // To set up a custom driver the constructor for it needs to be hooked up
-            // before world creation in the bootstrap system. The netcode bootstrap is
-            // already defined in the main connection sample and as there can
-            // be only one set up in the project, we just add this line here on top of
-            // the existing NetCodeBootstrap class (normally a project would only have
-            // the boostrap defined in one place).
+            // 要设置自定义驱动程序，需要连接它的构造函数
+            // 在引导程序 system 中创建 world 之前。Netcode引导程序是
+            // 已经在主连接示例中定义，并且可以
+            // 项目中只有一个设置，我们只需在此处添加这一行
+            // 现有的 NetCodeBootstrap 类（通常一个项目只会有
+            // boostrap 定义在一处）。
             NetworkStreamReceiveSystem.DriverConstructor = new SecureDriverConstructor();
             return base.Initialize(defaultWorldName);
         }

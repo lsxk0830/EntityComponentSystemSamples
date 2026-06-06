@@ -7,7 +7,7 @@ namespace Unity.Physics.Authoring
 {
     public class SimpleMotor : BaseJoint
     {
-        // Type of motor. The order is chosen to match Unity.Physics.JointType
+        // 电机类型。选择订单以匹配 Unity.Physics.JointType
         public enum MotorType
         {
             AngularPosition,
@@ -35,12 +35,12 @@ namespace Unity.Physics.Authoring
                 float target = authoring.Type == MotorType.AngularPosition || authoring.Type == MotorType.AngularVelocity ? math.radians(authoring.Target) : authoring.Target;
 
                 RigidTransform bFromA = math.mul(math.inverse(authoring.worldFromB), authoring.worldFromA);
-                float3 anchorInB = math.transform(bFromA, authoring.AnchorPosition); //position of anchor relative to Connected Entity in world space
-                float3 axisInB = math.mul(bFromA.rot, axis); //motor axis in Connected Entity space
+                float3 anchorInB = math.transform(bFromA, authoring.AnchorPosition); //world 空间中锚点相对于已连接 Entity 的位置
+                float3 axisInB = math.mul(bFromA.rot, axis); //连接 Entity 空间中的电机轴
 
-                // Always calculate the perpendicular axes
+                // 始终计算垂直轴
                 Math.CalculatePerpendicularNormalized(axis, out var perpendicularLocal, out _);
-                float3 perpendicularAxisInB = math.mul(bFromA.rot, perpendicularLocal); //perp motor axis in Connected Entity space
+                float3 perpendicularAxisInB = math.mul(bFromA.rot, perpendicularLocal); //连接 Entity 空间中的 perp 电机轴
 
                 JointType jointType = JointType.Custom;
                 var constraints = new FixedList512Bytes<Constraint>();

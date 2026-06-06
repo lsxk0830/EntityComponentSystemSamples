@@ -5,15 +5,15 @@ using Unity.Entities.Serialization;
 
 namespace Streaming.SceneManagement.SectionMetadata
 {
-    // Adds each circle to the metadata entity of its section.
-    // (It is assumed each circle belongs to a different section.)
+    // 将每个圆圈添加到其部分的元数据 entity 中。
+    // （假设每个圆圈属于不同的部分。）
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     partial struct CircleBakingSystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Cleanup from previous baking.
+            // 从之前的 baking 中进行清理。
             var cleanupQuery = SystemAPI.QueryBuilder().WithAll<Circle, SectionMetadataSetup>().Build();
             state.EntityManager.RemoveComponent<Circle>(cleanupQuery);
 

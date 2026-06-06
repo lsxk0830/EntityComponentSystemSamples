@@ -35,7 +35,7 @@ public partial struct JointDeletionSystem : ISystem, ISystemStartStop
 
         if (m_Counter == 60)
         {
-            // delete all joints between pairs of entities that both have a DeleteJoints component
+            // 删除具有 DeleteJoints component 的 entities 对之间的所有关节
             var entityPairs = query.ToComponentDataArray<PhysicsConstrainedBodyPair>(Allocator.Temp);
             var joints = query.ToEntityArray(Allocator.Temp);
 

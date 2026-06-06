@@ -10,7 +10,7 @@ namespace KickBall
         public ObstacleConfig Obstacle;
         public BallConfig Ball;
 
-        [Header("Prefabs")] 
+        [Header("Prefabs")]
         public GameObject ObstaclePrefab;
         public GameObject PlayerPrefab;
         public GameObject BallPrefab;

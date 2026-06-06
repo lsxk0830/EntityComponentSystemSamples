@@ -5,39 +5,39 @@ using UnityEngine;
 namespace Unity.Physics.Authoring
 {
     /// <summary>
-    /// A structure for storing authoring data for a capsule shape. In contrast to the
-    /// CapsuleGeometry struct in the run-time, this structure permits storing stable orientation
-    /// values, as well as height values that can be retained when the source data are defined with
-    /// respect to a non-uniformly scaled object.
+    /// 用于存储胶囊形状的 authoring 数据的结构。相比之下
+    /// CapsuleGeometry 结构中的 run 时间，该结构允许存储稳定的方向
+    /// 值，以及当源数据定义时可以保留的高度值
+    /// 相对于非均匀缩放的对象。
     /// </summary>
     [Serializable]
     public struct CapsuleGeometryAuthoring : IEquatable<CapsuleGeometryAuthoring>
     {
         /// <summary>
-        /// The local orientation of the capsule. It is aligned with the forward axis (z) when it is
-        /// identity.
+        /// 胶囊的局部方向。当它是时，它与前轴（z）对齐
+        /// 身份。
         /// </summary>
         public quaternion Orientation { get => m_OrientationEuler; set => m_OrientationEuler.SetValue(value); }
         internal EulerAngles OrientationEuler { get => m_OrientationEuler; set => m_OrientationEuler = value; }
         [SerializeField]
         EulerAngles m_OrientationEuler;
 
-        /// <summary>   The local position offset of the capsule. </summary>
+        /// <summary> 胶囊的局部位置偏移。</summary>
         public float3 Center { get => m_Center; set => m_Center = value; }
         [SerializeField]
         float3 m_Center;
 
         /// <summary>
-        /// The height of the capsule. It may store any value, but will ultimately always be converted
-        /// into a value that is at least twice the radius.
+        /// 胶囊的高度。它可以存储任何值，但最终总会被转换
+        /// 为至少两倍半径的值。
         /// </summary>
         public float Height { get => m_Height; set => m_Height = value; }
         [SerializeField]
         float m_Height;
 
-        /// <summary>   The radius of the capsule. </summary>
+        /// <summary> 胶囊的半径。</summary>
         ///
-        /// <value> The radius. </value>
+        /// <value> 半径。</value>
         public float Radius { get => m_Radius; set => m_Radius = value; }
         [SerializeField]
         float m_Radius;
@@ -65,7 +65,7 @@ namespace Unity.Physics.Authoring
     public static class CapsuleGeometryAuthoringExtensions
     {
         /// <summary>
-        /// Construct a CapsuleGeometryAuthoring instance from a run-time CapsuleGeometry instance.
+        /// 从 run 时间 CapsuleGeometry 实例构造 CapsuleGeometryAuthoring 实例。
         /// </summary>
         public static CapsuleGeometryAuthoring ToAuthoring(this CapsuleGeometry input)
         {
@@ -81,7 +81,7 @@ namespace Unity.Physics.Authoring
         }
 
         /// <summary>
-        /// Construct a run-time CapsuleGeometry instance from a CapsuleGeometryAuthoring instance.
+        /// 从 CapsuleGeometryAuthoring 实例构造 run 时间 CapsuleGeometry 实例。
         /// </summary>
         public static CapsuleGeometry ToRuntime(this CapsuleGeometryAuthoring input)
         {

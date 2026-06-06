@@ -1,7 +1,7 @@
-// Simplified version of the SDF Surface shader :
-// - No support for Bevel, Bump or envmap
-// - Diffuse only lighting
-// - Fully supports only 1 directional light. Other lights can affect it, but it will be per-vertex/SH.
+// SDF 表面着色器的简化版本：
+// - 不支持斜角、凹凸或环境贴图
+// - 仅漫射照明
+// - 仅完全支持 1 个定向灯。其他灯光可以影响它，但它将是逐顶点/SH。
 
 Shader "TextMeshPro/Mobile/Distance Field (Surface)" {
 
@@ -24,7 +24,7 @@ Properties {
 	_WeightNormal		("Weight Normal", float) = 0
 	_WeightBold			("Weight Bold", float) = 0.5
 
-	// Should not be directly exposed to the user
+	// 不应直接暴露给用户
 	_ShaderFlags		("Flags", float) = 0
 	_ScaleRatioA		("Scale RatioA", float) = 1
 	_ScaleRatioB		("Scale RatioB", float) = 1
@@ -75,7 +75,7 @@ SubShader {
 		float2	uv_MainTex;
 		float2	uv2_FaceTex;
 		float2  uv2_OutlineTex;
-		float2	param;					// Weight, Scale
+		float2	param;					// 重量、规模
 		float3	viewDirEnv;
 	};
 
@@ -83,7 +83,7 @@ SubShader {
 
 	ENDCG
 
-	// Pass to render object as a shadow caster
+	// 作为阴影投射器传递给渲染对象
 	Pass
 	{
 		Name "Caster"

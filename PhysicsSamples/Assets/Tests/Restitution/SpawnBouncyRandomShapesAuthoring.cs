@@ -51,7 +51,7 @@ partial class SpawnBouncyRandomShapesSystem : SpawnRandomObjectsSystemBase<Bounc
             if (collider.IsCreated)
                 collider.Dispose();
         m_CollidersToDispose.Dispose();
-        // CurrentTweakedCollider is already in the list to dispose, and does not need to be disposed separately.
+        // CurrentTweakedCollider 已在待处理列表中，无需单独处理。
         base.OnDestroy();
     }
 

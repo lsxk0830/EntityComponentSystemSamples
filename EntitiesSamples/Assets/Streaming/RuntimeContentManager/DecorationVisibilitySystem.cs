@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Streaming.RuntimeContentManager
 {
-    // Creates jobs that compute visibility of the entities
+    // 创建 jobs 来计算 entities 的可见性
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [RequireMatchingQueriesForUpdate]
@@ -24,7 +24,7 @@ namespace Streaming.RuntimeContentManager
         }
     }
 
-    // Job to compute the visibility of an entity and trigger loading and unloading
+    // Job 用于计算 entity 和 trigger 加载和卸载的可见性
     [BurstCompile]
     partial struct DecorationVisibilityJob : IJobEntity
     {
@@ -34,7 +34,7 @@ namespace Streaming.RuntimeContentManager
 
         void Execute(ref DecorationVisualComponentData dec, in LocalToWorld transform)
         {
-            // "in view" just means within distance in this sample.
+            // 在此示例中，“视野内”仅表示在距离内。
             var distToCamera = math.distance(transform.Position, CamPos);
             var newWithinLoadRange = distToCamera < LoadRadius;
             if (dec.withinLoadRange && !newWithinLoadRange)

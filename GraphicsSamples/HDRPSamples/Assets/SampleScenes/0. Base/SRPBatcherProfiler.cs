@@ -10,7 +10,7 @@ namespace UnityEngine.Experimental.Rendering
     public class SRPBatcherProfiler : MonoBehaviour
     {
         public bool m_Enable = true;
-        private const float kAverageStatDuration = 1.0f;            // stats refresh each second
+        private const float kAverageStatDuration = 1.0f;            // 统计数据每秒刷新一次
         private int m_frameCount;
 		private float m_AccDeltaTime;
         private string m_statsLabel;
@@ -39,10 +39,10 @@ namespace UnityEngine.Experimental.Rendering
 			kSRPBShadowApplyShader,
 			kPrepareBatchRendererGroupNodes,
 		};
-		
+
         RecorderEntry[] recordersList =
         {
-			// Warning: Keep that list in the exact same order than SRPBMarkers enum
+			// Warning: 使该列表的顺序与 SRPBMarkers 枚举的顺序完全相同
             new RecorderEntry() { name="RenderLoop.Draw" },
             new RecorderEntry() { name="Shadows.Draw" },
             new RecorderEntry() { name="RenderLoop.DrawSRPBatcher", oldName="RenderLoopNewBatcher.Draw" },
@@ -94,7 +94,7 @@ namespace UnityEngine.Experimental.Rendering
 			m_statsLabel = "Gathering data...";
             RazCounters();
         }
-        
+
         void ToggleStats()
         {
             m_Enable = !m_Enable;
@@ -128,12 +128,12 @@ namespace UnityEngine.Experimental.Rendering
 				m_AccDeltaTime += Time.unscaledDeltaTime;
 				m_frameCount++;
 
-				// get timing & update average accumulators
+				// 获取计时并更新平均累加器
 				for (int i = 0; i < recordersList.Length; i++)
 				{
 					if ( recordersList[i].recorder != null )
 					{
-						recordersList[i].accTime += recordersList[i].recorder.elapsedNanoseconds / 1000000.0f;      // acc time in ms
+						recordersList[i].accTime += recordersList[i].recorder.elapsedNanoseconds / 1000000.0f;      // 加速时间（毫秒）
 						recordersList[i].callCount += recordersList[i].recorder.sampleBlockCount;
 					}
 				}

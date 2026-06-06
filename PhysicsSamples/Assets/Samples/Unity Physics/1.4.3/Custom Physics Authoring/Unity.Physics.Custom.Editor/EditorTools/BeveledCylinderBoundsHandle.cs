@@ -39,7 +39,7 @@ namespace Unity.Physics.Editor
             {
                 var size = (float3)GetSize();
                 var diameter = 0f;
-                // only consider size values on enabled axes
+                // 仅考虑启用轴上的尺寸值
                 if (IsAxisEnabled(0)) diameter = math.max(diameter, math.abs(size.x));
                 else if (IsAxisEnabled(1)) diameter = math.max(diameter, math.abs(size.y));
                 return diameter * 0.5f;
@@ -116,8 +116,8 @@ namespace Unity.Physics.Editor
                     cameraForward = Camera.current.transform.forward;
                 }
 
-                // Since the geometry is transformed by Handles.matrix during rendering, we transform the camera position
-                // by the inverse matrix so that the two-shaded wireframe will have the proper orientation.
+                // 由于在渲染过程中几何图形被 Handles.matrix 变换，因此我们变换相机位置
+                // 通过逆矩阵，以便两个阴影线框将具有正确的方向。
                 var invMatrix   = Handles.inverseMatrix;
                 cameraCenter    = invMatrix.MultiplyPoint(cameraCenter);
                 cameraForward   = invMatrix.MultiplyVector(cameraForward);
@@ -158,7 +158,7 @@ namespace Unity.Physics.Editor
                     {
                         var upOffset = up * bevelRadius;
 
-                        // top/bottom caps
+                        // 顶盖/底盖
                         if (bevelLessThanCylinderRadius)
                         {
                             Handles.color = topBackFaced ? backfacedColor : frontfacedColor;
@@ -174,7 +174,7 @@ namespace Unity.Physics.Editor
                         Handles.color = currSideBackFaced ? backfacedColor : frontfacedColor;
                         if (!noSides)
                         {
-                            // Square side of bevelled cylinder
+                            // 斜角圆柱体的方边
                             Handles.DrawLine(top2 + startOffset, bottom2 + startOffset);
                             Handles.DrawLine(bottom2 + startOffset, bottom1 + startOffset);
                             Handles.DrawLine(bottom1 + startOffset, top1 + startOffset);
@@ -182,7 +182,7 @@ namespace Unity.Physics.Editor
                         }
                         else
                         {
-                            // Square side of bevelled cylinder, when squashed to a single line
+                            // 斜角圆柱体的方形侧面，当被压扁成一条线时
                             Handles.DrawLine(top2 + startOffset, bottom2 + startOffset);
                         }
                     }
@@ -197,7 +197,7 @@ namespace Unity.Physics.Editor
                         var currMidPoint         = ctr + ((top1 + top2 + bottom1 + bottom2) * 0.25f) + startOffset;
                         var currSideBackFaced    = PhysicsBoundsHandleUtility.IsBackfaced(currMidPoint, up, sideways2, axes, isCameraInsideBox);
 
-                        // Square side of bevelled cylinder
+                        // 斜角圆柱体的方边
                         Handles.color = (currSideBackFaced && prevSideBackFaced) ? backfacedColor : frontfacedColor;
                         Handles.DrawLine(bottom1 + startOffset, top1 + startOffset);
 
@@ -249,7 +249,7 @@ namespace Unity.Physics.Editor
                         var up1 = b;
                         var dn1 = b + m_SideCount;
 
-                        // Side horizon on vertical curved edge
+                        // 垂直弯曲边缘上的侧地平线
                         if (m_Corners[up1].splitCount > 1 &&
                             m_Corners[dn1].splitCount > 1)
                         {
@@ -261,7 +261,7 @@ namespace Unity.Physics.Editor
                                 Handles.DrawLine(point0, point1);
                             }
                         }
-                        // Top horizon on horizontal curved edge
+                        // 水平弯曲边缘上的顶部地平线
                         if (m_Corners[up0].splitCount > 1 &&
                             m_Corners[up1].splitCount > 1)
                         {
@@ -273,7 +273,7 @@ namespace Unity.Physics.Editor
                                 Handles.DrawLine(point0, point1);
                             }
                         }
-                        // Bottom horizon on horizontal curved edge
+                        // 水平弯曲边缘上的底部地平线
                         if (m_Corners[dn0].splitCount > 1 &&
                             m_Corners[dn1].splitCount > 1)
                         {
@@ -319,7 +319,7 @@ namespace Unity.Physics.Editor
 
             var convexDiameter = 2f * bevelRadius;
 
-            // ensure changed dimension cannot be made less than convex diameter
+            // 确保改变的尺寸不能小于凸面直径
             if (upperBound[changedAxis] - lowerBound[changedAxis] < convexDiameter)
             {
                 switch (handle)
@@ -335,7 +335,7 @@ namespace Unity.Physics.Editor
                 }
             }
 
-            // ensure radius changes uniformly
+            // 确保半径变化均匀
             if (changedAxis != k_DirectionZ)
             {
                 var rad = 0.5f * (upperBound[changedAxis] - lowerBound[changedAxis]);

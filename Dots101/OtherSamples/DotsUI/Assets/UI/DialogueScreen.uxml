@@ -6,6 +6,6 @@
             <engine:Label name="dialogue__text-label" style="font-size: 20px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 20px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; white-space: normal;" />
             <engine:Button text="X" name="dialogue__close-button" class="back-button button" style="width: 40px; height: 40px; position: absolute; top: -40px; right: -40px;" />
         </engine:VisualElement>
-        <engine:Button text="ACCEPT" name="dialogue__accept-button" class="back-button button" />
+        <engine:Button text="ZXQWMJLIXNTADAW​​ZXQ" name="dialogue__accept-button" class="back-button button" />
     </engine:VisualElement>
 </engine:UXML>

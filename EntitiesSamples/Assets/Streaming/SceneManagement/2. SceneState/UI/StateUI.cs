@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Streaming.SceneManagement.SceneState
 {
-    // Component to control the UI in the sample
+    // Component 控制示例中的 UI
     public class StateUI : MonoBehaviour
     {
         [SerializeField] VisualTreeAsset rowTemplate;
@@ -26,27 +26,27 @@ namespace Streaming.SceneManagement.SceneState
         private int lastClickedRow;
         private bool clicked = false;
 
-        // Look up table to choose the color of the loading state based in its value
+        // 查表根据其值选择加载状态的颜色
         private static readonly Color[] ButtonColorPerState =
         {
-            UnloadedColor, // Unloaded
+            UnloadedColor, // 已卸载
             LoadedMetaColor, // LoadedSectionEntities
-            InProgressColor, // Loading
+            InProgressColor, // 加载中
             LoadedColor, // LoadedSuccessfully
-            InProgressColor, // Unloading
+            InProgressColor, // 卸货
 
             ErrorColor, // LoadingSceneHeaderFailed
             ErrorColor, // LoadingSectionFailed
         };
 
-        // which loading actions are active/valid for which states
+        // 哪些加载操作对于哪些状态有效/有效
         private static readonly int[] AvailableLoadingActionsPerState =
         {
-            (int)LoadingAction.LoadAll | (int)LoadingAction.LoadMeta, // Unloaded
+            (int)LoadingAction.LoadAll | (int)LoadingAction.LoadMeta, // 已卸载
             (int)LoadingAction.LoadAll | (int)LoadingAction.UnloadAll, // LoadedSectionEntities
-            (int)LoadingAction.UnloadAll, // Loading
+            (int)LoadingAction.UnloadAll, // 加载中
             (int)LoadingAction.UnloadAll | (int)LoadingAction.UnloadEntities, // LoadedSuccessfully
-            (int)LoadingAction.LoadAll | (int)LoadingAction.LoadMeta, // Unloading
+            (int)LoadingAction.LoadAll | (int)LoadingAction.LoadMeta, // 卸货
 
             (int)LoadingAction.UnloadAll , // LoadingSceneHeaderFailed
             (int)LoadingAction.UnloadAll, // LoadingSectionFailed
@@ -84,7 +84,7 @@ namespace Streaming.SceneManagement.SceneState
                     row.ActionButton2.text = "Unload All";
                     row.ActionButton3.text = "Unload Content";
 
-                    var idx = index; // captured variable
+                    var idx = index; // 捕获变量
                     row.ActionButton0.clicked += () => OnActionClick(idx, LoadingAction.LoadAll);
                     row.ActionButton1.clicked += () => OnActionClick(idx, LoadingAction.LoadMeta);
                     row.ActionButton2.clicked += () => OnActionClick(idx, LoadingAction.UnloadAll);
@@ -133,7 +133,7 @@ namespace Streaming.SceneManagement.SceneState
             clicked = true;
         }
 
-        // Class used to store the UI elements per scene
+        // 用于存储每个 scene 的 UI 元素的类
         public class Row
         {
             public Label SceneName;

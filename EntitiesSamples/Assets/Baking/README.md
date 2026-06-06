@@ -1,42 +1,42 @@
-# Entities baking samples
+# Entities baking 示例
 
 ## AutoAuthoring
 
-A solution for conveniently creating authoring components that simply copy each field of the authoring MonoBehaviour to a corresponding field of an IComponentData.
+一种方便创建 authoring components 的解决方案，只需将 authoring MonoBehaviour 的每个字段复制到 IComponentData 的相应字段即可。
 
-## BakingDependencies sample
+## BakingDependencies 示例
 
-This sample demonstrates how a baker and a baking system can react to changes made on the authoring data.
+此示例演示了 baker 和 baking system 如何对 authoring 数据所做的更改做出反应。
 
-The `ImageGeneratorAuthoring` component references an image and a `ScriptableObject` asset, which contains a float value, a mesh, and a material. During baking, this component generates one primitive per pixel in the image and sets the color correspondingly.
+`ImageGeneratorAuthoring` component 引用图像和 `ScriptableObject` 资源，其中包含浮点值、网格和材质。在 baking 期间，此 component 为图像中的每个像素生成一个图元并相应地设置颜色。
 
-Modifying any of the authoring component's fields will trigger a re-bake of the necessary GameObjects in the subscene. For example, modifying the float field will re-bake both GameObjects (because they both use the asset), but modifying the "hello.png" image will only re-bake the one GameObject which depends upon it.
+修改 authoring component 的任何字段都将在 subscene 中重新烘焙必要的 GameObjects。例如，修改 float 字段将重新烘焙两个 GameObjects （因为它们都使用该资源），但修改“hello.png”图像只会重新烘焙依赖于它的一个 GameObject。
 
-## BakingTypes sample
+## BakingTypes 示例
 
-This sample doesn't do anything at runtime, but it uses baking to create a bounding box around each set of cubes (enable Gizmos to see the white debug lines). When you drag the cubes around in the Scene window, you'll see the bounding box update as you drag because baking is re-triggered as you edit the subscene.
+此示例在运行时不执行任何操作，但它使用 baking 在每组立方体周围创建一个边界框（使 Gizmos 能够看到白色调试线）。当您在 Scene 窗口中拖动立方体时，您将看到边界框在拖动时更新，因为在编辑 subscene 时会重新触发 baking。
 
-## BlobAssetBaker sample
+## BlobAssetBaker 示例
 
-This sample creates a [BlobAsset](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/blob-assets-concept.html) during Baking. At runtime, the animation curve stored in the BlobAsset is used to animate the y position of a cube.
+此示例在 Baking 期间创建 [BlobAsset](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/blob-assets-concept.html)。在运行时，存储在 BlobAsset 中的动画曲线用于为立方体的 y 位置设置动画。
 
-## BlobAssetBakingSystem sample
+## BlobAssetBakingSystem 示例
 
-This sample demonstrates how to bake BlobAssets in an efficient and scalable way using baking systems. In the code:
+此示例演示如何使用 baking systems 以高效且可扩展的方式烘焙 BlobAssets。在代码中：
 
-- The subscene contains 256 GameObjects, split in four types: Capsules, Cubes, Cylinders and Spheres.
-- Each GameObject in the subscene has a `MeshBBAuthoring` component that defines the information we want to store in a blob asset.
-- The `MeshBBAuthoring` baker stores the mesh vertices in a `BakingType` buffer and additional information in a `BakingType` component.
-- The `MeshBBRenderSystem`, which updates in edit mode, uses the blob asset to draw a debug bounding box around the 256 baked entities.
+- subscene 包含 256 个 GameObjects，分为四种类型：胶囊、立方体、圆柱体和球体。
+- subscene 中的每个 GameObject 都有一个 `MeshBBAuthoring` component，它定义了我们要存储在 Blob 资产中的信息。
+- `MeshBBAuthoring` baker 将网格顶点存储在 `BakingType` 缓冲区中，并将附加信息存储在 `BakingType` component 中。
+- 在编辑模式下更新的 `MeshBBRenderSystem` 使用 blob 资源在 256 个烘焙的 entities 周围绘制调试边界框。
 
-The `ComputeBlobAssetSystem` BakingSystem is set up in three main steps:
+`ComputeBlobAssetSystem` BakingSystem 的设置分为三个主要步骤：
 
-1. BlobAssets that are not already present in the BlobAssetStore are added to a list for processing.
-2. Unique BlobAssets are identified by their hashes.
-3. `BlobAssetReference` are stored in entity components.
+1. 尚未存在于 BlobAssetStore 中的 BlobAssets 将添加到列表中进行处理。
+2. 唯一的 BlobAssets 通过其哈希值进行标识。
+3. `BlobAssetReference` 存储在 entity components 中。
 
-Note that bakers track which BlobAssets are referenced by which entities and keep the BlobAssetStore updated accordingly. However, BlobAssets created in a *baking system* are not tracked automatically, so the baking system must manually check if the entities reference different BlobAssets compared to last bake and update the BlobAssetStore manually. If an Entity is removed altogether, the baking systems must clean up any baked BlobAssets that the entity might reference.
+请注意，bakers 跟踪 BlobAssets 被 entities 引用，并相应地更新 BlobAssetStore。但是，在 *baking system* 中创建的 BlobAssets 不会自动跟踪，因此 baking system 必须手动检查 entities 参考是否不同 BlobAssets 与上次烘焙相比并手动更新 BlobAssetStore。如果完全删除 Entity，则 baking systems 必须清除 entity 可能引用的任何烘焙 BlobAssets。
 
-## PrefabReference sample
+## PrefabReference 示例
 
-This sample demonstrates how to use an `EntityPrefabReference`. Whereas directly baking a prefab in each SubScene creates one baked entity per SubScene, an `EntityPrefabReference` allows multiple SubScenes to reference a single baked prefab entity.
+此示例演示如何使用 `EntityPrefabReference`。虽然每个 SubScene 中的 baking 和 prefab 直接为每个 SubScene 创建一个烘焙的 entity，但 `EntityPrefabReference` 允许多个 SubScenes 引用单个烘焙的 entity。prefab entity。

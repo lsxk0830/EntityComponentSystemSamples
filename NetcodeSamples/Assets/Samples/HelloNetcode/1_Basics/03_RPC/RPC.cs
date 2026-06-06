@@ -25,14 +25,14 @@ namespace Samples.HelloNetcode
         protected override void OnCreate()
         {
             RequireForUpdate<EnableRPC>();
-            // Can't send any RPC/chat messages before connection is established
+            // 在建立连接之前无法发送任何 RPC/聊天消息
             RequireForUpdate<NetworkId>();
         }
 
         protected override void OnUpdate()
         {
-            // This is not set up to handle multiple clients/worlds using one or more chat windows but the
-            // rpc messages must be consumed or else warnings will be emitted
+            // 这并未设置为使用一个或多个聊天窗口处理多个 clients/worlds，但
+            // 必须使用 rpc 消息，否则将发出警告
             if (World.IsThinClient())
             {
                 EntityManager.DestroyEntity(GetEntityQuery(new EntityQueryDesc()
@@ -42,8 +42,8 @@ namespace Samples.HelloNetcode
                 }));
             }
 
-            // When a user or chat message RPCs arrive they are added the queues for consumption
-            // in the UI system.
+            // 当用户或聊天消息 RPCs 到达时，它们会被添加到消费队列中
+            // 在 UI system 中。
             var buffer = new EntityCommandBuffer(Allocator.Temp);
             var connections = GetComponentLookup<NetworkId>(true);
             FixedString32Bytes worldName = World.Name;
@@ -51,7 +51,7 @@ namespace Samples.HelloNetcode
             {
                 buffer.DestroyEntity(entity);
 
-                // Not thread safe, so all UI logic is kept on main thread
+                // 不是线程安全的，因此所有 UI 逻辑都保留在主线程上
                 RpcUiData.Messages.Data.Enqueue(chat.ValueRO.Message);
             }
 
@@ -75,7 +75,7 @@ namespace Samples.HelloNetcode
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial class RpcServerSystem : SystemBase
     {
-        // User information is just tracked as a single integer (=connection ID) to make this as simple as possible
+        // 用户信息仅作为单个整数进行跟踪（=连接 ID），以使这尽可能简单
         private NativeList<int> m_Users;
 
         protected override void OnCreate()
@@ -95,9 +95,9 @@ namespace Samples.HelloNetcode
             var connections = GetComponentLookup<NetworkId>(true);
             FixedString32Bytes worldName = World.Name;
 
-            // New incoming RPCs are placed on an entity with the ReceiveRpcCommandRequestComponent component and the RPC data payload component (ChatMessage)
-            // This entity should be deleted when you're done processing it
-            // The server RPC broadcasts the chat message to all connections
+            // 新传入的 RPCs 与 ReceiveRpcCommandRequestComponent component 和 RPC 数据负载 component (ChatMessage) 一起放置在 entity 上
+            // 处理完后应删除此 entity
+            // server RPC 向所有连接广播聊天消息
             foreach (var (rpcCmd, chat, entity) in SystemAPI.Query<ReceiveRpcCommandRequest, ChatMessage>().WithEntityAccess())
             {
                 var conId = connections[rpcCmd.SourceConnection].Value;
@@ -114,14 +114,14 @@ namespace Samples.HelloNetcode
             {
                 var connectionId = id.Value;
 
-                // Notify all connections about new chat user (including himself)
+                // 通知所有有关新聊天用户（包括他自己）的连接
                 var broadcastEntity = buffer.CreateEntity();
                 buffer.AddComponent(broadcastEntity, new ChatUser() { UserData = connectionId });
                 buffer.AddComponent<SendRpcCommandRequest>(broadcastEntity);
                 UnityEngine.Debug.Log($"[{worldName}] New user 'User {connectionId}' connected. Broadcasting user entry to all connections;");
 
-                // Notify only new connection about other users already connected, this uses the TargetConnection portion
-                // of the RPC request component
+                // 仅通知新连接有关已连接的其他用户，这使用 TargetConnection 部分
+                // RPC 请求 component
                 for (int i = 0; i < users.Length; ++i)
                 {
                     var newEntity = buffer.CreateEntity();
@@ -132,10 +132,10 @@ namespace Samples.HelloNetcode
                     UnityEngine.Debug.Log($"[{worldName}] Sending user 'User {user}' to new connection {connectionId}");
                 }
 
-                // Add connection to user list
+                // 将连接添加到用户列表
                 users.Add(connectionId);
 
-                // Mark this connection/user so we don't process again
+                // 标记此连接/用户，以便我们不再处理
                 buffer.AddComponent<ChatUserInitialized>(entity);
             }
 
@@ -146,8 +146,8 @@ namespace Samples.HelloNetcode
         }
     }
 
-    // Management for the queue which passes data between DOTS and GameObject systems, this way
-    // the two are decoupled a bit cleaner
+    // 对 DOTS 和 GameObject systems 之间传递数据的队列进行管理，这样
+    // 两者解耦得更干净一些
     [UpdateInGroup(typeof(HelloNetcodeSystemGroup))]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class RpcUiDataSystem : SystemBase
@@ -181,7 +181,7 @@ namespace Samples.HelloNetcode
         public static readonly SharedStatic<UnsafeQueue<FixedString128Bytes>> Messages = SharedStatic<UnsafeQueue<FixedString128Bytes>>.GetOrCreate<MessagesKey>();
         public static readonly SharedStatic<UnsafeQueue<int>> Users = SharedStatic<UnsafeQueue<int>>.GetOrCreate<UsersKey>();
 
-        // Identifiers for the shared static fields
+        // 共享静态字段的标识符
         private class MessagesKey {}
         private class UsersKey {}
     }

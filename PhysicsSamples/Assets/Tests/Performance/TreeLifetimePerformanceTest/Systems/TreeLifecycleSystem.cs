@@ -1,14 +1,14 @@
-//#define DEBUG_TREE_GROW_LOGGING
+//#定义 DEBUG_TREE_GROW_LOGGING
 
-// This system iterates over all the entities with a TreeComponent (aka: the tree root / prefab). The TreeComponent
-// counts down timers that track where a tree is in its lifecycle, where a tree transitions from:
-// growing > dead > deleted > regrown and then the cycle repeats. The system counts down the timers. The transition between
-// lifecycle states is done in other systems. This work generally needs to be done on the child entities in the prefab's
-// LinkedEntityGroup, therefore this system sets the TreeFlag on each of these entities to trigger the work in other systems.
-// Lifecycle state changes to countdown the next timer are generally done in the other systems so that we can be sure
-// the work is done. All data modified is written to the EndFixedStepSimulationEntityCommandBufferSystem which runs
-// after the PhysicsSystemGroup. This means that some data which is set, won't be processed by another system until the
-// next frame
+// 此 system 使用 TreeComponent（又名：树根 / prefab）迭代所有 entities。TreeComponent
+// 倒计时计时器，跟踪树在其生命周期中的位置，树从以下位置转换：
+// 生长>死亡>删除>重新生长，然后重复循环。system 对定时器进行倒计时。之间的过渡
+// 生命周期状态在其他 systems 中完成。这项工作一般需要在 prefab 的子 entities 上完成
+// LinkedEntityGroup，因此这个 system 将每个 entities 上的 TreeFlag 设置为 trigger 在其他 systems 中的工作。
+// 生命周期状态更改为倒计时下一个计时器通常是在其他 systems 中完成的，这样我们就可以确定
+// 工作完成了。所有修改的数据都写入运行的 EndFixedStepSimulationEntityCommandBufferSystem
+// 在 PhysicsSystemGroup 之后。这意味着设置的某些数据不会被另一个 system 处理，直到
+// 下一帧
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -40,7 +40,7 @@ namespace Unity.Physics
             public EntityCommandBuffer.ParallelWriter ECB;
             public float GrowTreeProbability;
 
-            // Gather all the entities with the TreeComponent (these will be the prefab tree roots only)
+            // 收集所有 entities 和 TreeComponent （这些仅是 prefab 树根）
             private void Execute([ChunkIndexInQuery] int chunkInQueryIndex, Entity entity,
                 ref TreeComponent treeComponent, in DynamicBuffer<LinkedEntityGroup> group)
             {
@@ -49,10 +49,10 @@ namespace Unity.Physics
                 switch (treeComponent.LifeCycleTracker)
                 {
                     default:
-                    case (LifeCycleStates.IsGrowing): // Count down GrowTimer
+                    case (LifeCycleStates.IsGrowing): // 倒计时 GrowTimer
                         treeComponent.GrowTimer--;
 
-                        // dice roll to see if we grow the tree
+                        // 掷骰子看看我们是否能种植这棵树
                         var treeHash = entity.Index * 17 ^ entity.Version * 23;
                         var hash = (uint)treeComponent.GrowTimer * 327 ^ (uint)treeComponent.GrowTime * 1571;
                         var seed = math.max(1, hash ^ (uint)treeHash);
@@ -67,23 +67,23 @@ namespace Unity.Physics
 
                             if (group.Length > 1)
                             {
-                                // Loop through the prefab LinkedEntityGroup entities
-                                for (var i = 1; i < group.Length; i++) //skip root
+                                // 循环遍历 prefab LinkedEntityGroup entities
+                                for (var i = 1; i < group.Length; i++) //跳过根目录
                                 {
                                     var childEntity = group[i].Value;
 
-                                    // Check if the entity is a tree top
+                                    // 检查 entity 是否是树顶
                                     var isTreeTop = TreeTopTagLookup.HasComponent(childEntity);
                                     var childTreeState = TreeStateLookup[childEntity];
 
-                                    // For a tree top, toggle flag from Default > TriggerTreeGrowthSystem
+                                    // 对于树顶，从“默认”>“TriggerTreeGrowthSystem”切换标志
                                     if (isTreeTop && childTreeState.Value == TreeState.States.Default)
                                     {
                                         childTreeState.Value = TreeState.States.TriggerTreeGrowthSystem;
                                         ECB.SetComponent(chunkInQueryIndex, childEntity, childTreeState);
 
-                                        // Incremental broadphase needs a smaller collection of entities to work with,
-                                        // so add enable the EnableTreeGrowth component for query filtering
+                                        // 增量宽相需要较小的 entities 集合才能使用，
+                                        // 因此添加启用 EnableTreeGrowth component 进行 query 过滤
                                         ECB.SetComponentEnabled<EnableTreeGrowth>(chunkInQueryIndex, childEntity,
                                             true);
                                     }
@@ -91,40 +91,40 @@ namespace Unity.Physics
                             }
                         }
 
-                        // Change states when timer expires
+                        // 定时器到期时更改状态
                         if (treeComponent.GrowTimer <= 0) treeComponent.LifeCycleTracker = LifeCycleStates.TransitionToDead;
                         break;
 
                     case (LifeCycleStates.TransitionToDead):
-                        // Work is done in TreeDeathSystem
-                        if (treeComponent.GrowTimer <= 0) // Verify grow timer has expired
+                        // 工作在 TreeDeathSystem 中完成
+                        if (treeComponent.GrowTimer <= 0) // 验证生长计时器是否已过期
                         {
                             if (group.Length > 1)
                             {
                                 bool allWorkDone = true;
-                                // Loop through the prefab LinkedEntityGroup entities
-                                for (var i = 1; i < group.Length; i++) //start after root
+                                // 循环遍历 prefab LinkedEntityGroup entities
+                                for (var i = 1; i < group.Length; i++) //root 后启动
                                 {
                                     var childEntity = group[i].Value;
 
-                                    // update flag for all children
+                                    // 更新所有孩子的标志
                                     var childTreeState = TreeStateLookup[childEntity];
                                     switch (childTreeState.Value)
                                     {
                                         case TreeState.States.Default:
                                         {
-                                            // if takes longer than a frame, don't want to overwrite
+                                            // 如果花费的时间超过一帧，则不想覆盖
                                             childTreeState.Value = TreeState.States.TriggerWholeTreeToDynamic;
                                             ECB.SetComponent(chunkInQueryIndex, childEntity, childTreeState);
 
-                                            // Incremental broadphase needs a smaller collection of entities to work with,
-                                            // so add enable the EnableTreeDeath component for query filtering
+                                            // 增量宽相需要较小的 entities 集合才能使用，
+                                            // 因此添加启用 EnableTreeDeath component 进行 query 过滤
                                             ECB.SetComponentEnabled<EnableTreeDeath>(chunkInQueryIndex, childEntity, true);
                                             break;
                                         }
                                         case TreeState.States.TransitionToDeadDone:
                                         {
-                                            // When TreeDeathSystem is done, we will end up here
+                                            // 当 TreeDeathSystem 完成后，我们将到达这里
                                             allWorkDone &= (childTreeState.Value == TreeState.States.TriggerChangeTreeColor);
                                             break;
                                         }
@@ -132,10 +132,10 @@ namespace Unity.Physics
                                             break;
                                     }
                                 }
-                                // Transition to next state only when all work is done
+                                // 仅当所有工作完成后才转换到下一个状态
                                 if (allWorkDone)
                                 {
-                                    // Skip "dead" state and go straight away to deletion if dead time is 0
+                                    // 如果死时间为 0，则跳过“死”状态并直接删除
                                     treeComponent.LifeCycleTracker = treeComponent.DeadTime > 0 ? LifeCycleStates.IsDead : LifeCycleStates.TransitionToDelete;
                                 }
                             }
@@ -143,35 +143,35 @@ namespace Unity.Physics
 
                         break;
 
-                    case (LifeCycleStates.IsDead): // Countdown DeathTimer
+                    case (LifeCycleStates.IsDead): // 倒计时 DeathTimer
                         treeComponent.DeathTimer--;
 
-                        // Do nothing but countdown timer and change states when it expires
+                        // 除了倒计时器并在计时器到期时更改状态之外什么都不做
                         if (treeComponent.DeathTimer <= 0) treeComponent.LifeCycleTracker = LifeCycleStates.TransitionToDelete;
                         break;
 
                     case (LifeCycleStates.TransitionToDelete):
-                        // Transition: delete all entities within the LinkedEntityGroup
-                        // TreeDeletionSystem uses this lifecycle state directly. Do nothing.
-                        if (rootTreeState.Value != TreeState.States.TriggerDeleteTrunkAndTop) // just in case this slips a frame
+                        // 过渡：删除 LinkedEntityGroup 内的所有 entities
+                        // TreeDeletionSystem 直接使用此生命周期状态。什么都不做。
+                        if (rootTreeState.Value != TreeState.States.TriggerDeleteTrunkAndTop) // 以防万一这会滑倒框架
                         {
                             rootTreeState.Value = TreeState.States.TriggerDeleteTrunkAndTop;
                             ECB.SetComponent(chunkInQueryIndex, entity, rootTreeState);
                         }
 
-                        // Transition to next state in TreeDeletionSystem
+                        // 转换到 TreeDeletionSystem 中的下一个状态
                         break;
 
                     case (LifeCycleStates.IsRegrown):
-                        // Countdown: the time until the tree is respawned
+                        // 倒计时：树重生之前的时间
                         treeComponent.RegrowTimer--;
 
                         if (treeComponent.RegrowTimer <= 0) treeComponent.LifeCycleTracker = LifeCycleStates.TransitionToInsert;
                         break;
 
                     case (LifeCycleStates.TransitionToInsert):
-                        // Transition: respawn the tree
-                        // Work is done in the TreeRegrowSystem
+                        // 过渡：重生树
+                        // 工作在 TreeRegrowSystem 中完成
                         break;
                 }
             }
@@ -208,7 +208,7 @@ namespace Unity.Physics
 
             var spawner = SystemAPI.GetSingleton<TreeSpawnerComponent>();
 
-            // Countdown the timers
+            // 计时器倒计时
             state.Dependency = new LifecycleCountdownJob
             {
 #if DEBUG_TREE_GROW_LOGGING

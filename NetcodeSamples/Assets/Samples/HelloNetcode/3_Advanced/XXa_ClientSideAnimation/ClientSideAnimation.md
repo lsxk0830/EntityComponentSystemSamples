@@ -1,55 +1,55 @@
-# HelloNetcode Client Side Animation sample
+# HelloNetcode Client 侧面动画示例
 
-## Requirements
+## 要求
 
-The spawn player sample is used to trigger the auto spawning of the player when establishing connection.
-The character controller is used to move and rotate the player around using the keyboard and mouse input.
+生成播放器示例用于 trigger 建立连接时自动生成播放器。
+角色控制器用于使用键盘和鼠标输入来移动和旋转玩家。
 
 * GoInGame
 * SpawnPlayer
 * CharacterController
 
-## Sample description
+## 示例描述
 
-This sample code demonstrates how to add animation to the spawned player using the built-in animation system known as [Mecanim](https://docs.unity3d.com/Manual/AnimationOverview.html) in Unity.
-The animation runs on the client-side only and is not synchronized to the server. The translation of the parent entity is the only component that synchronizes.
+此示例代码演示了如何使用 Unity 中的内置动画 system（称为 [Mecanim](https://docs.unity3d.com/Manual/AnimationOverview.html)）向生成的播放器添加动画。
+动画仅在 client 端运行，不同步到 server。父 entity 的翻译是唯一同步的 component。
 
-The scene contains a plane on which the character can move around and a spawner as mentioned in the `SpawnPlayer` sample.
-Upon entering play mode, the character will appear in the game view, and the camera will follow them around.
-To move the character, use the arrow keys. You can turn the character using the mouse, which will change the viewpoint. Notice that the character follows the camera view.
+scene 包含角色可以在其上移动的平面和 `SpawnPlayer` 示例中提到的生成器。
+进入游戏模式后，角色将出现在游戏视图中，并且摄像机将跟随他们。
+要移动角色，请使用箭头键。您可以使用鼠标转动角色，这将改变视点。请注意，角色跟随摄像机视图移动。
 
-Inside the `Character` folder, you will find the prefab `ClientAnimatedCharacter`, which is the entity assigned to the `Spawner` in the subscene.
-It is set up to handle character controllers like the `CharacterController` sample.
-A `Ghost Authoring Inspection Component` is attached and has set `DontSerializeVariant` on the rotation component.
-This is important because the rotation is not synchronized on the server, and the server's value would overwrite the rotation value set on the client-side.
+在 `Character` 文件夹中，您将找到 prefab `ClientAnimatedCharacter`，它是分配给 subscene 中的 `Spawner` 的 entity。
+它被设置为处理 `CharacterController` 示例等字符控制器。
+连接了 `Ghost Authoring Inspection Component` 并将 `DontSerializeVariant` 设置在旋转 component 上。
+这很重要，因为 server 上的旋转不同步，并且 server 的值将覆盖 client 侧设置的旋转值。
 
-The `Ghost Presentation Game Object Authoring` is used to spawn the `Terraformer` prefab as a client-side representation of the character.
-The server-side representation is not set because no presentation object is required on the server-side.
-During the baking step and when entering play mode, the presentation object is spawned and assigned an entity.
-Netcode does this inside the `GhostPresentationGameObjectSystem` system in the package code.
-Once the `Terraformer` is spawned, communication between the entity and game object worlds can occur from the `MonoBehaviour` attached to it.
+`Ghost Presentation Game Object Authoring` 用于生成 `Terraformer` prefab 作为角色的 client 侧表示。
+未设置 server 端表示，因为 server 端不需要表示对象。
+在 baking 步骤期间以及进入播放模式时，将生成演示对象并为其分配 entity。
+Netcode 在 package 代码中的 `GhostPresentationGameObjectSystem` system 内部执行此操作。
+一旦 `Terraformer` 生成，entity 和游戏对象 worlds 之间的通信可以通过附加到它的 `MonoBehaviour` 进行。
 
-The `Terraformer` prefab has the `Character Animation` component and an `Animator` component.
-The `Animator` component has the `Animator Controller` containing the logic for when to play animation clips.
-This controller has a list of parameters that are used in the `Character Animation` script to control the animation being played.
+`Terraformer` prefab 具有 `Character Animation` component 和 `Animator` component。
+`Animator` component 具有 `Animator Controller`，其中包含何时播放动画剪辑的逻辑。
+该控制器具有 `Character Animation` 脚本中使用的参数列表，用于控制正在播放的动画。
 
-The `Character Animation` class is invoked from the system `UpdateAnimationStateSystem` to ensure that the input data is gathered before invoking the `UpdateAnimationState` method.
-This method also returns an updated `LocalTransform` component used in the system to update the rotation on the character.
+从 system `UpdateAnimationStateSystem` 调用 `Character Animation` 类，以确保在调用 `UpdateAnimationState` 方法之前收集输入数据。
+此方法还返回 system 中使用的更新的 `LocalTransform` component 以更新角色的旋转。
 
-By combining the character controller data to know when to jump, run, etc., the state in the animation controller's state machine responds correctly to this information.
-Additionally, when turning the viewport around by moving the mouse in the game view, the animation follows the camera's viewpoint.
+通过结合角色控制器数据来知道何时跳转、run 等，动画控制器的状态机中的状态正确响应这些信息。
+此外，当通过在游戏视图中移动鼠标来转动视口时，动画会跟随相机的视点。
 
-## Notes
-* In the following sample you will see a server side animation sample.
-* In order to synchronize the rotation value as well one would need to extend the CharacterControllerPlayerInput found in the Character Controller sample. Here we would need to send the updated rotation value to update the server side as well. 
+## 笔记
+* 在下面的示例中，您将看到 server 侧面动画示例。
+* 为了同步旋转值，还需要扩展角色控制器示例中的 CharacterControllerPlayerInput。这里我们需要发送更新的旋转值来更新 server 端。
 
-## Hack to fix editor problem
+## Hack 修复编辑器问题
 
-In the sample scene an additional scene was added called Hack. This contains a component Hack which references the Terraformer and store all animation clips from the Animator in a List.
-A bug was discovered in the editor/player implementation of how serialization and deserialization of the baked entity references works.
-During awake the references are not initialized in the expected order, leading to unassigned animation clip references in the standalone build.
+在示例 scene 中，添加了一个名为 Hack 的附加 scene。其中包含一个 component Hack，它引用 Terraformer 并将来自 Animator 的所有动画剪辑存储在列表中。
+在编辑器/播放器实现中发现了烘焙 entity 引用的序列化和反序列化工作方式的错误。
+在唤醒期间，引用未按预期顺序初始化，导致独立构建中出现未分配的动画剪辑引用。
 
-Having this additional scene with reference to the animation clips ensures that the animation clip references are maintained and serialized correctly for the Animator.
-When the fix for the runtime is published this hack will be unnecessary.
+引用动画剪辑的附加 scene 可确保为动画器正确维护和序列化动画剪辑引用。
+当运行时的修复程序发布时，这种黑客攻击将不再需要。
 
-To make this hack a zero cost abstraction in terms of CPU cost, auto load has been disabled on the SubScene. This can be seen in the inspector for the Hack scene.  
+为了使此黑客攻击在 CPU 成本方面成为零成本抽象，SubScene 上已禁用自动加载。这可以在 Hack scene 的检查器中看到。

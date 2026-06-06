@@ -45,10 +45,10 @@ public partial struct SetContactFlagsSystem : ISystem
 {
     private ComponentLookup<ModifyContactJacobians> m_JacobianData;
 
-    // This job reads the modify component and sets some data on the contact, to get propagated to the jacobian
-    // for processing in our jacobian modifier job. This is necessary because some flags require extra data to
-    // be allocated along with the jacobian (e.g., SurfaceVelocity data typically does not exist). We also set
-    // user data bits in the jacobianFlags to save us from looking up the ComponentLookup later.
+    // 此 job 读取修改 component 并设置联系人上的一些数据，以传播到雅可比
+    // 用于在我们的雅可比修改器 job 中进行处理。这是必要的，因为某些标志需要额外的数据
+    // 与雅可比一起分配（e.g.、SurfaceVelocity 数据通常不存在）。我们还设置了
+    // jacobianFlags 中的用户数据位使我们免于稍后查找 ComponentLookup。
     [BurstCompile]
     struct SetContactFlagsJob : IContactsJob
     {
@@ -115,7 +115,7 @@ public partial struct SetContactFlagsSystem : ISystem
     }
 }
 
-// A system which configures the simulation step to modify contact jacobains in various ways
+// 一个 system，它配置模拟步骤以各种方式修改接触 jacobains
 [UpdateInGroup(typeof(PhysicsSolveAndIntegrateGroup), OrderFirst = true)]
 public partial struct ModifyContactJacobiansSystem : ISystem
 {
@@ -130,7 +130,7 @@ public partial struct ModifyContactJacobiansSystem : ISystem
         [ReadOnly]
         public ComponentLookup<ModifyContactJacobians> modificationData;
 
-        // Don't do anything for triggers
+        // 不要为触发器做任何事情
         public void Execute(ref ModifiableJacobianHeader h, ref ModifiableTriggerJacobian j) {}
 
         public void Execute(ref ModifiableJacobianHeader jacHeader, ref ModifiableContactJacobian contactJacobian)
@@ -151,17 +151,17 @@ public partial struct ModifyContactJacobiansSystem : ISystem
             }
 
             {
-                // Check for jacobians we want to ignore:
+                // 检查我们想要忽略的雅可比矩阵：
                 if (IsModificationType(ModifyContactJacobians.ModificationType.DisabledContact, typeA, typeB))
                 {
                     jacHeader.Flags = jacHeader.Flags | JacobianFlags.Disabled;
                 }
 
-                // Check if NoTorque modifier, or friction should be disabled through jacobian
+                // 检查是否应通过雅可比禁用 NoTorque 修改器或摩擦力
                 if (IsModificationType(ModifyContactJacobians.ModificationType.NoAngularEffects, typeA, typeB) ||
                     IsModificationType(ModifyContactJacobians.ModificationType.DisabledAngularFriction, typeA, typeB))
                 {
-                    // Disable all friction angular effects
+                    // 禁用所有摩擦角度效果
                     var friction0 = contactJacobian.Friction0;
                     friction0.AngularA = 0.0f;
                     friction0.AngularB = 0.0f;
@@ -178,10 +178,10 @@ public partial struct ModifyContactJacobiansSystem : ISystem
                     contactJacobian.AngularFriction = angularFriction;
                 }
 
-                // Check if SurfaceVelocity present
+                // 检查 SurfaceVelocity 是否存在
                 if (jacHeader.HasSurfaceVelocity && IsModificationType(ModifyContactJacobians.ModificationType.SurfaceVelocity, typeA, typeB))
                 {
-                    // Since surface normal can change, make sure angular velocity is always relative to it, not independent
+                    // 由于表面法线可能会发生变化，因此请确保角速度始终与其相关，而不是独立的
                     jacHeader.SurfaceVelocity = new SurfaceVelocity
                     {
                         LinearVelocity = float3.zero,
@@ -189,10 +189,10 @@ public partial struct ModifyContactJacobiansSystem : ISystem
                     };
                 }
 
-                // Check if MassFactors present and we should make inertia infinite
+                // 检查 MassFactors 是否存在，我们应该使惯性无限大
                 if (jacHeader.HasMassFactors && IsModificationType(ModifyContactJacobians.ModificationType.InfiniteInertia, typeA, typeB))
                 {
-                    // Give both bodies infinite inertia
+                    // 给两个物体无限的惯性
                     jacHeader.MassFactors = new MassFactors
                     {
                         InverseInertiaFactorA = float3.zero,
@@ -202,10 +202,10 @@ public partial struct ModifyContactJacobiansSystem : ISystem
                     };
                 }
 
-                // Check if MassFactors present and we should make inertia 10x bigger
+                // 检查 MassFactors 是否存在，我们应该将惯性增大 10 倍
                 if (jacHeader.HasMassFactors && IsModificationType(ModifyContactJacobians.ModificationType.BiggerInertia, typeA, typeB))
                 {
-                    // Give both bodies 10x bigger inertia
+                    // 给两个物体 10 倍大的惯性
                     jacHeader.MassFactors = new MassFactors
                     {
                         InverseInertiaFactorA = new float3(0.1f),
@@ -216,20 +216,20 @@ public partial struct ModifyContactJacobiansSystem : ISystem
                 }
             }
 
-            // Angular jacobian modifications
+            // 角度雅可比修改
             for (int i = 0; i < contactJacobian.NumContacts; i++)
             {
                 ContactJacAngAndVelToReachCp jacobianAngular = jacHeader.GetAngularJacobian(i);
 
-                // Check if NoTorque modifier
+                // 检查是否有 NoTorque 修饰符
                 if (IsModificationType(ModifyContactJacobians.ModificationType.NoAngularEffects, typeA, typeB))
                 {
-                    // Disable all angular effects
+                    // 禁用所有角度效果
                     jacobianAngular.Jac.AngularA = 0.0f;
                     jacobianAngular.Jac.AngularB = 0.0f;
                 }
 
-                // Check if SoftContact modifier
+                // 检查是否有 SoftContact 修饰符
                 if (IsModificationType(ModifyContactJacobians.ModificationType.SoftContact, typeA, typeB))
                 {
                     jacobianAngular.Jac.EffectiveMass *= 0.1f;

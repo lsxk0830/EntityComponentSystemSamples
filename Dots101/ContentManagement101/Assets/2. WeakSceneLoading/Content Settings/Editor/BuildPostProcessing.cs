@@ -6,45 +6,45 @@ using UnityEditor.Build.Reporting;
 
 namespace ContentManagement.Sample.Editor
 {
-   public class BuildPostprocessorFilteringDuplicates : IPostprocessBuildWithReport 
+   public class BuildPostprocessorFilteringDuplicates : IPostprocessBuildWithReport
 {
-    // Callback order: lower number = earlier call
+    // 回拨顺序：较小的数字 = 较早的呼叫
     public int callbackOrder => 1;
 
     public void OnPostprocessBuild(BuildReport report)
     {
         var settings = AssetDatabase.LoadAssetAtPath<WeakSceneListScriptableObject>("Assets/2. WeakSceneLoading/Content Settings/WeakSceneList.asset");
         var isTargetingRemote = (settings.ContentSource & ContentSourcePath.Remote) != 0;
-        
-        // When building for remote content delivery, 
-        // it's recommended to remove any redundant assets from StreamingAssets after the build completes.
-        // This prevents unnecessary duplication and reduces the final build size.
-        // If the build is intended to use only local assets, this step is not needed, 
-        // as all required content must remain in StreamingAssets (folder inside of the build).
+
+        // 在构建远程内容交付时，
+        // 建议在构建完成后从 StreamingAssets 中删除所有冗余资源。
+        // 这可以防止不必要的重复并减少最终构建的大小。
+        // 如果构建仅打算使用本地资源，则不需要此步骤，
+        // 因为所有必需的内容必须保留在 StreamingAssets（构建内的文件夹）中。
         if (!isTargetingRemote)
             return;
-        
+
         string pathToBuiltProject = report.summary.outputPath;
         Debug.Log("Build completed: " + pathToBuiltProject);
-        
+
         string streamingAssetsPath = null;
 
-        if (report.summary.platform == BuildTarget.StandaloneWindows || report.summary.platform == BuildTarget.StandaloneWindows64) 
+        if (report.summary.platform == BuildTarget.StandaloneWindows || report.summary.platform == BuildTarget.StandaloneWindows64)
         {
             string buildFolder = Path.GetDirectoryName(pathToBuiltProject);
             string dataFolder = Path.Combine(buildFolder, Path.GetFileNameWithoutExtension(pathToBuiltProject) + "_Data");
             streamingAssetsPath = Path.Combine(dataFolder, "StreamingAssets");
         }
         else if (report.summary.platform == BuildTarget.StandaloneOSX) {
-            string buildFolder = pathToBuiltProject; // .app
+            string buildFolder = pathToBuiltProject; // 。应用程序
             string dataFolder = Path.Combine(buildFolder, "Contents", "Resources", "Data");
             streamingAssetsPath = Path.Combine(dataFolder, "StreamingAssets");
         }
 
-        if (streamingAssetsPath != null) 
+        if (streamingAssetsPath != null)
         {
-            // In order to get the DebugCatalog.txt file enable,
-            // Please add ENABLE_CONTENT_BUILD_DIAGNOSTICS to "Scripting define" in the Build Profile 
+            // 为了使 DebugCatalog.txt 文件启用，
+            // 请将 ENABLE_CONTENT_BUILD_DIAGNOSTICS 添加到构建配置文件中的“脚本定义”中
             var path = Directory.GetParent(Application.dataPath).FullName;
             var catalogPath = Path.Combine(path, "Catalog/DebugCatalog.txt");
 
@@ -52,10 +52,10 @@ namespace ContentManagement.Sample.Editor
             {
                 if (File.Exists(catalogPath))
                 {
-                    // Read the entire catalog content into one string for searching
+                    // 将整个目录内容读入一个字符串中进行搜索
                     string catalogContent = File.ReadAllText(catalogPath);
 
-                    // Get all files in streamingAssetsPath (non-recursive)
+                    // 获取 streamingAssetsPath 中的所有文件（非递归）
                     var files = Directory.GetFiles(streamingAssetsPath, "*", SearchOption.AllDirectories);
                     int deleteCount = 0;
 
@@ -65,7 +65,7 @@ namespace ContentManagement.Sample.Editor
                         Debug.Log($"<color=yellow>FileName: {fileName}</color> ");
                         if(fileName.Contains(".bin") || fileName.Contains(".txt"))
                             continue;
-                        
+
                         if (catalogContent.Contains(fileName))
                         {
                             File.Delete(filePath);
@@ -87,5 +87,5 @@ namespace ContentManagement.Sample.Editor
             }
         }
     }
-} 
+}
 }

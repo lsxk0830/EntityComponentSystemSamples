@@ -19,7 +19,7 @@ namespace Samples.HelloNetcode
 
         public void Dispose()
         {
-            // As this is IDisposable, we can trigger the destruction of the HealthBar when this ghost entity is destroyed.
+            // 由于这是 IDisposable，所以当这个 ghost entity 被销毁时，我们可以通过 trigger 来销毁 HealthBar。
             if (HealthBar != null)
                 Object.Destroy(HealthBar.gameObject);
         }

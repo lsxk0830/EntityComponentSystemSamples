@@ -5,7 +5,7 @@ namespace GravityWell
 {
     public class GravityWellAuthoring : MonoBehaviour
     {
-        public float OrbitPos;  // orbit pos as angle in rads
+        public float OrbitPos;  // 轨道 pos 为以 rad 为单位的角度
         public class Baker : Baker<GravityWellAuthoring>
         {
             public override void Bake(GravityWellAuthoring authoring)
@@ -18,10 +18,10 @@ namespace GravityWell
             }
         }
     }
-    
+
     public struct GravityWell : IComponentData
     {
-        public float OrbitPos;   // in radians
+        public float OrbitPos;   // 以弧度为单位
     }
 }
 

@@ -11,8 +11,8 @@ namespace Baking.BakingTypes
         {
             public override void Bake(BoundingBoxAuthoring authoring)
             {
-                // Get a dependency on the mesh and the transform
-                // This ensures that if either of these change, the Baker is rerun
+                // 获取对网格和变换的依赖关系
+                // 这确保如果其中任何一个发生更改，Baker 都会重新运行
                 var mesh = GetComponent<MeshFilter>().sharedMesh;
                 var pos = GetComponent<Transform>().position;
                 DependsOn(mesh);
@@ -24,7 +24,7 @@ namespace Baking.BakingTypes
                 float xp = float.MinValue, yp = float.MinValue, zp = float.MinValue;
                 float xn = float.MaxValue, yn = float.MaxValue, zn = float.MaxValue;
 
-                // Calculate the bounding box
+                // 计算边界框
                 if (hasMesh)
                 {
                     var vertices = new List<Vector3>(4096);
@@ -61,8 +61,8 @@ namespace Baking.BakingTypes
         }
     }
 
-    // BakingType components are present in the Baking process, but not in the destination world.
-    // It can be used to get data from a Baker to a Baking System.
+    // BakingType components 存在于 Baking 进程中，但不存在于目标 world 中。
+    // 它可用于将数据从 Baker 获取到 Baking System。
     [BakingType]
     public struct BoundingBox : IComponentData
     {
@@ -71,14 +71,14 @@ namespace Baking.BakingTypes
         public float3 MaxBBVertex;
     }
 
-    // TemporaryBakingType components are removed after the Baking systems run.
+    // TemporaryBakingType components 在 Baking systems run 之后删除。
     [TemporaryBakingType]
     public struct Changes : IComponentData
     {
     }
 
-    // This component is added to every entity with a BoundingBoxComponent. It tracks the previous parent of the entity.
-    // When the entity is either re-parented or destroyed, the bounding box of its previous parent needs to be recomputed.
+    // 此 component 被添加到带有 BoundingBoxComponent 的每个 entity 中。它跟踪 entity 的前一个父项。
+    // 当 entity 被重新设置父级或被销毁时，需要重新计算其先前父级的边界框。
     [BakingType]
     public struct BoundingBoxCleanup : ICleanupComponentData
     {

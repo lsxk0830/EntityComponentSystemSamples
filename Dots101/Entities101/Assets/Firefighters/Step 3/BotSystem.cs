@@ -43,14 +43,14 @@ namespace Tutorials.Firefighters
                         if (MoveToTarget(ref botTrans.ValueRW, bot.ValueRO.TargetPos, moveSpeed))
                         {
                             var team = SystemAPI.GetComponent<Team>(bot.ValueRO.Team);
-                            
+
                             var bucket = SystemAPI.GetComponentRW<Bucket>(team.Bucket);
                             bucket.ValueRW.CarryingBot = botEntity;
                             bucket.ValueRW.IsCarried = true;
-                            
+
                             bot.ValueRW.Bucket = team.Bucket;
                             bot.ValueRW.IsCarrying = true;
-                            bot.ValueRW.TargetPos = bot.ValueRO.LinePos; // was set in TeamSystem
+                            bot.ValueRW.TargetPos = bot.ValueRO.LinePos; // 设置于 TeamSystem
                             bot.ValueRW.State = BotState.MOVE_TO_LINE;
                         }
 
@@ -60,11 +60,11 @@ namespace Tutorials.Firefighters
                     {
                         var bucket = SystemAPI.GetComponentRW<Bucket>(bot.ValueRO.Bucket);
                         var val = fillRate + bucket.ValueRO.Water;
-                        if (val < 1.0f) // keep filling
+                        if (val < 1.0f) // 继续填充
                         {
                             bucket.ValueRW.Water = fillRate + bucket.ValueRO.Water;
                         }
-                        else // done filling
+                        else // 完成填充
                         {
                             bucket.ValueRW.Water = 1;
                             bot.ValueRW.State = BotState.PASS_BUCKET;
@@ -74,7 +74,7 @@ namespace Tutorials.Firefighters
                     }
                     case BotState.DOUSE_FIRE:
                     {
-                        // (only a douser should be put in this state)
+                        // （只有遮光板应处于此状态）
                         if (MoveToTarget(ref botTrans.ValueRW, bot.ValueRO.TargetPos, moveSpeed))
                         {
                             var bucket = SystemAPI.GetComponentRW<Bucket>(bot.ValueRO.Bucket);
@@ -93,7 +93,7 @@ namespace Tutorials.Firefighters
                     }
                     case BotState.PASS_BUCKET:
                     {
-                        // the next bot should generally not be moving while we're passing to it, but just in case, we get its current pos
+                        // 当我们传递给下一个机器人时，它通常不应该移动，但为了以防万一，我们得到了它当前的位置
                         var targetPos = SystemAPI.GetComponent<LocalTransform>(bot.ValueRO.NextBot).Position.xz;
                         if (MoveToTarget(ref botTrans.ValueRW, targetPos, moveSpeed))
                         {
@@ -134,7 +134,7 @@ namespace Tutorials.Firefighters
                             {
                                 bot.ValueRW.State = BotState.FILL_BUCKET;
                             }
-                            else // full bucket
+                            else // 满桶
                             {
                                 bot.ValueRW.State = BotState.PASS_BUCKET;
                             }
@@ -149,7 +149,7 @@ namespace Tutorials.Firefighters
                             {
                                 bot.ValueRW.State = BotState.DOUSE_FIRE;
                             }
-                            else // empty bucket
+                            else // 空桶
                             {
                                 bot.ValueRW.State = BotState.PASS_BUCKET;
                             }
@@ -171,13 +171,13 @@ namespace Tutorials.Firefighters
             var dir = targetPos - pos.xz;
             var moveVectorNormalized = math.normalizesafe(dir);
             var moveVector = moveVectorNormalized * moveSpeed;
-            
-            // The the animated model faces up the z axis, so we need to rotate it 90 degrees clockwise.
+
+            // 动画模型面向 z 轴，因此我们需要将其顺时针旋转 90 度。
             var modelRotation = math.radians(90);
-            
-            // atan2 returns a counter-clockwise angle of rotation, so we negate to make it clockwise
-            var facingRotation = -math.atan2(moveVectorNormalized.y, moveVectorNormalized.x);   
-            
+
+            // atan2 返回逆时针旋转角度，因此我们求反使其顺时针旋转
+            var facingRotation = -math.atan2(moveVectorNormalized.y, moveVectorNormalized.x);
+
             botTrans.Rotation = quaternion.RotateY(modelRotation + facingRotation);
 
             if (math.lengthsq(moveVector) >= math.lengthsq(dir))

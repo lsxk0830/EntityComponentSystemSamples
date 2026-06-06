@@ -28,7 +28,7 @@ namespace Blender
                 float buoyancyForce = depth * buoyant.ValueRO.BuoyancyForce * deltaTime;
                 velocity.ValueRW.ApplyLinearImpulse(mass.ValueRO, new float3(0, buoyancyForce, 0));
 
-                // apply water drag
+                // 施加水阻力
                 velocity.ValueRW.Linear *= 1.0f - buoyant.ValueRO.Drag * deltaTime;
             }
         }

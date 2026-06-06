@@ -9,8 +9,8 @@ using Unity.Mathematics;
 namespace Tutorials.Tornado
 {
     /*
-     * Updates the bars and joints of the buildings.
-     * The force of the tornado breaks the joints.
+     * 更新建筑物的钢筋和接缝。
+     * 龙卷风的力量使关节折断。
      */
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     public partial struct BuildingSystem : ISystem
@@ -100,7 +100,7 @@ namespace Tutorials.Tornado
             var previous = previousPoints[i];
             previous.y += .01f;
 
-            // tornado force
+            // 龙卷风力量
             float tdx = tornadoPosition.x + BuildingSystem.TornadoSway(point.y, time) - point.x;
             float tdz = tornadoPosition.y - point.z;
             float tornadoDist = math.sqrt(tdx * tdx + tdz * tdz);

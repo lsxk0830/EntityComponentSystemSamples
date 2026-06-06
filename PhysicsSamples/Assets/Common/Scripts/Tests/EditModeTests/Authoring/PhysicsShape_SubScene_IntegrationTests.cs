@@ -10,53 +10,53 @@ using UnityEngine.TestTools;
 
 namespace Unity.Physics.Tests.Authoring
 {
-    // Physics shape conversion tests for the sub-scene workflow
+    // Physics 子 scene 工作流程的形状转换测试
     class PhysicsShape_SubScene_IntegrationTests
         : ConversionSystem_SubScene_IntegrationTestsFixture
     {
-        // Creates a sub-scene, populates it and loads it.
-        // Then, performs validation action, enters play mode and again performs validation action.
+        // 创建一个子 scene，填充并加载它。
+        // 然后，执行验证操作，进入播放模式并再次执行验证操作。
         IEnumerator BaseColliderSubSceneTest(Action createSubSceneObjects, Action validation)
         {
-            // create a sub-scene, populate it and load it.
+            // 创建一个子 scene，填充并加载它。
             Assert.IsNull(SubSceneManaged);
             Assert.AreEqual(Entity.Null, SubSceneEntity);
 
-            // create sub-scene
+            // 创建子 scene
             CreateAndLoadSubScene(createSubSceneObjects);
             Assert.IsNotNull(SubSceneManaged);
 
-            // wait until sub-scene is loaded by skipping frames
+            // 等待子 scene 通过跳帧加载
             while (!SceneSystem.IsSceneLoaded(World.DefaultGameObjectInjectionWorld.Unmanaged, SubSceneEntity))
             {
                 yield return null;
             }
 
-            // enable sub-scene for editing
+            // 启用子 scene 进行编辑
             Scenes.Editor.SubSceneUtility.EditScene(SubSceneManaged);
 
-            // Phase 1:
-            // make sure we are in edit mode and validate
+            // 第一阶段：
+            // 确保我们处于编辑模式并验证
             Assume.That(Application.isPlaying, Is.False);
 
-            // call validation function
+            // 调用验证函数
             validation();
 
-            // Phase 2:
-            // enter play mode and validate
+            // 第二阶段：
+            // 进入播放模式并验证
             yield return new EnterPlayMode();
 
-            // make sure we are in play mode before validating
+            // 在验证之前确保我们处于播放模式
             while (!Application.isPlaying)
             {
                 yield return null;
             }
 
-            // call validation function
+            // 调用验证函数
             validation();
         }
 
-        // Tests that collider blobs in physics colliders are shared if they are identical
+        // 测试物理 colliders 中的 collider 斑点是否相同（如果它们相同）
         [UnityTest]
         public IEnumerator TestSharedColliderBlobs()
         {
@@ -66,15 +66,15 @@ namespace Unity.Physics.Tests.Authoring
                 collider1 = new GameObject(TestNameWithoutSpecialCharacters).AddComponent<PhysicsShapeAuthoring>();
                 collider2 = new GameObject(TestNameWithoutSpecialCharacters).AddComponent<PhysicsShapeAuthoring>();
 
-                // we don't want actual collisions to occur in this test
+                // 我们不希望在此测试中发生实际碰撞
                 collider1.CollisionResponse = CollisionResponsePolicy.RaiseTriggerEvents;
                 collider2.CollisionResponse = CollisionResponsePolicy.RaiseTriggerEvents;
 
-                // use identical colliders
+                // 使用相同的 colliders
                 collider1.SetBox(default);
                 collider2.SetBox(default);
 
-                // make sure that the identical colliders can share a single collider blob by disabling the "force unique" setting
+                // 确保相同的 colliders 可以通过禁用“强制唯一”设置来共享单个 collider Blob
                 collider1.ForceUnique = false;
                 collider2.ForceUnique = false;
             };
@@ -89,10 +89,10 @@ namespace Unity.Physics.Tests.Authoring
                         Assume.That(colliderComponents, Has.Length.EqualTo(2));
                         var colliderComponent1 = colliderComponents[0];
                         var colliderComponent2 = colliderComponents[1];
-                        // make sure that the two collider blobs are shared and their pointers are thus identical
+                        // 确保两个 collider blob 是共享的，因此它们的指针是相同的
                         Assume.That((IntPtr)colliderComponent1.ColliderPtr, Is.EqualTo((IntPtr)colliderComponent2.ColliderPtr));
 
-                        // make sure that the colliders indicate that they are not unique.
+                        // 确保 colliders 指示它们不是唯一的。
                         foreach (var collider in colliderComponents)
                         {
                             Assume.That(collider.IsUnique, Is.False);
@@ -104,7 +104,7 @@ namespace Unity.Physics.Tests.Authoring
             return BaseColliderSubSceneTest(creation, validation);
         }
 
-        // Tests that collider blobs in physics colliders are unique despite being identical if they are forced to be unique
+        // 测试物理中的 collider 斑点 colliders 是唯一的，尽管它们是相同的（如果它们被迫是唯一的）
         [UnityTest]
         public IEnumerator TestUniqueColliderBlobs()
         {
@@ -114,15 +114,15 @@ namespace Unity.Physics.Tests.Authoring
                 collider1 = new GameObject(TestNameWithoutSpecialCharacters).AddComponent<PhysicsShapeAuthoring>();
                 collider2 = new GameObject(TestNameWithoutSpecialCharacters).AddComponent<PhysicsShapeAuthoring>();
 
-                // we don't want actual collisions to occur in this test
+                // 我们不希望在此测试中发生实际碰撞
                 collider1.CollisionResponse = CollisionResponsePolicy.RaiseTriggerEvents;
                 collider2.CollisionResponse = CollisionResponsePolicy.RaiseTriggerEvents;
 
-                // use identical colliders
+                // 使用相同的 colliders
                 collider1.SetBox(default);
                 collider2.SetBox(default);
 
-                // force the collider blobs to be unique in both PhysicsCollider components
+                // 强制 collider blob 在两个 PhysicsCollider components 中都是唯一的
                 collider1.ForceUnique = true;
                 collider2.ForceUnique = true;
             };
@@ -137,10 +137,10 @@ namespace Unity.Physics.Tests.Authoring
                         Assume.That(colliderComponents, Has.Length.EqualTo(2));
                         var colliderComponent1 = colliderComponents[0];
                         var colliderComponent2 = colliderComponents[1];
-                        // make sure that the two collider blobs are not identical
+                        // 确保两个 collider blob 不相同
                         Assume.That((IntPtr)colliderComponent1.ColliderPtr, Is.Not.EqualTo((IntPtr)colliderComponent2.ColliderPtr));
 
-                        // make sure that the colliders indicate that they are unique.
+                        // 确保 colliders 指示它们是唯一的。
                         foreach (var collider in colliderComponents)
                         {
                             Assume.That(collider.IsUnique, Is.True);

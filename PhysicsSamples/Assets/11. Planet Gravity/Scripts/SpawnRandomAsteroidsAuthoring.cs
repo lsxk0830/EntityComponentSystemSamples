@@ -35,9 +35,9 @@ partial class SpawnRandomAsteroidsSystem : SpawnRandomObjectsSystemBase<Asteroid
     internal override int GetRandomSeed(AsteroidSpawnSettings spawnSettings)
     {
         var seed = base.GetRandomSeed(spawnSettings);
-        // Historical note: this used to be "^ spawnSettings.Prefab.GetHashCode(), but the prefab's hash wasn't stable across code changes.
-        // Now it's hard-coded. If two spawners in the same scene differ only by the prefab they spawn, set their RandomSeedOffset field
-        // to different values to differentiate them.
+        // 历史记录：这曾经是“^ spawnSettings.Prefab.GetHashCode()，但 prefab 的哈希在代码更改中并不稳定。
+        // 现在它是硬编码的。如果同一 scene 中的两个生成器仅在它们生成的 prefab 上有所不同，则设置它们的 RandomSeedOffset 字段
+        // 不同的值来区分它们。
         seed = (seed * 397) ^ 220;
         seed = (seed * 397) ^ (int)(spawnSettings.MassFactor * 1000);
         return seed;

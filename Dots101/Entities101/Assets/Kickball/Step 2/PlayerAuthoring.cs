@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Tutorials.Kickball.Step2
 {
-    // Same pattern as ObstacleAuthoring.cs in Step 1.
+    // 与步骤 1 中的 ObstacleAuthoring.cs 相同的模式。
     public class PlayerAuthoring : MonoBehaviour
     {
         class Baker : Baker<PlayerAuthoring>
@@ -14,7 +14,7 @@ namespace Tutorials.Kickball.Step2
 
                 AddComponent<Player>(entity);
 
-                // Used in Step 5
+                // 在步骤 5 中使用
                 AddComponent<Carry>(entity);
                 SetComponentEnabled<Carry>(entity, false);
             }
@@ -25,10 +25,10 @@ namespace Tutorials.Kickball.Step2
     {
     }
 
-    // Used in Step 5
+    // 在步骤 5 中使用
     public struct Carry : IComponentData, IEnableableComponent
     {
-        // on a ball, this denotes the player carrying the ball; on a player, this denotes the ball being carried
+        // 在球上，这表示持球的球员；对于球员来说，这表示球正在被携带
         public Entity Target;
     }
 }

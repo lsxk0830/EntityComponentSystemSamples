@@ -8,16 +8,16 @@ namespace Streaming.SceneManagement.SubsceneInstancing
     public class GridAuthoring : MonoBehaviour
     {
 #if UNITY_EDITOR
-        public UnityEditor.SceneAsset scene; // the subscene to instantiate
-        public int size;  // number of instances will be size x size
-        public float2 spacing;  // distance between the instances
+        public UnityEditor.SceneAsset scene; // 实例化 subscene
+        public int size;  // 实例数将为大小 x 大小
+        public float2 spacing;  // 实例之间的距离
 
         class Baker : Baker<GridAuthoring>
         {
             public override void Bake(GridAuthoring authoring)
             {
-                // We need a dependency on the scene in case the scene gets deleted.
-                // This needs to be outside the authoring.scene != null check in case the asset file gets deleted and then restored.
+                // 我们需要对 scene 的依赖，以防 scene 被删除。
+                // 这需要在 authoring.scene!= null 检查之外，以防资产文件被删除然后恢复。
                 DependsOn(authoring.scene);
 
                 if (authoring.scene != null)

@@ -50,7 +50,7 @@ public partial struct ChangeScaleSystem : ISystem
 
             newScale = math.lerp(oldScale, scaleSettings.Target, 0.05f);
 
-            // If we reach the target, get a new target
+            // 如果我们达到目标，就制定新目标
             if (math.abs(newScale - scaleSettings.Target) < 0.01f)
             {
                 scaleSettings.Target = scaleSettings.Target == scaleSettings.Min ? scaleSettings.Max : scaleSettings.Min;

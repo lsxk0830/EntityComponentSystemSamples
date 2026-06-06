@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Streaming.RuntimeContentManager
 {
-    // render entities that are loaded and should render
+    // 渲染已加载并应渲染的 entities
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial struct DecorationRenderSystem : ISystem

@@ -12,8 +12,8 @@ namespace HelloCube.GameObjectSync
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // We need to wait for the scene to load before Updating, so we must RequireForUpdate at
-            // least one component type loaded from the scene.
+            // 在更新之前我们需要等待 scene 加载，所以我们必须在 RequireForUpdate
+            // 从 scene 加载至少一种 component 类型。
 
             state.RequireForUpdate<ExecuteGameObjectSync>();
         }
@@ -44,7 +44,7 @@ namespace HelloCube.GameObjectSync
         public GameObject RotatorPrefab;
         public Toggle RotationToggle;
 
-        // Every IComponentData class must have a no-arg constructor.
+        // 每个 IComponentData 类都必须有一个无参数构造函数。
         public DirectoryManaged() { }
     }
 #endif

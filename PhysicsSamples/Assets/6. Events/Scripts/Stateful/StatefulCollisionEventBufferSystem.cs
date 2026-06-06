@@ -5,12 +5,12 @@ using Unity.Physics.Systems;
 
 namespace Unity.Physics.Stateful
 {
-    // This system converts stream of CollisionEvents to StatefulCollisionEvents that can be stored in a Dynamic Buffer.
-    // In order for this conversion, it is required to:
-    //    1) Use the 'Collide Raise Collision Events' option of the 'Collision Response' property on a PhysicsShapeAuthoring component, and
-    //    2) Add a StatefulCollisionEventBufferAuthoring component to that entity (and select if details should be calculated or not)
-    // or, if this is desired on a Character Controller:
-    //    1) Tick the 'Raise Collision Events' flag on the CharacterControllerAuthoring component.
+    // 此 system 将 CollisionEvents 流转换为可存储在动态缓冲区中的 StatefulCollisionEvents。
+    // 为了进行此转换，需要：
+    //    1) 使用 PhysicsShapeAuthoring component 上“碰撞响应”属性的“碰撞引发碰撞事件”选项，并且
+    //    2) 将 StatefulCollisionEventBufferAuthoring component 添加到 entity （并选择是否应计算详细信息）
+    // 或者，如果角色控制器需要这样做：
+    //    1) 勾选 CharacterControllerAuthoring component 上的“引发冲突事件”标志。
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateAfter(typeof(PhysicsSimulationGroup))]
     public partial struct StatefulCollisionEventBufferSystem : ISystem
@@ -18,7 +18,7 @@ namespace Unity.Physics.Stateful
         private StatefulSimulationEventBuffers<StatefulCollisionEvent> m_StateFulEventBuffers;
         private ComponentHandles m_Handles;
 
-        // Component that does nothing. Made in order to use a generic job. See OnUpdate() method for details.
+        // Component 不执行任何操作。为了使用通用的 job 而制作。详细信息请参见 OnUpdate() 方法。
         internal struct DummyExcludeComponent : IComponentData {};
 
         struct ComponentHandles

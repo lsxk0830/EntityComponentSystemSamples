@@ -83,10 +83,10 @@ namespace HelloCube.ClosestTarget
                 {
                     var tree = new KDTree(targetEntities.Length, Allocator.TempJob, 64);
 
-                    // init KD tree
+                    // 初始化 KD 树
                     for (int i = 0; i < targetEntities.Length; i += 1)
                     {
-                        // NOTE - the first parameter is ignored, only the index matters
+                        // NOTE - 第一个参数被忽略，只有索引重要
                         tree.AddEntry(i, targetTransforms[i].Position);
                     }
 

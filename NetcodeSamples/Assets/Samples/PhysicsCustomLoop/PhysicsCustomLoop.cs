@@ -7,9 +7,9 @@ using Unity.Physics.Systems;
 
 namespace Unity.NetCode
 {
-    //We want this system to no run into any custom physics world. So we don't target directly BeforePhysicsSytemGroup
-    //This system is responbile to instrument the CustomBuildPhysicsWorld if rebuild or update the physics world
-    //based on the PhysicsLoopConfig settings and the current simulated tick.
+    //我们希望这个 system 不包含 run 到任何自定义物理 world 中。所以我们不直接瞄准 BeforePhysicsSytemGroup
+    //如果重建或更新物理 world，则此 system 负责检测 CustomBuildPhysicsWorld
+    //基于 PhysicsLoopConfig 设置和当前模拟报价。
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup), OrderFirst = true)]
@@ -33,11 +33,11 @@ namespace Unity.NetCode
             var settings = state.EntityManager.GetComponentDataRW<BuildPhysicsWorldSettings>(physicsBuildWorld);
             settings.ValueRW.UseImmediateMode = loopConfig.UseImmediateMode;
             settings.ValueRW.StepImmediateMode = loopConfig.StepImmediateMode;
-            //The first prediction tick we always rebuild the physics world no matter what to
-            //start from a clean state.
-            //We do the same also for the final full tick and partial ticks, so the very last step also use a
-            //good starting point.
-            //In case physics tick rate > simulation tick rate, the build should be done only the first physic step
+            //第一个 prediction 滴答声我们总是重建物理 world 无论如何
+            //从干净的状态开始。
+            //我们对最终的完整刻度和部分刻度也执行相同的操作，因此最后一步也使用
+            //良好的起点。
+            //如果物理滴答率 > 模拟滴答率，则应仅在第一个物理步骤中完成构建
             if (networkTime.IsFirstPredictionTick || networkTime.IsFinalFullPredictionTick)
             {
                 if (!lastFullBuildTick.IsValid || lastFullBuildTick != networkTime.ServerTick)
@@ -58,7 +58,7 @@ namespace Unity.NetCode
     }
 
     /// <summary>
-    /// System that enable/disable which physics system need to update for a given predicted tick.
+    /// System 启用/禁用哪些物理 system 需要针对给定的 predicted 更新。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup), OrderFirst = true)]
@@ -73,7 +73,7 @@ namespace Unity.NetCode
         private ComponentSystemGroup PhysicsCreateContactsGroup;
         private ComponentSystemGroup PhysicsCreateJacobiansGroup;
         private ComponentSystemGroup PhysicsSolveAndIntegrateGroup;
-        //Custom physics systems.
+        //自定义物理 systems。
         private SystemHandle CustomBuildPhysicsWorldHandle;
         private SystemHandle ImmediatePhysicsStepHandle;
 
@@ -96,21 +96,21 @@ namespace Unity.NetCode
         {
             var loopConfig = SystemAPI.GetSingleton<PhysicsLoopConfig>();
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
-            //Setup this once per prediction update, becaue the loopConfig does not change in between prediction steps.
+            //每次 prediction 更新时设置一次，因为 loopConfig 在 prediction 步骤之间不会更改。
             if (networkTime.IsFirstPredictionTick)
             {
                 World.Unmanaged.ResolveSystemStateRef(CustomBuildPhysicsWorldHandle).Enabled = true;
                 World.Unmanaged.ResolveSystemStateRef(ImmediatePhysicsStepHandle).Enabled = loopConfig.StepImmediateMode != 0;
-                //Disable the normal build physics systems. The CustomBuildPhysicsWorldHandle will handle everything
+                //禁用正常构建物理 systems。CustomBuildPhysicsWorldHandle 将处理一切
                 World.Unmanaged.ResolveSystemStateRef(BuildPhysicWorldHandle).Enabled = false;
-                //In immediate mode we don't want any of this systems runs because the step is already executing all this.
+                //在立即模式下，我们不希望任何 systems 运行，因为该步骤已经执行了所有这些。
                 PhysicsCreateBodyPairsGroup.Enabled = loopConfig.StepImmediateMode == 0;
                 PhysicsCreateContactsGroup.Enabled = loopConfig.StepImmediateMode == 0;
                 PhysicsCreateJacobiansGroup.Enabled = loopConfig.StepImmediateMode == 0;
                 PhysicsSolveAndIntegrateGroup.Enabled = loopConfig.StepImmediateMode == 0;
             }
-            //We enable syncing proxies, interpolation and physics velocity smoothing only for the final prediction
-            //tick. The cost is usually little, but running them for nothing does not make much sense
+            //我们仅为最终的 prediction 启用同步代理、interpolation 和物理速度平滑
+            //打钩。成本通常很少，但免费运行它们没有多大意义
             var isFinalTick = networkTime.IsFinalPredictionTick || networkTime.IsFinalFullPredictionTick;
             World.Unmanaged.ResolveSystemStateRef(SyncCustomPhysicsProxySystemHandle).Enabled = isFinalTick;
             World.Unmanaged.ResolveSystemStateRef(BufferInterpolatedRigidBodiesMotionHandle).Enabled = isFinalTick;
@@ -119,8 +119,8 @@ namespace Unity.NetCode
     }
 
     /// <summary>
-    /// System that runs on the client and disable the custom physics build world before the FixedStepSimulationSystemGroup.
-    /// This will make any physics world simulation (i.e client0only physics) to execute normally.
+    /// System 在 client 上运行，并在 FixedStepSimulationSystemGroup 之前禁用自定义物理构建 world。
+    /// 这将使任何物理 world 模拟（i.e client0only 物理）正常执行。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]

@@ -2,39 +2,39 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 
-// We'll use Unity.Mathematics.float3 instead of Vector3,
-// and we'll use Unity.Mathematics.math.distancesq instead of Vector3.sqrMagnitude.
+// 我们将使用 Unity.Mathematics.float3 而不是 Vector3，
+// 我们将使用 Unity.Mathematics.math.distancesq 而不是 Vector3.sqrMagnitude。
 using Unity.Mathematics;
 
 namespace Tutorials.Jobs.Step2
 {
-    // Include the BurstCompile attribute to Burst compile the job.
+    // 将 BurstCompile 属性包含到 Burst 编译 job。
     [BurstCompile]
     public struct FindNearestJob : IJob
     {
-        // All of the data which a job will access should 
-        // be included in its fields. In this case, the job needs
-        // three arrays of float3.
+        // job 将访问的所有数据都应该
+        // 纳入其领域。在这种情况下，job 需要
+        // 三个 float3 数组。
 
-        // Array and collection fields that are only read in
-        // the job should be marked with the ReadOnly attribute.
-        // Although not strictly necessary in this case, marking data  
-        // as ReadOnly may allow the job scheduler to safely run 
-        // more jobs concurrently with each other.
-        // (See the "Intro to jobs" for more detail.)
+        // 只读的数组和集合字段
+        // job 应标有 ReadOnly 属性。
+        // 尽管在这种情况下并非绝对必要，但标记数据
+        // 因为 ReadOnly 可能允许 job 调度程序安全地 run
+        // 多个 jobs 互相并发。
+        // （有关更多详细信息，请参阅“jobs 简介”。）
 
         [ReadOnly] public NativeArray<float3> TargetPositions;
         [ReadOnly] public NativeArray<float3> SeekerPositions;
 
-        // For SeekerPositions[i], we will assign the nearest 
-        // target position to NearestTargetPositions[i].
+        // 对于 SeekerPositions[i]，我们将分配最近的
+        // 目标位置为 NearestTargetPositions[i]。
         public NativeArray<float3> NearestTargetPositions;
 
-        // 'Execute' is the only method of the IJob interface.
-        // When a worker thread executes the job, it calls this method.
+        // “执行”是 IJob 接口的唯一方法。
+        // 当工作线程执行 job 时，它会调用此方法。
         public void Execute()
         {
-            // Compute the square distance from each seeker to every target.
+            // 计算每个导引头到每个目标的平方距离。
             for (int i = 0; i < SeekerPositions.Length; i++)
             {
                 float3 seekerPos = SeekerPositions[i];

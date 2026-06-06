@@ -96,7 +96,7 @@ namespace Samples.CustomChunkSerializer
 
         protected override void OnUpdate()
         {
-            //First frame: create all the ghost prefabs. This is going to create
+            //第一帧：创建所有 ghost prefab。这将创建
             Entity prefab = CreateEntityArchetype(EntityManager, World.IsServer());
             var comp = SystemAPI.GetSingleton<TestCustomSerializer>();
             var prefabConfig = new GhostPrefabCreation.Config
@@ -162,10 +162,10 @@ namespace Samples.CustomChunkSerializer
 
         protected override void OnUpdate()
         {
-            //change all the components is a bad case scenario, because that may not let the serialization
-            //code to perform all the calculation (many call, zero size to write), lots of write etc
-            //it is possible to maximize the amount of work by forcing the ghost send system to always send
-            //up to x chunks to have some more reliable "results"
+            //改变所有的 components 是一个坏的情况场景，因为这可能不会让序列化
+            //执行所有计算的代码（多次调用、零大小写入）、大量写入等
+            //通过强制 ghost 发送 system 始终发送，可以最大化工作量
+            //最多 x chunks 以获得一些更可靠的“结果”
             var testCustomSerializer = SystemAPI.GetSingleton<TestCustomSerializer>();
             var ghostsQuery = GetEntityQuery(typeof(GhostInstance));
             var ghostsChunks = ghostsQuery.ToArchetypeChunkArray(Allocator.Temp);

@@ -1,21 +1,21 @@
-# Mesh Deformations
+# 网格变形
 
-This sample demonstrates BlendShape and SkinWeight entities. Enter Play mode to see the simple mesh deformations.
+此示例演示了 BlendShape 和 SkinWeight entities。进入播放模式以查看简单的网格变形。
 
 <img src="../../../../READMEimages/MeshDeformations.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene shows various meshes using combinations of common mesh deformations. The red meshes are deformed using blend shapes. The blue meshes are deformed using skinning only. In purple you can see both methods applied to the same mesh. All values and transforms are animated using a simple animation system that writes to the ECS transform components. These in turn are used to calculate the skin matrices picked up by the Mesh Deformation system.
+scene 使用常见网格变形的组合显示各种网格。红色网格使用混合形状进行变形。蓝色网格仅使用蒙皮进行变形。在紫色中，您可以看到两种方法都应用于同一网格。所有值和变换都使用写入 ECS 变换 components 的简单动画 system 进行动画处理。这些依次用于计算网格变形 system 拾取的皮肤矩阵。
 
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. Note that to use this sample you need to add the ENABLE_COMPUTE_DEFORMATIONS define symbol to the **Scripting Define Symbols** list in **Edit > ProjectSettings > Player > Other Settings**
-2. In the Hierarchy, select one of the Subscenes
-3. In the Inspector, click Open
-4. Select the **cube_test_mesh** object, note that the material must use a Shader Graph that includes the Compute Deformation node
+1. 请注意，要使用此示例，您需要将 ENABLE_COMPUTE_DEFORMATIONS 定义符号添加到 **Edit > ProjectSettings > Player > Other Settings** 中的 **Scripting Define Symbols** 列表中
+2. 在 Hierarchy 中，选择子场景之一
+3. 在 Inspector 中，单击“打开”
+4. 选择**cube_test_mesh**对象，注意材质必须使用包含 Compute Deformation 节点的 Shader Graph
 
-## More information
+## 更多信息
 
-For more information about deformations, see the [Mesh Deformations](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/mesh_deformations.html) documentation.
+有关变形的更多信息，请参阅[网格变形](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/mesh_deformations.html) 文档。

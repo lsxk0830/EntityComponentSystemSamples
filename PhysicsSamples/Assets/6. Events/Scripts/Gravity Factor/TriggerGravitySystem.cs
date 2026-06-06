@@ -4,9 +4,9 @@ using Unity.Entities;
 using Unity.Physics;
 using Unity.Physics.Systems;
 
-// This system sets the PhysicsGravityFactor of any dynamic body that enters a Trigger Volume.
-// A Trigger Volume is defined by a PhysicsShapeAuthoring with the `Is Trigger` flag ticked and a
-// TriggerGravityFactor behaviour added.
+// 此 system 设置进入 Trigger 卷的任何动态主体的 PhysicsGravityFactor。
+// Trigger 卷由 PhysicsShapeAuthoring 定义，其中勾选了 `Is Trigger` 标志和
+// 添加了 TriggerGravityFactor 行为。
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
@@ -69,14 +69,14 @@ public partial struct TriggerGravitySystem : ISystem
             bool isBodyATrigger = TriggerGravityFactorGroup.HasComponent(entityA);
             bool isBodyBTrigger = TriggerGravityFactorGroup.HasComponent(entityB);
 
-            // Ignoring Triggers overlapping other Triggers
+            // 忽略与其他触发器重叠的触发器
             if (isBodyATrigger && isBodyBTrigger)
                 return;
 
             bool isBodyADynamic = PhysicsVelocityGroup.HasComponent(entityA);
             bool isBodyBDynamic = PhysicsVelocityGroup.HasComponent(entityB);
 
-            // Ignoring overlapping static bodies
+            // 忽略重叠的静态物体
             if ((isBodyATrigger && !isBodyBDynamic) ||
                 (isBodyBTrigger && !isBodyADynamic))
                 return;
@@ -85,13 +85,13 @@ public partial struct TriggerGravitySystem : ISystem
             var dynamicEntity = isBodyATrigger ? entityB : entityA;
 
             var triggerGravityComponent = TriggerGravityFactorGroup[triggerEntity];
-            // tweak PhysicsGravityFactor
+            // 调整 PhysicsGravityFactor
             {
                 var component = PhysicsGravityFactorGroup[dynamicEntity];
                 component.Value = triggerGravityComponent.GravityFactor;
                 PhysicsGravityFactorGroup[dynamicEntity] = component;
             }
-            // damp velocity
+            // 阻尼速度
             {
                 var component = PhysicsVelocityGroup[dynamicEntity];
                 component.Linear *= triggerGravityComponent.DampingFactor;

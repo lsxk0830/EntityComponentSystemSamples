@@ -6,20 +6,20 @@ namespace Baking.BlobAssetBaker
 {
     public class BlobAnimationAuthoring : MonoBehaviour
     {
-        // We'll bake this animation curve into a blob.
+        // 我们将把这条动画曲线烘焙成一个斑点。
         public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         class Baker : Baker<BlobAnimationAuthoring>
         {
             public override void Bake(BlobAnimationAuthoring authoring)
             {
-                // TransformUsageFlags.Dynamic gives the entity LocalTransform and LocalToWorld components.
+                // TransformUsageFlags.Dynamic 给出 entity LocalTransform 和 LocalToWorld components。
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
 
                 var blobReference = CreateBlob(authoring.Curve, Allocator.Persistent);
 
-                // Ownership of the BlobAsset is passed to the BlobAssetStore,
-                // which will automatically manage the lifetime and deduplication of the BlobAsset.
+                // BlobAsset 的所有权传递给 BlobAssetStore，
+                // 它将自动管理 BlobAsset 的生命周期和重复数据删除。
                 AddBlobAsset<AnimationBlobData>(ref blobReference, out _);
 
                 AddComponent(entity, new Animation { AnimBlobReference = blobReference });
@@ -28,10 +28,10 @@ namespace Baking.BlobAssetBaker
             BlobAssetReference<AnimationBlobData> CreateBlob(AnimationCurve curve, Allocator allocator,
                 Allocator builderAllocator = Allocator.TempJob)
             {
-                // Make sure to dispose the builder once the blob asset is created.
+                // 确保在创建 blob 资产后立即处置生成器。
                 using (var blobBuilder = new BlobBuilder(builderAllocator))
                 {
-                    // A blob asset is built starting with a root struct (AnimationBlobData in this case).
+                    // Blob 资源是从根结构（本例中为 AnimationBlobData）开始构建的。
                     ref var root = ref blobBuilder.ConstructRoot<AnimationBlobData>();
                     int keyCount = 12;
 
@@ -39,7 +39,7 @@ namespace Baking.BlobAssetBaker
                     root.InvLength = 1.0F / endTime;
                     root.KeyCount = keyCount;
 
-                    // Build the Keys array.
+                    // 构建 Keys 数组。
                     var array = blobBuilder.Allocate(ref root.Keys, keyCount + 1);
                     for (int i = 0; i < keyCount; i++)
                     {
@@ -49,7 +49,7 @@ namespace Baking.BlobAssetBaker
 
                     array[keyCount] = array[keyCount - 1];
 
-                    // Copy the builder data into the final blob asset form.
+                    // 将构建器数据复制到最终的 Blob 资产表单中。
                     return blobBuilder.CreateBlobAssetReference<AnimationBlobData>(allocator);
                 }
             }
@@ -62,8 +62,8 @@ namespace Baking.BlobAssetBaker
         public float Time;
     }
 
-    // The root struct of our blob.
-    // A very simple animation curve using linear interpolation at fixed intervals.
+    // 我们 blob 的根结构。
+    // 一个非常简单的动画曲线，使用固定间隔的线性 interpolation。
     public struct AnimationBlobData
     {
         public BlobArray<float> Keys;

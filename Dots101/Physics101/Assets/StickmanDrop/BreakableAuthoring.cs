@@ -10,7 +10,7 @@ namespace StickmanDrop
             public override void Bake(BreakableAuthoring authoring)
             {
                 var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                AddComponent<Breakable>(entity);           
+                AddComponent<Breakable>(entity);
             }
         }
     }

@@ -6,7 +6,7 @@ using Unity.Scenes;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // This system will load/unload the tile scenes based on the tile distance to Relevant entities
+    // 此 system 将根据与相关 entities 的图块距离加载/卸载图块 scenes
     [UpdateAfter(typeof(TileDistanceSystem))]
     partial struct TileLoadingSystem : ISystem
     {
@@ -31,7 +31,7 @@ namespace Streaming.SceneManagement.CompleteSample
 
             NativeList<LoadableTile> priorityLoadList = new NativeList<LoadableTile>(tileEntities.Length, Allocator.Temp);
 
-            // Find all the scenes that should be loaded/unloaded based on the distances to relevant entities
+            // 根据到相关 entities 的距离找到所有应该装载/卸载的 scenes
             for (int index = 0; index < tileInfos.Length; ++index)
             {
                 if (tileDistances[index] < tileInfos[index].LoadingDistanceSq)
@@ -44,10 +44,10 @@ namespace Streaming.SceneManagement.CompleteSample
                 }
                 else if (tileDistances[index] > tileInfos[index].UnloadingDistanceSq)
                 {
-                    // Check if the tile has been loaded before
+                    // 检查之前是否已经加载过 tile
                     if (state.EntityManager.HasComponent<SubsceneEntity>(tileEntities[index]))
                     {
-                        // We unload the scene
+                        // 我们卸载 scene
                         var complexSceneSubsceneEntity =
                             state.EntityManager.GetComponentData<SubsceneEntity>(tileEntities[index]);
                         SceneSystem.UnloadScene(state.WorldUnmanaged, complexSceneSubsceneEntity.Value, SceneSystem.UnloadParameters.DestroyMetaEntities);
@@ -56,18 +56,18 @@ namespace Streaming.SceneManagement.CompleteSample
                 }
             }
 
-            // Prioritize loading sections closest to the relevant entities
+            // 优先加载最接近相关 entities 的部分
             priorityLoadList.Sort(new SectionDistanceComparer());
 
-            // Load
+            // 加载
             int loading = 0;
-            int maxToLoad = 4; // limit how many we load at one time
+            int maxToLoad = 4; // 限制我们一次加载的数量
             foreach (var loadEntry in priorityLoadList)
             {
                 int tileIndex = loadEntry.TileIndex;
                 if (!state.EntityManager.HasComponent<SubsceneEntity>(tileEntities[tileIndex]))
                 {
-                    // Load the Scene as a new instance and disable the auto loading of the sections
+                    // 将 Scene 加载为新实例并禁用各部分的自动加载
                     var sceneEntity = SceneSystem.LoadSceneAsync(state.WorldUnmanaged,
                         tileInfos[tileIndex].Scene, new SceneSystem.LoadParameters()
                         {
@@ -78,36 +78,36 @@ namespace Streaming.SceneManagement.CompleteSample
 
                     state.EntityManager.AddComponent(sceneEntity, loadComponentTypeSet);
 
-                    // Postpone adding the PostLoadCommandBuffer so most of the load code can be Bursted
+                    // 推迟添加 PostLoadCommandBuffer，以便大部分加载代码可以被突发
                     state.EntityManager.SetComponentData(sceneEntity, new RequiresPostLoadCommandBuffer
                     {
                         Position = center,
                         Rotation = tileInfos[tileIndex].Rotation
                     });
 
-                    // We also store the center of the tile, to make it accessible for distance checks on it during the section loading
+                    // 我们还存储图块的中心，以便在部分加载期间可以对其进行距离检查
                     state.EntityManager.SetComponentData(sceneEntity, new TileEntity
                     {
                         Value = tileEntities[tileIndex]
                     });
 
-                    // We store the scene entity to handle the unload later
+                    // 我们存储 scene entity 以便稍后处理卸载
                     state.EntityManager.AddComponentData(tileEntities[tileIndex], new SubsceneEntity
                     {
                         Value = sceneEntity
                     });
 
-                    // Increase the loading count, so we only load a limit number of scenes simultaneously
+                    // 增加加载数量，因此我们只能同时加载有限数量的 scenes
                     ++loading;
                 }
                 else
                 {
-                    // We need to check if the current tile is loading
+                    // 我们需要检查当前图块是否正在加载
                     var subSceneEntityComponent = state.EntityManager.GetComponentData<SubsceneEntity>(tileEntities[tileIndex]);
                     var streamingState = SceneSystem.GetSceneStreamingState(state.WorldUnmanaged, subSceneEntityComponent.Value);
                     if (streamingState != SceneSystem.SceneStreamingState.LoadedSuccessfully && streamingState != SceneSystem.SceneStreamingState.LoadedSectionEntities)
                     {
-                        // Increase the loading count, so we only load a limit number of scenes simultaneously
+                        // 增加加载数量，因此我们只能同时加载有限数量的 scenes
                         ++loading;
                     }
                 }

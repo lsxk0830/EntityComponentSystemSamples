@@ -51,14 +51,14 @@ public partial struct DriveClientAsDynamicSystem : ISystem
                 var serverMass = m_PhysicsMass[proxyDriver.ValueRO.rootEntity];
                 if (serverMass.IsKinematic)
                 {
-                    // set something big if we have a kinematic body on server, otherwise take the server mass as it is
+                    // 如果我们在 server 上有运动体，则设置较大的值，否则按原样采用 server 质量
                     serverMass.InverseMass = 1.0f / 10000f;
                 }
 
                 commandBuffer.SetComponent(client, serverMass);
                 if (m_GravityFactor.HasComponent(client))
                 {
-                    m_GravityFactor[client] = new PhysicsGravityFactor { Value = 0.0f }; // disable gravity
+                    m_GravityFactor[client] = new PhysicsGravityFactor { Value = 0.0f }; // 禁用重力
                 }
                 else
                 {

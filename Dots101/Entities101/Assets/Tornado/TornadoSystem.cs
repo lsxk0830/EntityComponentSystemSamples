@@ -6,7 +6,7 @@ using Unity.Transforms;
 namespace Tutorials.Tornado
 {
     /*
-     * Updates the swirling boxes that form the tornado.
+     * 更新形成龙卷风的旋转盒子。
      */
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     public partial struct TornadoSystem : ISystem

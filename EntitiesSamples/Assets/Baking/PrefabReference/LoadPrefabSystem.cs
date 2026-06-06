@@ -20,10 +20,10 @@ namespace Baking.PrefabReference
             var config = SystemAPI.GetSingleton<Config>();
             var configEntity = SystemAPI.GetSingletonEntity<Config>();
 
-            // Adding the RequestEntityPrefabLoaded component will request the prefab to be loaded.
-            // It will load the entity scene file corresponding to the prefab and add a PrefabLoadResult
-            // component to the entity. The PrefabLoadResult component contains the entity you can use to
-            // instantiate the prefab (see the PrefabReferenceSpawnerSystem system).
+            // 添加 RequestEntityPrefabLoaded component 将请求加载 prefab。
+            // 它将加载 prefab 对应的 entity scene 文件，并添加一个 PrefabLoadResult
+            // component 至 entity。PrefabLoadResult component 包含 entity，您可以使用
+            // 实例化 prefab（请参阅 PrefabReferenceSpawnerSystem system）。
             state.EntityManager.AddComponentData(configEntity, new RequestEntityPrefabLoaded
             {
                 Prefab = config.PrefabReference

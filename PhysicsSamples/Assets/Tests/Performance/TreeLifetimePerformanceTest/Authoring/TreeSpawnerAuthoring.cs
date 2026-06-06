@@ -24,7 +24,7 @@ namespace Unity.Physics
                 if (authoring.TreePrefab == null) return;
                 var prefabTreeEntity = GetEntity(authoring.TreePrefab, TransformUsageFlags.Dynamic);
 
-                // Is added to the prefab
+                // 添加到 prefab
                 var createComponent = new TreeSpawnerComponent
                 {
                     TreeEntity = prefabTreeEntity,
@@ -43,7 +43,7 @@ namespace Unity.Physics
         }
     }
 
-    // This component is used once to initialize the tree spawner and then deleted
+    // 这个 component 使用一次来初始化树生成器，然后删除
     public struct TreeSpawnerComponent : IComponentData
     {
         public Entity TreeEntity;
@@ -58,7 +58,7 @@ namespace Unity.Physics
         public bool EnableColourChange;
     }
 
-    // A component placed on the tree prefab entity (aka: tree root) to keep track of the life cycle of the tree
+    // A component 放置在树 prefab entity （又名：树根）上，用于跟踪树的生命周期
     public struct TreeComponent : IComponentData
     {
         public float3 SpawningPosition;
@@ -71,30 +71,30 @@ namespace Unity.Physics
         public LifeCycleStates LifeCycleTracker;
     }
 
-    // Used to track the life cycle of the tree rather than adding tags and doing structural changes
-    // For states with names beginning with 'Is_': these states all decrement various timers.
-    // For states with names beginning with 'TransitionTo_': these states are used as flags to signal external systems
+    // 用于跟踪树的生命周期，而不是添加标签和进行结构更改
+    // 对于名称以“Is_”开头的状态：这些状态都会减少各种计时器。
+    // 对于名称以“TransitionTo_”开头的状态：这些状态用作向外部 systems 发出信号的标志
     public enum LifeCycleStates
     {
-        IsGrowing,                  // countdown state to decrement GrowTimer
-        TransitionToDead,           // Flag for TreeDeathSystem: Turn tree orange, transition trunk & top from static to dynamic bodies
-        IsDead,                     // countdown state to decrement DeathTimer
-        TransitionToDelete,         // Flag for TreeDeletionSystem: delete the tree top and tree trunk entities
-        IsRegrown,                  // countdown state to decrement RegrowTimer
-        TransitionToInsert          // Flag for TreeRegrowSystem: respawn the tree
+        IsGrowing,                  // 倒计时状态递减 GrowTimer
+        TransitionToDead,           // TreeDeathSystem 的标志：将树变成橙色，将树干和顶部从静态主体过渡到动态主体
+        IsDead,                     // 倒计时状态递减 DeathTimer
+        TransitionToDelete,         // TreeDeletionSystem 的标志：删除树顶和树干 entities
+        IsRegrown,                  // 倒计时状态递减 RegrowTimer
+        TransitionToInsert          // TreeRegrowSystem 的标志：重生树
     }
 
-    // Track the state added to the each piece of the tree (root, top, trunk) to identify it for the systems outside of TreeLifetimeSystem
+    // 跟踪添加到树的每个部分（根、顶部、树干）的状态，以便为 TreeLifetimeSystem 外部的 systems 识别它
     public struct TreeState : IComponentData
     {
         public enum States : byte
         {
-            Default,                    // Carry on
-            TriggerTreeGrowthSystem,    // Set: TreeGrowthSystem, Used: TreeGrowthSystem, Lifecycle: IsGrowing
-            TriggerWholeTreeToDynamic,  // Set: TreeLifecycleSystem, Used: TreeDeathSystem, Lifecycle: TransitionToDead
-            TriggerChangeTreeColor,     // Set: TreeLifecycleSystem during TransitionToDead, Used: TreeDeathSystem, Lifecycle: TransitionToDead
-            TransitionToDeadDone,       // Set: TreeDeathSystem, Used: TreeDeathSystem, Lifecycle: TransitionToDead
-            TriggerDeleteTrunkAndTop,   //Set: TreeLifecycleSystem, Used: TreeDeletionSystem, Lifecycle: TransitionToDelete
+            Default,                    // 继续
+            TriggerTreeGrowthSystem,    // 套装：TreeGrowthSystem，已使用：TreeGrowthSystem，生命周期：IsGrowing
+            TriggerWholeTreeToDynamic,  // 套装：TreeLifecycleSystem，已使用：TreeDeathSystem，生命周期：TransitionToDead
+            TriggerChangeTreeColor,     // 设置：TransitionToDead 期间的 TreeLifecycleSystem，已使用：TreeDeathSystem，生命周期：TransitionToDead
+            TransitionToDeadDone,       // 套装：TreeDeathSystem，已使用：TreeDeathSystem，生命周期：TransitionToDead
+            TriggerDeleteTrunkAndTop,   //套装：TreeLifecycleSystem，已使用：TreeDeletionSystem，生命周期：TransitionToDelete
         }
 
         public static TreeState Default => new TreeState { Value = States.Default };
@@ -102,6 +102,6 @@ namespace Unity.Physics
         public States Value;
     }
 
-    // Tag used in TreeRegrowSystem to identify what entities need a second pass to be respawned
+    // TreeRegrowSystem 中使用的标签，用于识别 entities 需要第二次重生的内容
     public struct TempIntermediateTreeSpawningTag : IComponentData {}
 }

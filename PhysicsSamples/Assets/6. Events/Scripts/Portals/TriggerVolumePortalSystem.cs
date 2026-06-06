@@ -78,28 +78,28 @@ public partial struct TriggerVolumePortalSystem : ISystem
                 var triggerEvent = triggerBuffer[i];
                 var otherEntity = triggerEvent.GetOtherEntity(portalEntity);
 
-                // check if we have already processed and potentially teleported this entity.
-                // If yes, skip. This can occur if the entity contains a compound collider.
+                // 检查我们是否已经处理并可能传送此 entity。
+                // 如果是，请跳过。如果 entity 包含化合物 collider，则可能会发生这种情况。
                 if (!processedEntities.Add(otherEntity))
                 {
                     continue;
                 }
 
-                // exclude other triggers, static bodies and processed events
+                // 排除其他触发器、静态体和已处理事件
                 if (triggerEvent.State != StatefulEventState.Enter || !NonTriggerDynamicBodyMask.MatchesIgnoreFilter(otherEntity))
                 {
                     continue;
                 }
 
-                // Check if entity just teleported to this portal,
-                // and if it did, decrement TransferCount
+                // 检查 entity 是否刚刚传送到此门户，
+                // 如果是，则递减 TransferCount
                 if (triggerVolumePortal.TransferCount != 0)
                 {
                     triggerVolumePortal.TransferCount--;
                     continue;
                 }
 
-                // a static body may be in a hierarchy, in which case Translation and Rotation may not be in world space
+                // 静态主体可能位于层次结构中，在这种情况下，平移和旋转可能不在 world 空间中
                 var portalTransform = HierarchyChildMask.MatchesIgnoreFilter(portalEntity)
                     ? Math.DecomposeRigidBodyTransform(ComponentDatas.LocalToWorldData[portalEntity].Value)
 

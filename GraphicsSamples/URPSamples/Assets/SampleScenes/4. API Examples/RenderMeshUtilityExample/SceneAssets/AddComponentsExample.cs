@@ -18,7 +18,7 @@ public class AddComponentsExample : MonoBehaviour
     public int m_h = 30;
 
 
-    // Example Burst job that creates many entities
+    // 创建许多 entities 的示例 Burst job
     [GenerateTestsForBurstCompatibility]
     public struct SpawnJob : IJobParallelFor
     {
@@ -30,10 +30,10 @@ public class AddComponentsExample : MonoBehaviour
 
         public void Execute(int index)
         {
-            // Clone the Prototype entity to create a new entity.
+            // 克隆原型 entity 以创建新的 entity。
             var e = Ecb.Instantiate(index, Prototype);
-            // Prototype has all correct components up front, can use SetComponent to
-            // set values unique to the newly created entity, such as the transform.
+            // 原型前面有所有正确的 components，可以使用 SetComponent 来
+            // 设置新创建的 entity 特有的值，例如变换。
             int matIndex = singleMat ? 0 : index;
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(matIndex, 0));
             Ecb.SetComponent(index, e, new LocalToWorld {Value = ComputeTransform(index)});
@@ -65,8 +65,8 @@ public class AddComponentsExample : MonoBehaviour
                 var mat = new Material(m_material);
                 Color col = Color.HSVToRGB(((float)(i * 10) / (float)objCount) % 1.0f, 0.7f, 1.0f);
                 //                Color col = Color.HSVToRGB(Random.Range(0.0f,1.0f), 1.0f, 1.0f);
-                mat.SetColor("_Color", col);              // set for LW
-                mat.SetColor("_BaseColor", col);          // set for HD
+                mat.SetColor("_Color", col);              // 设置为 LW
+                mat.SetColor("_BaseColor", col);          // 设置为 HD
                 matList.Add(mat);
             }
         }
@@ -75,19 +75,19 @@ public class AddComponentsExample : MonoBehaviour
             matList.Add(m_material);
         }
 
-        // Create a RenderMeshDescription using the convenience constructor
-        // with named parameters.
+        // 使用便捷构造函数创建 RenderMeshDescription
+        // 带有命名参数。
         var desc = new RenderMeshDescription(
             shadowCastingMode: ShadowCastingMode.Off,
             receiveShadows: false);
 
         var renderMeshArray = new RenderMeshArray(matList.ToArray(), new[] { Mesh });
 
-        // Create empty base entity
+        // 创建空底座 entity
         var prototype = entityManager.CreateEntity();
 
-        // Call AddComponents to populate base entity with the components required
-        // by Entities Graphics
+        // 调用 AddComponents 以使用所需的 components 填充基础 entity
+        // 通过 Entities Graphics
         RenderMeshUtility.AddComponents(
             prototype,
             entityManager,
@@ -96,9 +96,9 @@ public class AddComponentsExample : MonoBehaviour
             MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
         entityManager.AddComponentData(prototype, new LocalToWorld());
 
-        // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
-        // which can be either a Prefab or an entity created at run time like in this sample.
-        // This is the fastest and most efficient way to create entities at run time.
+        // 通过克隆预先创建的原型 entity，在 Burst job 中生成大部分 entities，
+        // 它可以是在 run 时间创建的 Prefab 或 entity，如本示例中所示。
+        // 这是在 run 时间创建 entities 的最快且最有效的方法。
         var spawnJob = new SpawnJob
         {
             Prototype = prototype,

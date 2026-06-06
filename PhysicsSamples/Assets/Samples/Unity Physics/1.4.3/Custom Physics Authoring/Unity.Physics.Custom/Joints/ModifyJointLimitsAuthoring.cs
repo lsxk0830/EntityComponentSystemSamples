@@ -13,7 +13,7 @@ using FloatRange = Unity.Physics.Math.FloatRange;
 
 namespace Unity.Physics.Authoring
 {
-    // stores an initial value and a pair of scalar curves to apply to relevant constraints on the joint
+    // 存储初始值和一对标量曲线以应用于 joint 上的相关约束
     struct ModifyJointLimits : ISharedComponentData, IEquatable<ModifyJointLimits>
     {
         public PhysicsJoint InitialValue;
@@ -29,7 +29,7 @@ namespace Unity.Physics.Authoring
             unchecked((AngularRangeScalar.GetHashCode() * 397) ^ LinearRangeScalar.GetHashCode());
     }
 
-    // an authoring component to add to a GameObject with one or more Joint
+    // 将 authoring component 添加到具有一个或多个 Joint 的 GameObject
     public class ModifyJointLimitsAuthoring : MonoBehaviour
     {
         public ParticleSystem.MinMaxCurve AngularRangeScalar = new ParticleSystem.MinMaxCurve(
@@ -97,7 +97,7 @@ namespace Unity.Physics.Authoring
         }
     }
 
-    // after joints have been converted, find the entities they produced and add ModifyJointLimits to them
+    // 关节转换后，找到它们生成的 entities，并将 ModifyJointLimits 添加到其中
     [UpdateAfter(typeof(EndJointBakingSystem))]
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     partial struct ModifyJointLimitsBakingSystem : ISystem
@@ -129,7 +129,7 @@ namespace Unity.Physics.Authoring
                 return;
             }
 
-            // Collect all the joints
+            // 收集所有关节
             NativeParallelMultiHashMap<Entity, (Entity, PhysicsJoint)> jointsLookUp =
                 new NativeParallelMultiHashMap<Entity, (Entity, PhysicsJoint)>(10, Allocator.TempJob);
 
@@ -165,7 +165,7 @@ namespace Unity.Physics.Authoring
         }
     }
 
-    // apply an animated effect to the limits on supported types of joints
+    // 对支持的关节类型的限制应用动画效果
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(PhysicsSystemGroup), OrderLast = true)]
     partial struct ModifyJointLimitsSystem : ISystem
@@ -185,10 +185,10 @@ namespace Unity.Physics.Authoring
                     modification.LinearRangeScalar.curveMax.Evaluate(time)
                 );
 
-                // in each case, get relevant properties from the initial value based on joint type, and apply scalar
+                // 在每种情况下，根据 joint 类型从初始值获取相关属性，并应用标量
                 switch (joint.ValueRW.JointType)
                 {
-                    // Custom type could be anything, so this demo just applies changes to all constraints
+                    // 自定义类型可以是任何类型，因此此演示仅将更改应用于所有约束
                     case JointType.Custom:
                         var constraints = modification.InitialValue.GetConstraints();
                         for (var i = 0; i < constraints.Length; i++)
@@ -204,7 +204,7 @@ namespace Unity.Physics.Authoring
 
                         joint.ValueRW.SetConstraints(constraints);
                         break;
-                    // other types have corresponding getters/setters to retrieve more meaningful data
+                    // 其他类型有相应的 getter/setter 来检索更有意义的数据
                     case JointType.LimitedDistance:
                         var distanceRange = modification.InitialValue.GetLimitedDistanceRange();
                         joint.ValueRW.SetLimitedDistanceRange(distanceRange * (float2)animatedLinearScalar);
@@ -217,7 +217,7 @@ namespace Unity.Physics.Authoring
                         var distanceOnAxis = modification.InitialValue.GetPrismaticRange();
                         joint.ValueRW.SetPrismaticRange(distanceOnAxis * (float2)animatedLinearScalar);
                         break;
-                    // ragdoll joints are composed of two separate joints with different meanings
+                    // 布娃娃关节由两个具有不同含义的独立关节组成
                     case JointType.RagdollPrimaryCone:
                         modification.InitialValue.GetRagdollPrimaryConeAndTwistRange(
                             out var maxConeAngle,
@@ -233,7 +233,7 @@ namespace Unity.Physics.Authoring
                         joint.ValueRW.SetRagdollPerpendicularConeRange(angularPlaneRange *
                             (float2)animatedAngularScalar);
                         break;
-                    // remaining types have no limits on their Constraint atoms to meaningfully modify
+                    // 其余类型对其 Constraint 原子进行有意义的修改没有限制
                     case JointType.BallAndSocket:
                     case JointType.Fixed:
                     case JointType.Hinge:

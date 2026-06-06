@@ -1,18 +1,18 @@
 # DisabledEntities
 
-This sample demonstrates disabled entities.
+此示例演示了禁用的 entities。
 
 <img src="../../../../READMEimages/DisabledEntities.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains 3 cubes with one of them disabled. This means only two cubes render to the screen. Working with disabled Entities is no different to GameObjects in the Editor.
+scene 包含 3 个立方体，其中之一已禁用。这意味着只有两个立方体渲染到屏幕上。使用禁用的 Entities 与 Editor 中的 GameObjects 没有什么不同。
 
-Disabling an entity disables everything. To stop rendering the entity using an ECS script, add the DisableRendering tag to the entity.
+禁用 entity 会禁用所有内容。要使用 ECS 脚本停止渲染 entity，请将 DisableRendering 标记添加到 entity。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, open the Subscenes
-2. Select the disabled Cube
-3. In the Inspector, note that the Cube object is disabled. 
+1. 在 Hierarchy 中，打开子场景
+2. 选择禁用的立方体
+3. 在 Inspector 中，请注意 Cube 对象已禁用。
 

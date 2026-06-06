@@ -46,7 +46,7 @@ namespace Unity.Physics.Tests
                 var bodies = PhysicsWorld.Bodies;
                 for (int i = 0; i < bodies.Length; i++)
                 {
-                    // Default tags are 0, write 1 to each of them
+                    // 默认标签为 0，每个标签写入 1
                     var body = bodies[i];
                     body.CustomTags = 1;
                     bodies[i] = body;

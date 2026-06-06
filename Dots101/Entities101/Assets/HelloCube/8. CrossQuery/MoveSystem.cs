@@ -21,7 +21,7 @@ namespace HelloCube.CrossQuery
 
             moveTimer += dt;
 
-            // periodically reverse direction and reset timer
+            // 定期反转方向并重置计时器
             bool flip = false;
             if (moveTimer > 3.0f)
             {
@@ -37,7 +37,7 @@ namespace HelloCube.CrossQuery
                     velocity.ValueRW.Value *= -1;
                 }
 
-                // move
+                // 移动
                 transform.ValueRW.Position += velocity.ValueRO.Value * dt;
             }
         }

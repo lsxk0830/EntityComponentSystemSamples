@@ -1,38 +1,38 @@
-# HelloNetcode Secure Connection sample
+# HelloNetcode 安全连接示例
 
-The NetCode package provides a way to create client and server worlds and securely connect them together (client connects to server) by using a custom bootstrapper.
+NetCode package 提供了一种创建 client 和 server worlds 并将它们安全地连接在一起的方法（client 连接到 server）。引导程序。
 
-See
+看
 
-* _Establish a connection_ section in the [Getting Started](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/getting-started.html) guide
+* [入门](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/getting-started.html) 指南中的 _ 建立连接 _ 部分
 * [Client Server Worlds](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/client-server-worlds.html)
-* [Network Connection](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
-* [Secure Client and Server](https://docs-multiplayer.unity3d.com/transport/current/secure-connection)
-* [Generate Required Keys and Certificate](https://docs-multiplayer.unity3d.com/transport/current/secure-connection#generating-the-required-keys-and-certificates-with-openssl)
+* [网络连接](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
+* [安全 Client 和 Server](https://docs-multiplayer.unity3d.com/transport/current/secure-connection)
+* [生成所需密钥和证书](https://docs-multiplayer.unity3d.com/transport/current/secure-connection#generating-the-required-keys-and-certificates-with-openssl)
 
-## Requirements
+## 要求
 
-Only needs the bootstrap to set-up client and server world.
+只需要引导程序设置 client 和 server world。
 
 * BootstrapAndFrontend
 
-## Sample description
+## 示例描述
 
-This sample shows the modification needed to the bootstrap functionality to enable the secure connection feature.
+此示例显示了为启用安全连接功能而需要对引导程序功能进行的修改。
 
-This sample contains no scene as nothing needs to be added to the scene to enable this feature.
+此示例不包含 scene，因为无需向 scene 添加任何内容即可启用此功能。
 
-To set up a secure connection on the network driver a custom/manual driver needs to be set up so different network parameters can be passed to it.
-The custom driver constructor needs to be set up in the bootstrap to be there early enough to replace the default driver. This is done in _SecureBootStrapExtension.cs_ but it's disabled with the _ENABLE_NETCODE_SAMPLE_SECURE_ define at the top of the file, since enabling it means it's enforced globally through the whole project. To enable it just uncomment the define there as well as in _NetworkParams.cs_ and _SecureDriverConstructor.cs_.
+要在网络驱动程序上建立安全连接，需要设置自定义/手动驱动程序，以便可以将不同的网络参数传递给它。
+需要在引导程序中设置自定义驱动程序构造函数，以便尽早替换默认驱动程序。这是在 _SecureBootStrapExtension.cs_ 中完成的，但它被文件顶部的 _ENABLE_NETCODE_SAMPLE_SECURE_ 定义禁用，因为启用它意味着它在整个项目中全局强制执行。要启用它，只需取消注释那里以及 _NetworkParams.cs_ 和 _SecureDriverConstructor.cs_ 中的定义。
 
-### Generating secure parameters
+### 生成安全参数
 
-Inside _NetworkParams.cs_ you will see static variables containing this sample's generated certificate. For your own game you would generate these by yourself. Follow the link '[Generate Required Keys and Certificate]' above to see how to do this.
+在 _NetworkParams.cs_ 内，您将看到包含此​​示例生成的证书的静态变量。对于您自己的游戏，您可以自己生成这些。请点击上面的链接“[生成所需的密钥和证书]”，了解如何执行此操作。
 
-**NOTE:** Make sure that you do not ship your generated keys and certificates when publishing your game.
-It is very easy for a malicious user to decompile the source code even if obfuscated and see the keys.
+**NOTE：** 确保您在发布游戏时不会发送生成的密钥和证书。
+即使源代码被混淆，恶意用户也很容易反编译并看到密钥。
 
-### Passing secure parameters
+### 传递安全参数
 
-The generated certificates are passed to the network driver in _SecureDriverConstructor.cs_. This is using a helper function to set up default values on the network settings.
-You can change this to manually construct the network driver instance, or pass in your own network settings using the appropriate override.
+生成的证书将传递到 _SecureDriverConstructor.cs_ 中的网络驱动程序。这是使用辅助函数来设置网络设置的默认值。
+您可以更改此设置以手动构建网络驱动程序实例，或使用适当的覆盖传递您自己的网络设置。

@@ -6,8 +6,8 @@ using UnityEngine;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Stores <see cref="ChangedRpc.UpdateType"/> for a given "NetworkConnection" entity.
-    ///     See <see cref="ServerPlayerListSystem" /> and <see cref="ClientPlayerListSystem" />.
+    ///     存储给定“NetworkConnection”entity 的 <see cref="ChangedRpc.UpdateType"/>。
+    ///     请参见 <see cref="ServerPlayerListSystem" /> 和 <see cref="ClientPlayerListSystem" />。
     /// </summary>
     public struct PlayerListEntry : ICleanupComponentData
     {
@@ -17,13 +17,13 @@ namespace Unity.NetCode.Samples.PlayerList
             public FixedString64Bytes Value;
         }
 
-        /// <summary>Sent by the server to a client if the clients username is invalid.</summary>
+        /// 如果 clients 用户名是 invalid.</summary>，则 <summary>Sent 由 server 到 client
         public struct InvalidUsernameResponseRpc : IRpcCommand
         {
             public FixedString64Bytes RequestedUsername;
         }
 
-        /// <remarks>Sent by server any time the clients username or state changes.</remarks>
+        /// <remarks>Sent 由 server 任何时候 clients 用户名或状态 changes.</remarks>
         public struct ChangedRpc : IRpcCommand
         {
             /// <inheritdoc cref="Reason" />
@@ -31,31 +31,31 @@ namespace Unity.NetCode.Samples.PlayerList
 
             public enum UpdateType : byte
             {
-                /// <summary>A player (who I'm aware of) disconnected.</summary>
+                /// <summary>A 玩家（我知道的）disconnected.</summary>
                 PlayerDisconnect = 0,
-                /// <summary>This is a new joiner, who joined AFTER me.</summary>
+                /// <summary>This 是新加入者，加入了 AFTER me.</summary>
                 NewJoiner,
-                /// <summary>This is an existing player, who joined the game BEFORE me.</summary>
+                /// <summary>This 是现有玩家，已加入游戏 BEFORE me.</summary>
                 ExistingPlayer,
-                /// <summary>A player changed their username.</summary>
+                /// <summary>A 玩家更改了 username.</summary>
                 UsernameChange,
             }
 
             public UpdateType ChangeType;
 
-            /// <remarks>Client cannot infer NetworkId as this RPC is sent from the server.</remarks>
+            /// <remarks>Client 无法推断 NetworkId，因为此 RPC 是从 server.</remarks> 发送的
             public int NetworkId;
 
             public ClientRegisterUsernameRpc Username;
 
             /// <summary>
-            ///     Invalid while <see cref="IsConnected" />. Stores the last disconnect reason / cause for this client, allowing
-            ///     other players to display the reason.
+            ///     <see cref="IsConnected" /> 时无效。存储最后一次断开连接的原因/导致此 client，允许
+            ///     其他玩家显示原因。
             /// </summary>
             public NetworkStreamDisconnectReason Reason;
         }
 
-        /// <summary>Stores the last received RPC for this player.</summary>
+        /// <summary>Stores 最后收到的此 player.</summary> 的 RPC
         public ChangedRpc State;
 
         public bool IsCreated => State.NetworkId != default;

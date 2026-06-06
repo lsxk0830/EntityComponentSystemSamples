@@ -14,7 +14,7 @@ namespace Boids
                 var frameIndex = sampledAnimationClip.FrameIndex;
                 var timeOffset = sampledAnimationClip.TimeOffset;
 
-                // Be careful not to cache Value (or any field in Value like Samples) inside of blob asset.
+                // 请注意，不要将 Value（或 Value 中的任何字段，如 Samples）缓存在 Blob 资源内。
                 var prevTranslation = sampledAnimationClip.TransformSamplesBlob.Value.TranslationSamples[frameIndex];
                 var nextTranslation = sampledAnimationClip.TransformSamplesBlob.Value.TranslationSamples[frameIndex + 1];
                 var prevRotation    = sampledAnimationClip.TransformSamplesBlob.Value.RotationSamples[frameIndex];
@@ -36,10 +36,10 @@ namespace Boids
                 var frameIndex = (int)(currentTime / sampledAnimationClip.SampleRate);
                 var timeOffset = (currentTime - (frameIndex * sampleRate)) * (1.0f / sampleRate);
 
-                // Just restart loop when over end:
-                //   - Don't interpolate between last and first frame.
-                //   - Don't worry about interpolating time into the start of the loop.
-                //   - Don't worry too much about exactly what the last frame even means.
+                // 结束时重新启动循环：
+                //   - 不要在最后一帧和第一帧之间进行插值。
+                //   - 不必担心将时间插入循环的开始。
+                //   - 不要太担心最后一帧的确切含义。
                 if (frameIndex >= (sampledAnimationClip.FrameCount - 2))
                 {
                     currentTime = 0.0f;

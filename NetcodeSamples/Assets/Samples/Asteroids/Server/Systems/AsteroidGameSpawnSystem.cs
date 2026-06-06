@@ -9,10 +9,10 @@ using Unity.Transforms;
 
 namespace Asteroids.Server
 {
-    /// <summary>Handles spawning of Ships and Asteroids.</summary>
+    /// <summary>Handles 生成船舶和 Asteroids.</summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    // The system was moved to the InitializationSystemGroup in order to avoid race-conditions with the Netcode systems
+    // system 已移至 InitializationSystemGroup，以避免与 Netcode systems 出现竞争条件
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial struct AsteroidGameSpawnSystem : ISystem
     {
@@ -58,7 +58,7 @@ namespace Asteroids.Server
             m_LevelQuery = state.GetEntityQuery(builder);
 
             builder.Reset();
-            builder.WithAllRW<NetworkId>(); // can't use NetworkStreamConnection, doesn't work for single world host.
+            builder.WithAllRW<NetworkId>(); // 无法使用 NetworkStreamConnection，不适用于单个 world 主机。
 
             m_ConnectionQuery = state.GetEntityQuery(builder);
 
@@ -70,8 +70,8 @@ namespace Asteroids.Server
             state.RequireForUpdate(m_LevelQuery);
             state.RequireForUpdate<AsteroidsSpawner>();
 
-            // Ensure every random is seeded uniquely (not Burst compatible)...
-            // AND that the random feedbacks into itself, ensuring better quality randomness for Asteroid spawns.
+            // 确保每个随机数都是唯一的种子（不兼容 Burst）...
+            // AND 随机反馈到自身，确保小行星生成具有更好的质量随机性。
             var fileTimeUtc = System.DateTime.UtcNow.ToFileTimeUtc();
             randomReference = new NativeReference<Random>(Random.CreateFromIndex((uint) fileTimeUtc), Allocator.Persistent);
 
@@ -85,7 +85,7 @@ namespace Asteroids.Server
         public void OnDestroy(ref SystemState state)
         {
             randomReference.Dispose();
-            // Others are disposed automatically.
+            // 其他的会自动处理。
         }
 
         [BurstCompile]
@@ -93,13 +93,13 @@ namespace Asteroids.Server
         {
             if (m_ConnectionQuery.IsEmptyIgnoreFilter)
             {
-                // No connected players, just destroy all asteroids to save CPU
+                // 没有连接的玩家，只需摧毁所有小行星即可拯救 CPU
                 state.EntityManager.DestroyEntity(m_StaticAsteroidsQuery);
                 state.EntityManager.DestroyEntity(m_DynamicAsteroidsQuery);
                 return;
             }
 
-            // If there is a host migration in progress skip any spawning here until it's done
+            // 如果正在进行主机迁移，请跳过此处的任何生成，直到完成为止
             if (!m_HostMigrationQuery.IsEmptyIgnoreFilter)
                 return;
 
@@ -125,10 +125,10 @@ namespace Asteroids.Server
             networkIdFromEntity.Update(ref state);
             localTransformLookup.Update(ref state);
 
-            // Optimization: Prevent gathering hundreds of thousands of asteroids, which kills the main thread.
-            // Note: This will cause the ship to potentially spawn inside asteroids, but the bigger map size
-            // should make this a low repro event.
-            // TODO - We could destroy all asteroids chunks within your spawn tile instead?
+            // 优化：防止聚集数十万个小行星，从而杀死主线程。
+            // Note: 这将导致飞船可能在小行星内生成，但地图尺寸更大
+            // 应该使这成为一个低重现事件。
+            // TODO - 我们可以摧毁你的生成方块中的所有小行星 chunks 吗？
             int currentAsteroidsCount = m_DynamicAsteroidsQuery.CalculateEntityCountWithoutFiltering() + m_StaticAsteroidsQuery.CalculateEntityCountWithoutFiltering();
             NativeList<Entity> dynamicAsteroidEntities = default;
             NativeList<LocalTransform> dynamicAsteroidTransforms = default;
@@ -256,25 +256,25 @@ namespace Asteroids.Server
 
             void Execute(Entity entity, in ReceiveRpcCommandRequest requestSource)
             {
-                // Destroy the spawn request:
+                // 销毁生成请求：
                 ecb.DestroyEntity(entity);
 
-                // Is request even valid?
+                // 请求有效吗？
                 if (!playerStateFromEntity.HasComponent(requestSource.SourceConnection) ||
                     !commandTargetFromEntity.HasComponent(requestSource.SourceConnection) ||
                     commandTargetFromEntity[requestSource.SourceConnection].targetEntity != Entity.Null ||
                     playerStateFromEntity[requestSource.SourceConnection].IsSpawning != 0)
                     return;
 
-                // Try find a random spawn position for the Ship that isn't near another player.
-                // Don't allow failure though, just take a "bad" position instead.
+                // 尝试为飞船找到一个不靠近其他玩家的随机生成位置。
+                // 但不要允许失败，而是采取“糟糕”的立场。
                 var rand = random.Value;
                 TryFindSpawnPos(ref rand, shipTransforms.AsArray(), level[0], shipLevelPadding, minShipToShipSpawnDistance, out var validShipPos);
                 random.Value = rand;
 
-                // Instantiate ship:
+                // 实例化船舶：
                 var shipEntity = ecb.Instantiate(shipPrefab);
-                //@ronald. this is necessary since the meshes are not backing the correct scaling factor
+                //@罗纳德。这是必要的，因为网格不支持正确的缩放因子
                 var originalScale = localTransformLookup[shipPrefab].Scale;
                 var trans = LocalTransform.FromPositionRotationScale(
                         validShipPos,
@@ -289,13 +289,13 @@ namespace Asteroids.Server
                 ecb.SetComponent(requestSource.SourceConnection, new PlayerStateComponentData {IsSpawning = 0});
                 ecb.AppendToBuffer(requestSource.SourceConnection, new LinkedEntityGroup {Value = shipEntity});
 
-                // Add to the list to prevent asteroids below from spawning near them.
+                // 添加到列表中以防止下面的小行星在它们附近生成。
                 shipTransforms.Add(trans);
 
-                // Mark the player as currently spawning
+                // 将玩家标记为当前正在生成
                 playerStateFromEntity[requestSource.SourceConnection] = new PlayerStateComponentData {IsSpawning = 1};
 
-                // Destroy asteroids that are too close to this spawn:
+                // 摧毁距离此生成点太近的小行星：
                 var minShipAsteroidSpawnDistanceSqr = minShipAsteroidSpawnDistance * minShipAsteroidSpawnDistance;
                 for (int i = 0; i < dynamicAsteroidTransforms.Length; i++)
                 {
@@ -333,14 +333,14 @@ namespace Asteroids.Server
                 var rand = random.Value;
                 for (int i = currentAsteroidsCount; i < numAsteroids; ++i)
                 {
-                    // Spawn asteroid at random pos, assuming we can find a valid one that isn't under a ship.
-                    // Don't treat this as an error (because it may happen occasionally by chance, or if the map is packed with ships).
-                    // Instead, just stop attempting to spawn any more this frame.
+                    // 在随机位置生成小行星，假设我们能找到一颗不在船下的有效小行星。
+                    // 不要将此视为错误（因为它可能偶尔会偶然发生，或者如果地图上挤满了船只）。
+                    // 相反，停止尝试再生成此帧即可。
                     if (!TryFindSpawnPos(ref rand, shipTransforms, level[0], asteroidLevelPadding, minShipAsteroidSpawnDistance, out var validAsteroidPos))
                         break;
 
                     var angle = rand.NextFloat(-0.0f, 359.0f);
-                    //@ronald. this is necessary since the meshes are not backing the correct scaling factor
+                    //@罗纳德。这是必要的，因为网格不支持正确的缩放因子
                     var originalScale = localTransformLookup[asteroidPrefab].Scale;
                     var trans = LocalTransform.FromPositionRotationScale(
                         validAsteroidPos,
@@ -391,7 +391,7 @@ namespace Asteroids.Server
                 }
                 if(isValidLocation)
                     return true;
-                minSpawnDistanceSqr *= 0.8f; // Reduce size & retry.
+                minSpawnDistanceSqr *= 0.8f; // 减小大小并重试。
             }
             return false;
         }

@@ -4,7 +4,7 @@ using UnityEngine.Assertions;
 
 namespace Query
 {
-    // An authoring component that configures a visualization for a raycast
+    // 为 raycast 配置可视化的 authoring component
     [DisallowMultipleComponent]
     public class VisualizedRaycastAuthoring : MonoBehaviour
     {

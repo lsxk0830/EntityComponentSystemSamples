@@ -20,7 +20,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
     private SimulationContext SimulationContext;
 #if HAVOK_PHYSICS_EXISTS
     private Havok.Physics.SimulationContext HavokSimulationContext;
-    protected bool SimulateHavok = false; // set based on the PhysicsStep component.
+    protected bool SimulateHavok = false; // 基于 PhysicsStep component 设置。
 #endif
 
     public bool DrawDebugInformation = false;
@@ -36,7 +36,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
     {
         if (!DrawDebugInformation || !m_BodyInfos.IsCreated || !m_JointInfos.IsCreated) return;
 
-        // Gizmo Draw the colliders
+        // Gizmo 绘制 colliders
         for (int i = 0; i < m_BodyInfos.Length; i++)
         {
             GameObject g = m_BodyInfoIndexToGameObjectMapping[i];
@@ -47,7 +47,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
             k_DrawComponent_DrawColliderEdges.Invoke(null, new object[] { collider, transform, false });
         }
 
-        // Gizmo Draw the joints
+        // Gizmo 绘制关节
         {
             Color originalColor = Gizmos.color;
 
@@ -82,7 +82,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
 
     public void Update()
     {
-        // +1 default static body
+        // +1 默认静态主体
         var NumStaticBodies = (m_BodyInfos.Length - m_NumDynamicBodies) + 1;
 
         PhysicsWorld.Reset(NumStaticBodies, m_NumDynamicBodies, m_JointInfos.Length);
@@ -132,7 +132,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
             }
         }
 
-        // Map the results to GameObjects
+        // 将结果映射到 GameObjects
         for (int i = 0; i < m_BodyInfos.Length; i++)
         {
             if (!m_BodyInfos[i].IsDynamic) continue;
@@ -231,7 +231,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
                 }
             }
 
-            // Create default static body
+            // 创建默认静态主体
             staticBodies[staticBodyIndex] = new RigidBody
             {
                 WorldFromBody = new RigidTransform(quaternion.identity, float3.zero),
@@ -268,8 +268,8 @@ public class SingleThreadedRagdoll : MonoBehaviour
                     EnableCollision = (byte)(jointInfo.EnableCollision ? 1 : 0),
                     Version = jointInfo.JointData.Version
                 };
-                // We have to memcopy the data over to convert it to the internal container
-                // as we do not have access to this internal container in the samples
+                // 我们必须将数据 memcopy 过来以将其转换到内部容器
+                // 因为我们无法访问示例中的这个内部容器
                 unsafe
                 {
                     ref var constraintsRef = ref joint.Constraints;
@@ -308,17 +308,17 @@ public class SingleThreadedRagdoll : MonoBehaviour
 
         public void Execute()
         {
-            // Create the physics world
+            // 创建物理 world
             CreateBodies(Input, BodyInfos, BodyInfoToBodiesIndexMap);
             CreateJoints(Input, JointInfos, BodyInfoToBodiesIndexMap);
 
-            // Build the broadphase
+            // 构建广泛阶段
             Input.World.CollisionWorld.BuildBroadphase(ref Input.World, Input.TimeStep, Input.Gravity);
 
-            // Step the physics world
+            // 步物理 world
             Simulation.StepImmediate(Input, ref SimulationContext);
 
-            // Export the changed motion data to body info
+            // 将更改的运动数据导出到身体信息
             ExportData(Input, BodyInfos);
         }
     }
@@ -336,17 +336,17 @@ public class SingleThreadedRagdoll : MonoBehaviour
 
         public void Execute()
         {
-            // Create the physics world
+            // 创建物理 world
             SingleThreadedPhysicsSimulationJob.CreateBodies(Input, Bodies, BodyInfoToBodiesIndexMap);
             SingleThreadedPhysicsSimulationJob.CreateJoints(Input, Joints, BodyInfoToBodiesIndexMap);
 
-            // Build the broadphase
+            // 构建广泛阶段
             Input.World.CollisionWorld.BuildBroadphase(ref Input.World, Input.TimeStep, Input.Gravity);
 
-            // Step the physics world
+            // 步物理 world
             Havok.Physics.HavokSimulation.StepImmediate(Input, ref SimulationContext);
 
-            // Export the changed motion data to body info
+            // 将更改的运动数据导出到身体信息
             SingleThreadedPhysicsSimulationJob.ExportData(Input, Bodies);
         }
     }
@@ -367,7 +367,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
         PhysicsWorld = new PhysicsWorld(0, 0, 0);
         HaveStaticBodiesChanged = new NativeReference<int>(1, Allocator.Persistent);
 
-        // Create all the Bodies
+        // 创建所有实体
         var basicBodyInfos = GameObject.FindObjectsByType<BasicBodyInfo>(FindObjectsSortMode.None);
         for (int i = 0; i < basicBodyInfos.Length; i++)
         {
@@ -381,7 +381,7 @@ public class SingleThreadedRagdoll : MonoBehaviour
             m_BodyInfos.Add(body);
         }
 
-        // Create all the Joints
+        // 创建所有关节
         var basicJointInfos = GameObject.FindObjectsByType<BasicJointInfo>(FindObjectsSortMode.None);
         for (int i = 0; i < basicJointInfos.Length; i++)
         {

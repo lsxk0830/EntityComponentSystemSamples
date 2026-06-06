@@ -25,9 +25,9 @@ public struct TriggerVolumePortal : IComponentData
 {
     public Entity Companion;
 
-    // When an entity is teleported to its companion,
-    // we increase the companion's TransferCount so that
-    // the entity doesn't get immediately teleported
-    // back to the original portal
+    // 当 entity 传送到其同伴时，
+    // 我们增加同伴的 TransferCount 以便
+    // entity 不会立即传送
+    // 回到原来的门户
     public int TransferCount;
 }

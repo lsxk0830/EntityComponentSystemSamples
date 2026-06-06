@@ -1,7 +1,7 @@
-# Boids sample
+# 群示例
 
-Schools of fish flock together and avoid sharks.
+鱼群聚集在一起躲避鲨鱼。
 
-This sample demonstrates advanced uses of ECS and jobs to achieve a complex, large scale simulation behavior.
+此示例演示了 ECS 和 jobs 的高级用法来实现复杂的大规模模拟行为。
 
 ![](./boids.jpg)

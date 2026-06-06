@@ -21,7 +21,7 @@ namespace Baking.AutoAuthoring
         {
             state.Enabled = false;
 
-            // unmanaged spawner
+            // 不受管理的产卵者
             {
                 var spawner = SystemAPI.GetSingleton<Spawner>();
 
@@ -36,7 +36,7 @@ namespace Baking.AutoAuthoring
                 }
             }
 
-            // managed spawner
+            // 管理产卵者
             {
                 var query = SystemAPI.QueryBuilder().WithAll<ManagedSpawner>().Build();
                 var spawner = query.GetSingleton<ManagedSpawner>();
@@ -61,7 +61,7 @@ namespace Baking.AutoAuthoring
                 }
             }
 
-            // buffer spawner
+            // 缓冲产卵者
             {
                 var spawnElements = SystemAPI.GetSingletonBuffer<BufferSpawner>();
                 var offset = math.float3(0);

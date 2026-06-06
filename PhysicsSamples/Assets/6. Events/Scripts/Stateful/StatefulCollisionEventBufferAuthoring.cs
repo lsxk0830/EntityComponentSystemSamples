@@ -35,7 +35,7 @@ namespace Unity.Physics.Stateful
         public bool CalculateDetails;
     }
 
-    // Collision Event that can be stored inside a DynamicBuffer
+    // 可以存储在 DynamicBuffer 内的碰撞事件
     public struct StatefulCollisionEvent : IBufferElementData, IStatefulSimulationEvent<StatefulCollisionEvent>
     {
         public Entity EntityA { get; set; }
@@ -47,8 +47,8 @@ namespace Unity.Physics.Stateful
         public StatefulEventState State { get; set; }
         public float3 Normal;
 
-        // Only if CalculateDetails is checked on PhysicsCollisionEventBuffer of selected entity,
-        // this field will have valid value, otherwise it will be zero initialized
+        // 仅当所选 entity 的 PhysicsCollisionEventBuffer 上选中 CalculateDetails 时，
+        // 该字段将具有有效值，否则它将被初始化为零
         internal Details CollisionDetails;
 
         public StatefulCollisionEvent(CollisionEvent collisionEvent)
@@ -64,38 +64,38 @@ namespace Unity.Physics.Stateful
             CollisionDetails = default;
         }
 
-        // This struct describes additional, optional, details about collision of 2 bodies
+        // 该结构描述了有关两个物体碰撞的附加、可选细节
         public struct Details
         {
             internal bool IsValid;
 
-            // If 1, then it is a vertex collision
-            // If 2, then it is an edge collision
-            // If 3 or more, then it is a face collision
+            // 如果为 1，则为顶点碰撞
+            // 如果为 2，则为边缘碰撞
+            // 如果 3 个或更多，则为面碰撞
             public int NumberOfContactPoints;
 
-            // Estimated impulse applied
+            // 估计施加的脉冲
             public float EstimatedImpulse;
-            // Average contact point position
+            // 平均接触点位置
             public float3 AverageContactPointPosition;
 
             public Details(int numContactPoints, float estimatedImpulse, float3 averageContactPosition)
             {
-                IsValid = (0 < numContactPoints); // Should we add a max check?
+                IsValid = (0 < numContactPoints); // 我们应该添加最大检查吗？
                 NumberOfContactPoints = numContactPoints;
                 EstimatedImpulse = estimatedImpulse;
                 AverageContactPointPosition = averageContactPosition;
             }
         }
 
-        // Returns the other entity in EntityPair, if provided with other one
+        // 返回 EntityPair 中的另一个 entity（如果提供了其他 entity）
         public Entity GetOtherEntity(Entity entity)
         {
             Assert.IsTrue((entity == EntityA) || (entity == EntityB));
             return entity == EntityA ? EntityB : EntityA;
         }
 
-        // Returns the normal pointing from passed entity to the other one in pair
+        // 返回从传递的 entity 到另一对中的正常指向
         public float3 GetNormalFrom(Entity entity)
         {
             Assert.IsTrue((entity == EntityA) || (entity == EntityB));
@@ -109,5 +109,5 @@ namespace Unity.Physics.Stateful
         }
 
         public int CompareTo(StatefulCollisionEvent other) => ISimulationEventUtilities.CompareEvents(this, other);
-    }    
+    }
 }

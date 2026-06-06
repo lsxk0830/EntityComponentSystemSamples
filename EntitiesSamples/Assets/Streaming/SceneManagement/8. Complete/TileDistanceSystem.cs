@@ -7,7 +7,7 @@ using Unity.Transforms;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // This system calculates the minimum tile distance to all relevant entities
+    // 此 system 计算到所有相关 entities 的最小平铺距离
     partial struct TileDistanceSystem : ISystem
     {
         private EntityQuery tilesQuery;
@@ -25,7 +25,7 @@ namespace Streaming.SceneManagement.CompleteSample
             var tiles = tilesQuery.ToComponentDataArray<TileInfo>(Allocator.Temp);
             NativeArray<float> distancesSq = new NativeArray<float>(tiles.Length, Allocator.Temp);
 
-            // Calculate the distance from the tile to the closest Relevant entity
+            // 计算从图块到最近的相关 entity 的距离
             {
                 for (int index = 0; index < tiles.Length; ++index)
                 {
@@ -46,7 +46,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 }
             }
 
-            // Copy the distances
+            // 复制距离
             tilesQuery.CopyFromComponentDataArray(distancesSq.Reinterpret<DistanceToRelevant>());
         }
     }

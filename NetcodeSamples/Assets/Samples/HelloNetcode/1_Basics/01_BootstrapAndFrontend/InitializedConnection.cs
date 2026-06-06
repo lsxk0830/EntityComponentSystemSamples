@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace Samples.HelloNetcode
 {
-    // This component is used to mark connections as initialized to avoid
-    // them being processed multiple times.
+    // 这个 component 用于将连接标记为已初始化，以避免
+    // 它们被多次处理。
     public struct InitializedConnection : IComponentData { }
 }

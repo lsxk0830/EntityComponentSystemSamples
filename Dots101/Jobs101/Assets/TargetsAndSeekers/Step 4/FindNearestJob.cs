@@ -18,22 +18,22 @@ namespace Tutorials.Jobs.Step4
         {
             float3 seekerPos = SeekerPositions[index];
 
-            // Find the target with the closest X coord.
+            // 找到 X 坐标最接近的目标。
             int startIdx = TargetPositions.BinarySearch(seekerPos, new AxisXComparer { });
 
-            // When no precise match is found, BinarySearch returns the bitwise negation of the last-searched offset.
-            // So when startIdx is negative, we flip the bits again, but we then must ensure the index is within bounds.
+            // 当没有找到精确匹配时，BinarySearch 返回最后搜索的偏移量的按位否定。
+            // 因此，当 startIdx 为负数时，我们再次翻转这些位，但必须确保索引在范围内。
             if (startIdx < 0) startIdx = ~startIdx;
             if (startIdx >= TargetPositions.Length) startIdx = TargetPositions.Length - 1;
 
-            // The position of the target with the closest X coord.
+            // X 坐标最接近的目标位置。
             float3 nearestTargetPos = TargetPositions[startIdx];
             float nearestDistSq = math.distancesq(seekerPos, nearestTargetPos);
 
-            // Searching upwards through the array for a closer target.
+            // 在阵列中向上搜索更近的目标。
             Search(seekerPos, startIdx + 1, TargetPositions.Length, +1, ref nearestTargetPos, ref nearestDistSq);
 
-            // Search downwards through the array for a closer target.
+            // 在阵列中向下搜索更近的目标。
             Search(seekerPos, startIdx - 1, -1, -1, ref nearestTargetPos, ref nearestDistSq);
 
             NearestTargetPositions[index] = nearestTargetPos;
@@ -47,7 +47,7 @@ namespace Tutorials.Jobs.Step4
                 float3 targetPos = TargetPositions[i];
                 float xdiff = seekerPos.x - targetPos.x;
 
-                // If the square of the x distance is greater than the current nearest, we can stop searching.
+                // 如果 x 距离的平方大于当前最近的，我们可以停止搜索。
                 if ((xdiff * xdiff) > nearestDistSq) break;
 
                 float distSq = math.distancesq(targetPos, seekerPos);

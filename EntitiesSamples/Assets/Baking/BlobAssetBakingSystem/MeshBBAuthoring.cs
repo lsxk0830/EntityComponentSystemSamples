@@ -21,7 +21,7 @@ namespace Baking.BlobAssetBakingSystem
                 var meshVertices = new NativeList<MeshVertex>(Allocator.Temp);
                 var vertices = new List<Vector3>(4096);
 
-                // Compute the blob asset hash based on Authoring properties
+                // 根据 Authoring 属性计算 blob 资产哈希
                 var mesh = GetComponent<MeshFilter>().sharedMesh;
                 DependsOn(mesh);
 
@@ -30,11 +30,11 @@ namespace Baking.BlobAssetBakingSystem
                 AssetDatabase.TryGetGUIDAndLocalFileIdentifier(mesh.GetInstanceID(), out string guid, out long localId);
                 Hash128 hash = default;
 
-                // Here we get a hash from the mesh to use it later to de-duplicate the blob assets
+                // 在这里，我们从网格中获取哈希值，以便稍后使用它来删除重复的 blob 资源
                 // mesh.GetHashCode() will not update if the mesh is changed outside of the editor
-                // So we get the hash from the asset path through the asset database.
-                // However, trying to get a hash from the Default Resources (cube, capsule eg.) will always give a hash of 0s
-                // In addition, it won't change (except for a Unity version update) so we can use GetHashCode
+                // 所以我们通过资产数据库从资产路径中获取哈希值。
+                // 但是，尝试从默认资源（例如立方体、胶囊）获取哈希值将始终给出 0 的哈希值
+                // 另外，它不会改变（除了 Unity 版本更新），所以我们可以使用 GetHashCode
                 if (IsBuiltin(new GUID(guid)))
                 {
                     hash = new Hash128((uint) localId, (uint) authoring.MeshScale.GetHashCode(), 0, 0);
@@ -48,7 +48,7 @@ namespace Baking.BlobAssetBakingSystem
                     Debug.LogError("This sample does not support procedural meshes stored in the scene");
                 }
 
-                // Copy the mesh vertices into the dynamic buffer array
+                // 将网格顶点复制到动态缓冲区数组中
                 if (hasMesh)
                 {
                     mesh.GetVertices(vertices);
@@ -59,19 +59,19 @@ namespace Baking.BlobAssetBakingSystem
                     }
                 }
 
-                // Add the dynamic buffer with the vertices to create the BlobAsset in the BakingSystem
+                // 添加带有顶点的动态缓冲区以在 BakingSystem 中创建 BlobAsset
                 var entity = GetEntity(TransformUsageFlags.None);
                 var buffer = AddBuffer<MeshVertex>(entity);
                 buffer.AddRange(meshVertices.AsArray());
 
-                // Add the hash and scale to for the BlobAsset creation
+                // 添加哈希和缩放以进行 BlobAsset 创建
                 AddComponent(entity, new RawMesh()
                 {
                     MeshScale = authoring.MeshScale,
                     Hash = hash
                 });
 
-                // Add the Component that will hold the BlobAssetReference later 
+                // 添加稍后将保存 BlobAssetReference 的 Component
                 AddComponent(entity, new MeshBB());
             }
 

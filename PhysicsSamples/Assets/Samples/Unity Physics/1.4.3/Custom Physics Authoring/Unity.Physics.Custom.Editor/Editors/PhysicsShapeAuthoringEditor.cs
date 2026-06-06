@@ -149,7 +149,7 @@ namespace Unity.Physics.Editor
 
         GeometryState m_GeometryState;
         int m_NumImplicitStatic;
-        // keep track of when the user is dragging some control to prevent continually rebuilding preview geometry
+        // 跟踪用户何时拖动某些控件以防止不断重建预览几何体
         [NonSerialized]
         int m_DraggingControlID;
         [NonSerialized]
@@ -221,7 +221,7 @@ namespace Unity.Physics.Editor
             uint m_InputHash;
             ConvexHullGenerationParameters m_HashedConvexParameters;
             NativeArray<float3> m_HashedPoints = new NativeArray<float3>(0, Allocator.Persistent);
-            // multiple preview jobs might be running if user assigned a different mesh before previous job completed
+            // 如果用户在之前的 job 完成之前分配了不同的网格，则多个预览 jobs 可能正在运行
             JobHandle m_MostRecentlyScheduledJob;
             Dictionary<JobHandle, NativeArray<BlobAssetReference<Collider>>> m_PreviewJobsOutput =
                 new Dictionary<JobHandle, NativeArray<BlobAssetReference<Collider>>>();
@@ -238,7 +238,7 @@ namespace Unity.Physics.Editor
                 switch (shape.ShapeType)
                 {
                     case ShapeType.ConvexHull:
-                        shape.GetBakedConvexProperties(currentPoints); // TODO: use HashableShapeInputs
+                        shape.GetBakedConvexProperties(currentPoints); // TODO: 使用 HashableShapeInputs
                         currentConvexProperties = shape.ConvexHullGenerationParameters;
 
                         return math.hash(
@@ -251,7 +251,7 @@ namespace Unity.Physics.Editor
 
                     case ShapeType.Mesh:
                         var triangles = new NativeList<int3>(1024, Allocator.Temp);
-                        shape.GetBakedMeshProperties(currentPoints, triangles);  // TODO: use HashableShapeInputs
+                        shape.GetBakedMeshProperties(currentPoints, triangles);  // TODO: 使用 HashableShapeInputs
 
                         return math.hash(
                             new uint3(
@@ -286,7 +286,7 @@ namespace Unity.Physics.Editor
                 if (shape.ShapeType != ShapeType.ConvexHull && shape.ShapeType != ShapeType.Mesh)
                     return;
 
-                // TODO: cache results per input data hash, and simply use existing data (e.g., to make undo/redo faster)
+                // TODO: 缓存每个输入数据哈希的结果，并简单地使用现有数据（e.g.，使撤消/重做更快）
                 var output = new NativeArray<BlobAssetReference<Collider>>(1, Allocator.Persistent);
 
                 m_MostRecentlyScheduledJob = shape.ShapeType == ShapeType.Mesh
@@ -316,13 +316,13 @@ namespace Unity.Physics.Editor
                 if (pointCloud.Length == 0)
                     return default;
 
-                // copy to NativeArray because NativeList not yet compatible with DeallocateOnJobCompletion
+                // 复制到 NativeArray 因为 NativeList 尚未与 DeallocateOnJobCompletion 兼容
                 var pointsArray = new NativeArray<float3>(
                     pointCloud.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory
                 );
                 pointsArray.CopyFrom(pointCloud.AsArray());
 
-                // TODO: if there is still an active job with the same input data hash, then just set it to be most recently scheduled job
+                // TODO: 如果仍然存在具有相同输入数据哈希的活动 job，则只需将其设置为最近调度的 job
                 return new CreateTempHullJob
                 {
                     GenerationParameters = shape.ConvexHullGenerationParameters.ToRunTime(),
@@ -340,7 +340,7 @@ namespace Unity.Physics.Editor
                 if (points.Length == 0 || triangles.Length == 0)
                     return default;
 
-                // copy to NativeArray because NativeList not yet compatible with DeallocateOnJobCompletion
+                // 复制到 NativeArray 因为 NativeList 尚未与 DeallocateOnJobCompletion 兼容
                 var pointsArray = new NativeArray<float3>(
                     points.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory
                 );
@@ -350,7 +350,7 @@ namespace Unity.Physics.Editor
                 );
                 triangleArray.CopyFrom(triangles.AsArray());
 
-                // TODO: if there is still an active job with the same input data hash, then just set it to be most recently scheduled job
+                // TODO: 如果仍然存在具有相同输入数据哈希的活动 job，则只需将其设置为最近调度的 job
                 return new CreateTempMeshJob
                 {
                     Points = pointsArray,
@@ -363,9 +363,9 @@ namespace Unity.Physics.Editor
             {
                 var repaintSceneViews = false;
 
-                foreach (var job in m_PreviewJobsOutput.Keys.ToArray()) // TODO: don't allocate on heap
+                foreach (var job in m_PreviewJobsOutput.Keys.ToArray()) // TODO: 不要在堆上分配
                 {
-                    // repaint scene views to indicate progress if most recent preview job is still in the queue
+                    // 如果最近的预览 job 仍在队列中，则重新绘制 scene 视图以指示进度
                     var mostRecentlyScheduledJob = m_MostRecentlyScheduledJob.Equals(job);
                     repaintSceneViews |= mostRecentlyScheduledJob;
 
@@ -376,7 +376,7 @@ namespace Unity.Physics.Editor
                     m_PreviewJobsOutput.Remove(job);
                     job.Complete();
 
-                    // only populate preview edge data if not already disposed and this job was actually the most recent
+                    // 仅填充预览边缘数据（如果尚未处理），并且此 job 实际上是最新的
                     if (!m_Disposed && mostRecentlyScheduledJob)
                     {
                         if (!output[0].IsCreated)
@@ -445,7 +445,7 @@ namespace Unity.Physics.Editor
                 preview.SchedulePreviewIfChanged(shape);
             }
 
-            // do not generate a new preview until the user has finished dragging a control handle (e.g., scale)
+            // 在用户完成拖动控制手柄之前不生成新预览（e.g.，比例）
             if (m_DraggingControlID == 0 && !EditorGUIUtility.editingTextField)
                 preview.SchedulePreviewIfChanged(shape);
 
@@ -458,7 +458,7 @@ namespace Unity.Physics.Editor
             var skinnedPoints = new NativeList<float3>(8192, Allocator.Temp);
             foreach (PhysicsShapeAuthoring shape in targets)
             {
-                // if a custom mesh is assigned, only check it
+                // 如果分配了自定义网格，则仅检查它
                 using (var so = new SerializedObject(shape))
                 {
                     var customMesh = so.FindProperty(m_CustomMesh.propertyPath).objectReferenceValue as UnityEngine.Mesh;
@@ -469,7 +469,7 @@ namespace Unity.Physics.Editor
                     }
                 }
 
-                // otherwise check all mesh filters in the hierarchy that might be included
+                // 否则检查层次结构中可能包含的所有网格过滤器
                 var geometryState = GeometryState.Okay;
                 using (var scope = new GetActiveChildrenScope<MeshFilter>(shape, shape.transform))
                 {
@@ -1096,7 +1096,7 @@ namespace Unity.Physics.Editor
                         if (Event.current.type != EventType.Repaint)
                             break;
                         var points = GetPreviewData(shape).Edges;
-                        // TODO: follow transformation until new preview is generated if e.g., user is dragging handles
+                        // TODO: 如果 e.g.，用户拖动手柄，则遵循转换，直到生成新预览
                         if (points.Length > 0)
                             Handles.DrawLines(points);
                         break;
@@ -1113,7 +1113,7 @@ namespace Unity.Physics.Editor
             }
         }
 
-        // ReSharper disable once UnusedMember.Global - magic method called by unity inspector
+        // ReSharper 禁用一次 UnusedMember.Global - 统一检查器调用的魔术方法
         public bool HasFrameBounds()
         {
             return true;
@@ -1135,7 +1135,7 @@ namespace Unity.Physics.Editor
             return bounds;
         }
 
-        // ReSharper disable once UnusedMember.Global - magic method called by unity inspector
+        // ReSharper 禁用一次 UnusedMember.Global - 统一检查器调用的魔术方法
         public Bounds OnGetFrameBounds()
         {
             var shape = target as PhysicsShapeAuthoring;

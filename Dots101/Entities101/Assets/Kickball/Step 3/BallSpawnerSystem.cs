@@ -10,8 +10,8 @@ using Random = Unity.Mathematics.Random;
 
 namespace Tutorials.Kickball.Step3
 {
-    // This UpdateBefore is necessary to ensure the balls get rendered in
-    // the correct position for the frame in which they're spawned.
+    // 这个 UpdateBefore 对于确保球被渲染是必要的
+    // 它们生成的帧的正确位置。
     [UpdateBefore(typeof(TransformSystemGroup))]
     public partial struct BallSpawnerSystem : ISystem
     {
@@ -34,7 +34,7 @@ namespace Tutorials.Kickball.Step3
 
             var rand = new Random(123);
 
-            // For every player, spawn a ball, position it at the player's location, and give it a random velocity.
+            // 对于每个玩家，生成一个球，将其放置在玩家的位置，并赋予它随机速度。
             foreach (var transform in
                      SystemAPI.Query<RefRO<LocalTransform>>()
                          .WithAll<Player>())

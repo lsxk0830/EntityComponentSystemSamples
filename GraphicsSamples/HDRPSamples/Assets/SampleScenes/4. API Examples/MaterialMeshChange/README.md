@@ -1,17 +1,17 @@
 # MaterialMeshChange
 
-This sample demonstrates how to change a Material and Mesh on Entities at runtime. Enter Play mode to see the rendering change over different frames.
+此示例演示了如何在运行时更改 Entities 上的材质和网格。进入播放模式以查看不同帧上的渲染变化。
 
 <img src="../../../../READMEimages/MaterialMeshChange.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains two entities. One changes its Mesh and another changes its Material. The MeshChanger and MaterialChanger are the ECS scripts that perform the respective Mesh / Material swapping.
+scene 包含两个 entities。一个更改其网格，另一个更改其材质。MeshChanger 和 MaterialChanger 是执行相应网格/材质交换的 ECS 脚本。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select the Subscene
-2. In the Inspector, click Open
-3. In the Hierarchy, select the **MeshChange** or **MaterialChange** GameObject
-4. In the Inspector, note that the Authoring components is attached
-5. Close the Subscene and enter Play mode. These two GameObjects are baked to Entities and change their mesh and material using the ECS System
+1. 在 Hierarchy 中，选择子场景
+2. 在 Inspector 中，单击“打开”
+3. 在 Hierarchy 中，选择 **MeshChange** 或 **MaterialChange** GameObject
+4. 在 Inspector 中，请注意附加了 Authoring components
+5. 关闭子场景并进入播放模式。这两个 GameObjects 被烘焙到 Entities 并使用 ECS System 更改其网格和材质

@@ -15,8 +15,8 @@ namespace Streaming.PrefabAndSceneReferences
             var entities = query.ToEntityArray(Allocator.Temp);
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-            // Load entity scene and add a cleanup component referencing the entity scene to
-            // unload when the primary entity will be destroyed
+            // 加载 entity scene 并添加引用 entity scene 的清理 component 到
+            // 卸载时主 entity 将被销毁
             for (int i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];
@@ -28,7 +28,7 @@ namespace Streaming.PrefabAndSceneReferences
                 ecb.RemoveComponent<SceneReference>(entity);
             }
 
-            // Load the PrefabReferences
+            // 加载 PrefabReferences
             foreach (var (prefabRef, entity) in
                      SystemAPI.Query<RefRO<PrefabReference>>()
                          .WithNone<RequestEntityPrefabLoaded>()
@@ -40,7 +40,7 @@ namespace Streaming.PrefabAndSceneReferences
                 });
             }
 
-            // Instantiate the PrefabReferences
+            // 实例化 PrefabReferences
             foreach (var (loadedPrefab, entity) in
                      SystemAPI.Query<RefRO<PrefabLoadResult>>()
                          .WithAll<PrefabReference>()
@@ -57,7 +57,7 @@ namespace Streaming.PrefabAndSceneReferences
 
             ecb.Playback(state.EntityManager);
 
-            // Unload the previously manually loaded entity scene after the subscene is being destroyed
+            // 在 subscene 被销毁后，卸载之前手动加载的 entity scene
             query = SystemAPI.QueryBuilder().WithAll<CleanupSceneReference>().WithNone<SceneTag>().Build();
             var cleanupSceneRefs = query.ToComponentDataArray<CleanupSceneReference>(Allocator.Temp);
             entities = query.ToEntityArray(Allocator.Temp);
@@ -71,7 +71,7 @@ namespace Streaming.PrefabAndSceneReferences
                 ecb.RemoveComponent<CleanupSceneReference>(entities[i]);
             }
 
-            // Unload the previously manually instantiated entity prefabs after the subscene is being destroyed
+            // 在 subscene 被销毁后，卸载之前手动实例化的 entity prefab
             foreach (var (prefabRef, entity) in
                      SystemAPI.Query<RefRO<CleanupPrefabReference>>()
                          .WithNone<SceneTag>()

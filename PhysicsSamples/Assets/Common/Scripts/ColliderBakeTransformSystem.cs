@@ -23,20 +23,20 @@ partial struct ColliderBakeTransformSystem : ISystem
         void Execute(ref ColliderBakeTransform transformData, ref SaveColliderBlobForDisposal saveCollider, ref PhysicsCollider collider, ref PhysicsMass mass,
             ref PostTransformMatrix postTransformMatrix, Entity entity, [ChunkIndexInQuery] int chunkIndex)
         {
-            // Collider should have been made unique before this job runs
+            // 在 job 运行之前，Collider 应该是唯一的
             if (!collider.IsUnique)
                 return;
 
-            // Skip if the transformation has already been applied to the collider previously and no animation is requested
+            // 如果先前已将变换应用于 collider 并且不请求动画，则跳过
             if (transformData.FrameCount > 0 && transformData.AnimationDuration <= 0)
                 return;
 
-            // If both drift prevention and the collider baking animation is enabled,
-            // store some data for later collider reset if the drift threshold has been reached.
+            // 如果同时启用了漂移预防和 collider baking 动画，
+            // 如果达到漂移阈值，则存储一些数据以供以后 collider 复位使用。
             if (transformData.DriftPrevention && transformData.AnimationDuration > 0)
             {
-                // store original geometry data for later reset if geometry drifts when the animation is reset, and
-                // replace baked collider with guaranteed unique clone right away.
+                // 如果重置动画时几何体发生漂移，则存储原始几何体数据以供以后重置，以及
+                // 立即用有保证的唯一克隆替换烘焙的 collider。
                 if (transformData.FrameCount == 0 && !transformData.OriginalCollider.IsCreated)
                 {
                     transformData.OriginalCollider = collider.Value;
@@ -70,12 +70,12 @@ partial struct ColliderBakeTransformSystem : ISystem
                         {
                             var driftedCollider = collider.Value;
 
-                            //clone and store the blob in save for disposal, in order to dispose at the end of the frame
+                            //克隆 blob 并将其存储在 save 中以供处置，以便在帧末尾进行处置
                             collider.Value = transformData.OriginalCollider.Value.Clone();
                             saveCollider.Collider = collider.Value;
 
-                            // We can't dispose the blob in Collider.value yet because it may be needed by the
-                            // DebugDraw system. Instead, add it to a queue to be disposed of next frame.
+                            // 我们还无法在 Collider.value 中处理该 blob，因为它可能需要
+                            // DebugDraw system。相反，将其添加到队列中以处理下一帧。
                             ColliderBlobsToDisposeNow.Enqueue(driftedCollider);
 
                             postTransformMatrix = transformData.OriginalPostTransformMatrix;
@@ -83,8 +83,8 @@ partial struct ColliderBakeTransformSystem : ISystem
                     }
                 }
 
-                // Normalize animation factor considering the sum of the animation function weights over the animation duration.
-                // Here, we are using an identity of the discrete sum of sines.
+                // 考虑动画持续时间内动画函数权重的总和，标准化动画因子。
+                // 在这里，我们使用正弦离散和的恒等式。
                 var N = math.ceil(animationFrames / 2);
                 var d = math.PI / N;
                 var s = math.sin(0.5f * d);
@@ -108,7 +108,7 @@ partial struct ColliderBakeTransformSystem : ISystem
 
             var deltaScale = transformData.Scale - 1f;
 
-            // Compute the affine transformation from the translation, rotation, scale and shear provided in the baking data.
+            // 根据 baking 数据中提供的平移、旋转、缩放和剪切计算仿射变换。
             var bakeTransform = new AffineTransform(
                 animationFactor * transformData.Translation,
                 math.slerp(math.conjugate(transformData.Rotation), transformData.Rotation,
@@ -127,11 +127,11 @@ partial struct ColliderBakeTransformSystem : ISystem
 
             bakeTransform = math.mul(bakeTransform, math.mul(shearXY, math.mul(shearXZ, shearYZ)));
 
-            // Apply the affine transformation to the collider geometry.
+            // 将仿射变换应用于 collider 几何体。
             collider.Value.Value.BakeTransform(bakeTransform);
 
-            // Update the rigid body's mass properties for if available and dynamic by copying the
-            // new, modified collider's mass properties into the PhysicsMass component.
+            // 通过复制来更新刚体的质量属性（如果可用且动态）
+            // 新的、修改后的 collider 的质量属性到 PhysicsMass component 中。
             if (!mass.IsKinematic)
             {
                 var massProperties = collider.MassProperties;
@@ -140,7 +140,7 @@ partial struct ColliderBakeTransformSystem : ISystem
                 mass.AngularExpansionFactor = massProperties.AngularExpansionFactor;
             }
 
-            // Apply bake transform also to the PostTransformMatrix to affect the visuals.
+            // 还将烘焙变换应用到 PostTransformMatrix 以影响视觉效果。
             postTransformMatrix = new PostTransformMatrix
             {
                 Value = math.mul((float4x4)bakeTransform, postTransformMatrix.Value)
@@ -161,8 +161,8 @@ partial struct ColliderBakeTransformSystem : ISystem
         using var ecb = new EntityCommandBuffer(Allocator.Temp);
         var dt = SystemAPI.Time.DeltaTime;
 
-        // Make sure all colliders we want to apply transformations to have a PostTransformMatrix component, so that
-        // we can also affect their visuals.
+        // 确保我们想要应用转换的所有 colliders 都具有 PostTransformMatrix component，以便
+        // 我们还可以影响他们的视觉效果。
         foreach (var(scaleAndShearData, collider, entity) in SystemAPI
                  .Query<ColliderBakeTransform, RefRW<PhysicsCollider>>()
                  .WithNone<PostTransformMatrix>()
@@ -187,7 +187,7 @@ partial struct ColliderBakeTransformSystem : ISystem
             DisposeNow = m_ColliderBlobsToDisposeNow
         }.Schedule(state.Dependency);
 
-        // Perform collider transform baking on NON-STATIC bodies with unique colliders
+        // 使用独特的 colliders 在 NON-STATIC 主体上执行 collider 变换 baking
         state.Dependency = new BakeTransformJob()
         {
             TimeStep = dt,
@@ -199,11 +199,11 @@ partial struct ColliderBakeTransformSystem : ISystem
     public void OnDestroy(ref SystemState state)
     {
         using var ecb = new EntityCommandBuffer(Allocator.Temp);
-        // Clean up any saved collider blobs that haven't been disposed of yet via the m_ColliderBlobsToDisposeNow queue
+        // 清理尚未通过 m_ColliderBlobsToDisposeNow 队列处理的任何已保存的 collider blob
         foreach (var(saveCollider, entity) in
                  SystemAPI.Query<RefRW<SaveColliderBlobForDisposal>>().WithEntityAccess())
         {
-            //dispose the latest collider clone inside our bake data component
+            //将最新的 collider 克隆放入我们的烘焙数据 component
             if (saveCollider.ValueRO.Collider.IsCreated)
             {
                 saveCollider.ValueRW.Collider.Dispose();
@@ -212,7 +212,7 @@ partial struct ColliderBakeTransformSystem : ISystem
         }
         ecb.Playback(state.EntityManager);
 
-        // Disposes blobs from clone of transformData.OriginalCollider that are used in the animation drift reset
+        // 处理来自 transformData.OriginalCollider 克隆的斑点，这些斑点用于动画漂移重置
         while (!m_ColliderBlobsToDisposeNow.IsEmpty())
         {
             m_ColliderBlobsToDisposeNow.Dequeue().Dispose();

@@ -104,7 +104,7 @@ class LoaderScene : MonoBehaviour
 
     void Update()
     {
-        // update the scroll rect position if selection is outside current viewport
+        // 如果选择位于当前视口之外，则更新滚动矩形位置
         if (m_Selected == EventSystem.current.currentSelectedGameObject)
             return;
 

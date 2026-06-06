@@ -10,23 +10,23 @@ using Unity.NetCode.LowLevel.Unsafe;
 namespace Unity.NetCode.Samples
 {
     /// <summary>
-    /// System used to restore the state of the client-only component present on predicted ghost when a
-    /// new snapshot from server is received.
+    /// System 用于恢复 predicted ghost 上存在的仅 component 的状态，当
+    /// 收到来自 server 的新 snapshot。
     /// <para>
-    /// The system must run after the <see cref="GhostUpdateSystem"/> (responsible
-    /// to update the state of all ghosts) and before the <see cref="PredictedSimulationSystemGroup"/>
-    /// </para> to guarantee the predicted ghosts components states are all synced to the same last received tick.
+    /// system 必须在 <see cref="GhostUpdateSystem"/> 之后为 run（负责
+    /// 更新所有 ghosts) 和<see cref="PredictedSimulationSystemGroup"/>之前的状态
+    /// </para> 保证 predicted ghosts components 状态全部同步到相同的最后接收的报价。
     /// <para>
-    /// The restoring process copy the component data and enable bits from the <see cref="ClientOnlyBackup"/> for
-    /// all ghosts that received a new snapshot.
-    /// If the server for which we want to restore the data is not found in the backup buffer, the components data are
-    /// left unchanged.
+    /// 恢复过程从 <see cref="ClientOnlyBackup"/> 复制 component 数据和使能位
+    /// 所有收到新 snapshot 的 ghosts。
+    /// 如果在备份缓冲区中没有找到我们要恢复数据的 server，则 components 数据
+    /// 保持不变。
     /// </para>
     /// <para>
-    /// After the component data has been restore for the last received tick, all the client-only buffers
-    /// are shrank, by removing the oldest backup. In particular:
-    /// <para>- For the ghosts that has received the new snapshot, the buffer is cleared</para>
-    /// <para>- For all ghosts that were not present in the snapshot, all backup with a tick older than the last received tick are removed.</para>
+    /// 在 component 数据恢复为最后接收到的刻度后，所有仅 client 的缓冲区
+    /// 通过删除最旧的备份来缩小。尤其：
+    /// <para>-对于已收到新 snapshot 的 ghosts，缓冲区为 cleared</para>
+    /// <para>-对于 snapshot 中不存在的所有 ghosts，所有具有早于上次收到的刻度的备份的备份都是 removed.</para>
     /// </para>
     /// </summary>
     [BurstCompile]
@@ -41,7 +41,7 @@ namespace Unity.NetCode.Samples
         private ComponentTypeHandle<ClientOnlyBackup> backupTypeHandle;
         private ComponentTypeHandle<GhostType> ghostTypeHandle;
         private ComponentTypeHandle<PredictedGhost> predictedGhostTypeHandle;
-        //Internal to make it accessible by the tests
+        //内部使其可供测试访问
         internal ClientOnlyTypeHandleList componentTypeHandles;
 
         [BurstCompile]
@@ -70,7 +70,7 @@ namespace Unity.NetCode.Samples
         {
             var clientOnlyCollection = SystemAPI.GetSingleton<ClientOnlyCollection>();
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
-            // complete the dependency in order to access the NetworkSnapshotAck (because written in NetworkStreamReceiveSystem)
+            // 完成依赖关系才能访问 NetworkSnapshotAck（因为写在 NetworkStreamReceiveSystem 中）
             state.CompleteDependency();
             var ackComponent = SystemAPI.GetSingleton<NetworkSnapshotAck>();
 
@@ -81,8 +81,8 @@ namespace Unity.NetCode.Samples
             linkedEntityGroupHandle.Update(ref state);
             componentTypeHandles.CreateOrUpdateTypeHandleList(ref state, clientOnlyCollection.ClientOnlyComponentTypes.AsArray());
 
-            //copy the component data from backup buffer and clear the client only backup buffers based on
-            //on the last received snapshot tick.
+            //从备份缓冲区复制 component 数据并清除 client 仅备份缓冲区
+            //在最后收到的 snapshot 上。
             var job = new RestoreFromBackup
             {
                 ghostTypeHandle = ghostTypeHandle,
@@ -112,7 +112,7 @@ namespace Unity.NetCode.Samples
             public NativeArray<ClientOnlyBackupInfo>.ReadOnly clientOnlyComponentCollection;
             public NativeHashMap<GhostType, ClientOnlyBackupMetadata>.ReadOnly prefabMetadata;
             public NetworkTick serverTick;
-            //The latest received tick from the server. All backup history before that tick can be cleared
+            //从 server 收到的最新报价。可以清除该勾选之前的所有备份历史记录
             public NetworkTick lastReceivedSnapshotByLocal;
             public NetDebug netDebug;
 
@@ -120,39 +120,39 @@ namespace Unity.NetCode.Samples
             {
                 var ghostComponents = chunk.GetNativeArray(ref ghostTypeHandle);
                 var ghostType = ghostComponents[0];
-                //Early exit if type is not setup or the ghost type is not found yet in the backup info.
+                //如果未设置类型或在备份信息中尚未找到 ghost 类型，请提前退出。
                 if (!prefabMetadata.TryGetValue(ghostType, out var metadata))
                 {
                     netDebug.LogError($"Unable to find client-only backup metadata for ghost with ghost type {ghostType}");
                     return;
                 }
                 var predictedGhosts = chunk.GetNativeArray(ref predictedGhostComponentTypeHandle);
-                //Use unsafe pointer to avoid the local copy and to let access the backup data by ref
+                //使用不安全指针来避免本地副本并让通过 ref 访问备份数据
                 var backups = (ClientOnlyBackup*)chunk.GetNativeArray(ref backupTypeHandle).GetUnsafeReadOnlyPtr();
                 for (int ent = 0; ent < chunk.Count; ++ent)
                 {
-                    //This is the state we need to restore from. Can be:
-                    // - the last full prediction tick (in case the prediction is continuing)
-                    // - the last received tick (in case of new data)
-                    // - the current tick (so nothing do)
+                    //这是我们需要恢复的状态。可以是：
+                    // - 最后一个完整的 prediction（如果 prediction 正在继续）
+                    // - 最后收到的报价（如果有新数据）
+                    // - 当前刻度（所以什么都不做）
                     var predictionStartTick = predictedGhosts[ent].PredictionStartTick;
-                    //If the backup didn't run yet or the entity is just spawned, use the current state.
-                    //IF the start tick is the the current target tick, there is nothing to backup.
+                    //如果备份尚未 run 或刚刚生成 entity，请使用当前状态。
+                    //IF 起始刻度是当前目标刻度，没有任何可备份的内容。
                     if (backups[ent].IsEmpty || !predictionStartTick.IsValid || predictionStartTick == serverTick)
                         continue;
                     var backupSlotIndex = backups[ent].GetSlotForTick(predictionStartTick, metadata.backupSize);
-                    //if there is no backup available do nothing and use the current component state
+                    //如果没有可用的备份，则不执行任何操作并使用当前的 component 状态
                     if (backupSlotIndex < 0)
                         continue;
                     var bufferReader = new BackupReader(backupSlotIndex, backups[ent], metadata);
                     RestoreComponentsFromBackup(chunk, ref bufferReader, ent, metadata);
-                    //Reset the length of the buffer to 0. We are going to re-predict all the ticks from the the prediction start
-                    //to for this entity
+                    //将缓冲区的长度重置为 0。我们将重新预测从 prediction 开始的所有价格变动
+                    //至此 entity
                     if(predictionStartTick == lastReceivedSnapshotByLocal)
                         backups[ent].Clear();
                 }
-                //Remove all backup with tick less or equal than the last received tick from the server.
-                //Ghosts are not not going to rollback to this tick anymore.
+                //从 server 中删除所有蜱虫小于或等于最后收到的蜱虫的备份。
+                //Ghosts 不会再回滚到这个刻度。
                 for (int ent = 0, chunkEntityCount = chunk.Count; ent < chunkEntityCount; ++ent)
                     backups[ent].RemoveBackupsOlderThan(lastReceivedSnapshotByLocal, metadata.backupSize);
             }
@@ -160,7 +160,7 @@ namespace Unity.NetCode.Samples
             private void RestoreComponentsFromBackup(ArchetypeChunk chunk, ref BackupReader reader, int ent,
                 in ClientOnlyBackupMetadata metadata)
             {
-                //We have a valid backup slot to use. Restore components and buffers.
+                //我们有一个有效的备份插槽可供使用。恢复 components 和缓冲区。
                 var iterEnd = metadata.componentBegin + metadata.numRootComponents;
                 var compIdx = metadata.componentBegin;
                 var typeHandles = new UnsafeList<DynamicComponentTypeHandle>(componentTypeHandles.Ptr, clientOnlyComponentCollection.Length);
@@ -185,7 +185,7 @@ namespace Unity.NetCode.Samples
                     compDataPtr += comp.ComponentSize * ent;
                     reader.RestoreComponent(comp, compDataPtr);
                 }
-                //If the chunk does not have a linked entity group we can't restore any child component.
+                //如果 chunk 没有链接的 entity 组，我们无法恢复任何子 component。
                 if (!chunk.Has(ref linkedEntityGroupHandle))
                     return;
 
@@ -195,11 +195,11 @@ namespace Unity.NetCode.Samples
                     var comp = clientOnlyComponentCollection[childCompIdx];
                     Assertions.Assert.IsFalse(comp.ComponentType.IsBuffer);
                     var typeHandle = typeHandles[comp.ComponentIndex];
-                    //NOTE: this a safety condition in case the entity group is changed and some child removed.
-                    //However, is a necessary but not sufficient condition: it is always possible to
-                    //change the entity or removing and add entities and the length will be same.
-                    //This does not provide a strong guarantee about which entity we are suppose to expect here,
-                    //neither is archetype.
+                    //NOTE: 这是一个安全条件，以防 entity 组发生更改并且某些子组被删除。
+                    //然而，这是一个必要但不充分的条件：总是可以
+                    //更改 entity 或删除并添加 entities，长度将相同。
+                    //这并不能有力保证我们在这里期望的是哪个 entity，
+                    //archetype 也不是。
                     if (entityGroup[ent].Length <= comp.EntityIndex)
                     {
                         reader.Skip(comp);
@@ -225,7 +225,7 @@ namespace Unity.NetCode.Samples
                     reader.RestoreComponent(comp, compDataPtr);
                 }
             }
-            //Little class that help reading backup from a buffer and that check boundary conditions (in the editor)
+            //帮助从缓冲区读取备份并检查边界条件的小类（在编辑器中）
             struct BackupReader
             {
                 private readonly uint* enableBits;

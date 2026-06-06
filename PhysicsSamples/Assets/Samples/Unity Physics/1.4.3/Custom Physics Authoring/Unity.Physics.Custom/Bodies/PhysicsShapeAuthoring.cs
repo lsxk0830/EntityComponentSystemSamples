@@ -89,7 +89,7 @@ namespace Unity.Physics.Authoring
         [ExpandChildren]
         ConvexHullGenerationParameters m_ConvexHullGenerationParameters = ConvexHullGenerationParameters.Default.ToAuthoring();
 
-        // TODO: remove this accessor in favor of GetRawVertices() when blob data is serializable
+        // TODO: 当 blob 数据可序列化时，删除此访问器以支持 GetRawVertices()
         internal UnityEngine.Mesh CustomMesh => m_CustomMesh;
         [SerializeField]
         [Tooltip("If no custom mesh is specified, then one will be generated using this body's rendered meshes.")]
@@ -195,7 +195,7 @@ namespace Unity.Physics.Authoring
         {
             center = m_PrimitiveCenter;
             var lookVector = math.mul(m_PrimitiveOrientation, new float3 { [props.Axis] = 1f });
-            // use previous axis so forward will prefer up
+            // 使用前一个轴，因此向前将优先向上
             var upVector = math.mul(m_PrimitiveOrientation, new float3 { [k_NextAxis[k_NextAxis[props.Axis]]] = 1f });
             orientation = m_PrimitiveOrientation;
             if (rebuildOrientation && props.Axis != 2)
@@ -361,7 +361,7 @@ namespace Unity.Physics.Authoring
             if (inputs.IsCreated)
                 inputs.Clear();
 
-            // get all the transforms that belong to this shape
+            // 获取属于该形状的所有变换
             s_BonesInHierarchy.Clear();
             using (var scope = new GetActiveChildrenScope<Transform>(shape, shape.transform))
             {
@@ -372,7 +372,7 @@ namespace Unity.Physics.Authoring
                 }
             }
 
-            // find all skinned mesh renderers in which this shape's transform might be a bone
+            // 查找所有蒙皮网格渲染器，其中该形状的变换可能是骨骼
             using (var scope = new GetActiveChildrenScope<SkinnedMeshRenderer>(shape, shape.transform.root))
             {
                 foreach (var skin in scope.Buffer)
@@ -386,7 +386,7 @@ namespace Unity.Physics.Authoring
                     )
                         continue;
 
-                    // get indices of this shape's transform hierarchy in skinned mesh's bone array
+                    // 获取蒙皮网格物体骨骼数组中该形状变换层次结构的索引
                     s_BoneIDs.Clear();
                     var bones = skin.bones;
                     for (int i = 0, count = bones.Length; i < count; ++i)
@@ -398,14 +398,14 @@ namespace Unity.Physics.Authoring
                     if (s_BoneIDs.Count == 0)
                         continue;
 
-                    // sample the vertices
+                    // 对顶点进行采样
                     if (pointCloud.IsCreated)
                     {
                         skin.BakeMesh(ReusableBakeMesh);
                         ReusableBakeMesh.GetVertices(s_Vertices);
                     }
 
-                    // add all vertices weighted to at least one bone in this shape's transform hierarchy
+                    // 添加加权到该形状的变换层次结构中至少一根骨骼的所有顶点
                     var bonesPerVertex = mesh.GetBonesPerVertex(); // Allocator.None
                     var weights = mesh.GetAllBoneWeights(); // Allocator.None
                     var vertexIndex = 0;
@@ -511,7 +511,7 @@ namespace Unity.Physics.Authoring
         {
             var offset = 0u;
 #if UNITY_EDITOR
-            // TODO: when min spec is 2020.1, collect all meshes and their data via single Burst job rather than one at a time
+            // TODO: 当最低规格为 2020.1 时，通过单个 Burst job 收集所有网格体及其数据，而不是一次收集一个
             using (var meshData = UnityEditor.MeshUtility.AcquireReadOnlyMeshData(mesh))
 #else
             using (var meshData = UnityEngine.Mesh.AcquireReadOnlyMeshData(mesh))
@@ -738,10 +738,10 @@ namespace Unity.Physics.Authoring
 
         void OnEnable()
         {
-            // included so tick box appears in Editor
+            // 包含，因此勾选框出现在 Editor 中
         }
 
-        const int k_VersionAddedForceUniqueID = 2; // added ForceUniqueID for stable artifact IDs
+        const int k_VersionAddedForceUniqueID = 2; // 添加了 ForceUniqueID 稳定神器 IDs
         const int k_LatestVersion = k_VersionAddedForceUniqueID;
 
         [SerializeField, HideInInspector]
@@ -761,7 +761,7 @@ namespace Unity.Physics.Authoring
 #if UNITY_EDITOR
                 if (PrefabUtility.IsPartOfAnyPrefab(this) || gameObject.scene.IsValid())
                 {
-                    // Inform user that scene needs to be saved:
+                    // 通知用户 scene 需要保存：
 
                     var scenePath = gameObject.scene.path;
 
@@ -837,11 +837,11 @@ namespace Unity.Physics.Authoring
             UpgradeVersionIfNecessary();
         }
 
-        // matrix to transform point from shape space into world space
+        // 将点从形状空间变换到 world 空间的矩阵
         public float4x4 GetShapeToWorldMatrix() =>
             new float4x4(Math.DecomposeRigidBodyTransform(transform.localToWorldMatrix));
 
-        // matrix to transform point from object's local transform matrix into shape space
+        // 将点从对象的局部变换矩阵变换到形状空间的矩阵
         internal float4x4 GetLocalToShapeMatrix() =>
             math.mul(math.inverse(GetShapeToWorldMatrix()), transform.localToWorldMatrix);
 
@@ -879,19 +879,19 @@ namespace Unity.Physics.Authoring
         }
 
         /// <summary>
-        /// Fit this shape to render geometry in its GameObject hierarchy. Children in the hierarchy will
-        /// influence the result if they have enabled MeshRenderer components or have vertices bound to
-        /// them on a SkinnedMeshRenderer. Children will only count as influences if this shape is the
-        /// first ancestor shape in their hierarchy. As such, you should add shape components to all
-        /// GameObjects that should have them before you call this method on any of them.
+        /// 适合此形状以渲染其 GameObject 层次结构中的几何图形。等级制度中的孩子会
+        /// 如果启用了 MeshRenderer components 或将顶点绑定到，则会影响结果
+        /// 他们在 SkinnedMeshRenderer 上。仅当此形状是儿童时，儿童才会被视为影响力
+        /// 他们的等级制度中的第一个祖先形状。因此，您应该将形状 components 添加到所有
+        /// GameObjects 在对其中任何一个调用此方法之前应该拥有它们。
         /// </summary>
         ///
-        /// <exception cref="UnimplementedShapeException"> Thrown when an Unimplemented Shape error
-        /// condition occurs. </exception>
+        /// <exception cref="UnimplementedShapeException"> 当未实现的形状错误时抛出
+        /// 情况发生。</exception>
         ///
-        /// <param name="minimumSkinnedVertexWeight"> (Optional)
-        /// The minimum total weight that a vertex in a skinned mesh must have assigned to this object
-        /// and/or any of its influencing children. </param>
+        /// <param name="minimumSkinnedVertexWeight">（可选）
+        /// 蒙皮网格中的顶点必须分配给该对象的最小总权重
+        /// 和/或任何对其有影响的儿童。</param>
 
         public void FitToEnabledRenderMeshes(float minimumSkinnedVertexWeight = 0f)
         {
@@ -900,7 +900,7 @@ namespace Unity.Physics.Authoring
 
             using (var points = new NativeList<float3>(65535, Allocator.Persistent))
             {
-                // temporarily un-assign custom mesh and assume this shape is a convex hull
+                // 暂时取消分配自定义网格并假设该形状是凸包
                 var customMesh = m_CustomMesh;
                 m_CustomMesh = null;
                 GetConvexHullProperties(points, Application.isPlaying, default, default, default, default);
@@ -908,7 +908,7 @@ namespace Unity.Physics.Authoring
                 if (points.Length == 0)
                     return;
 
-                // TODO: find best rotation, particularly if any points came from skinned mesh
+                // TODO: 找到最佳旋转，特别是如果任何点来自蒙皮网格
                 var orientation = quaternion.identity;
                 var bounds = new Bounds(points[0], float3.zero);
                 for (int i = 1, count = points.Length; i < count; ++i)
@@ -937,7 +937,7 @@ namespace Unity.Physics.Authoring
                     SetSphere(GetSphereProperties(out orientation), orientation);
                     break;
                 case ShapeType.Plane:
-                    // force recalculation of plane orientation by making it think shape type is out of date
+                    // 通过使其认为形状类型已过时来强制重新计算平面方向
                     m_ShapeType = ShapeType.Box;
                     GetPlaneProperties(out var center, out var size2D, out orientation);
                     SetPlane(center, size2D, orientation);
@@ -961,7 +961,7 @@ namespace Unity.Physics.Authoring
 #if UNITY_EDITOR
             InitializeConvexHullGenerationParameters();
             FitToEnabledRenderMeshes(m_MinimumSkinnedVertexWeight);
-            // TODO: also pick best primitive shape
+            // TODO: 也选择最好的原始形状
             UnityEditor.SceneView.RepaintAll();
 #endif
         }

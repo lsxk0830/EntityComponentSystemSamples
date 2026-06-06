@@ -1,26 +1,26 @@
-# HelloNetcode Character Controller sample
+# HelloNetcode 字符控制器示例
 
-This samples shows how you can expand kinematic character controllers as used in the Physics sample to allow characters to react to and walk on static geometry. The motion is still using kinematic physics, but it checks if it is standing on something and makes sure to not go through obstacles.
+此示例展示了如何扩展 Physics 示例中使用的运动学角色控制器，以允许角色对静态几何体做出反应并在其上行走。该运动仍然使用运动物理学，但它会检查它是否站在某物上并确保不会穿过障碍物。
 
-See
+看
 
 * [Physics](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/physics.html)
 * [Unity Physics](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/TableOfContents.html) package
 
-## Requirements
+## 要求
 
-The spawn player sample is used to trigger the auto spawning of the player when connection is established. The dynamic physics objects from the physics sample are used.
+生成播放器示例用于 trigger 在建立连接时自动生成播放器。使用Physics 示例中的动态物理对象。
 
 * GoInGame
 * SpawnPlayer
 * Physics
 
-## Sample description
+## 示例描述
 
-This sample works very similar to the Physics sample, the only difference is how the character is moved. The character has a reference to a character controller config which has a separate physics collider. The collider used for the character controller only collides with static geometry, this means that the character controller can perform collider casts to find a valid position to move to. The actual movement is performed by setting a physics velocity on the real collider and let physics move it. This means all interactions with dynamic objects are performed, but they do not affect the movement of the player.
+此示例的工作方式与 Physics 示例非常相似，唯一的区别在于角色的移动方式。该角色引用了角色控制器配置，该配置具有单独的物理 collider。用于角色控制器的 collider 仅与静态几何体碰撞，这意味着角色控制器可以执行 collider 转换来找到要移动到的有效位置。实际的移动是通过在真实的 collider 上设置物理速度并让物理移动它来执行的。这意味着与动态对象的所有交互都会执行，但它们不会影响玩家的移动。
 
-The character controller prefab has been modified compared to the physics player sample like so:
+与物理播放器示例相比，角色控制器 prefab 已进行修改，如下所示：
 
-* Add a CharacterControllerAuthoring with a reference to a new prefab which has a CharacterControllerConfigAuthoring
+* 添加 CharacterControllerAuthoring 并引用新的 prefab，该新 CharacterControllerConfigAuthoring
 
-The CharacterControllerConfig is a separate prefab which has a collider setup to only collide with static objects, and some configuration parameters for movement.
+CharacterControllerConfig 是一个单独的 prefab，它具有仅与静态对象碰撞的 collider 设置，以及一些用于移动的配置参数。

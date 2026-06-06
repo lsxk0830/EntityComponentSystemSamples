@@ -26,7 +26,7 @@ void GetSurfaceNormal_float(texture2D atlas, float textureWidth, float textureHe
 {
 	float3 delta = float3(1.0 / textureWidth, 1.0 / textureHeight, 0.0);
 
-	// Read "height field"
+	// 阅读“高度场”
 	float4 h = float4(
 		SAMPLE_TEXTURE2D(atlas, SamplerState_Linear_Clamp, uv - delta.xz).a,
 		SAMPLE_TEXTURE2D(atlas, SamplerState_Linear_Clamp, uv + delta.xz).a,
@@ -39,7 +39,7 @@ void GetSurfaceNormal_float(texture2D atlas, float textureWidth, float textureHe
 
 	float bevelWidth = max(.01, _BevelWidth);
 
-	// Track outline
+	// 轨道轮廓
 	h -= .5;
 	h /= bevelWidth;
 	h = saturate(h + .5);
@@ -68,12 +68,12 @@ void EvaluateLight_float(float4 faceColor, float3 n, out float4 color)
 	col *= lerp(_Ambient, 1, n.z * n.z);
 
 	//fixed4 reflcol = texCUBE(_Cube, reflect(input.viewDir, -n));
-	//faceColor.rgb += reflcol.rgb * lerp(_ReflectFaceColor.rgb, _ReflectOutlineColor.rgb, saturate(sd + outline * 0.5)) * faceColor.a;
+	//faceColor.rgb += reflcol.rgb * lerp(_ReflectFaceColor.rgb, _ReflectOutlineColor.rgb, 饱和(sd + 轮廓 * 0.5)) * faceColor.a;
 
 	color = float4(col, faceColor.a);
 }
 
-// Add custom function to handle time in HDRP
+// 在 HDRP 中添加自定义函数来处理时间
 
 
 //
@@ -94,9 +94,9 @@ void ScreenSpaceRatio2_float(float4x4 projection, float4 position, float2 object
 	SSR = rsqrt(dot(pixelSize, pixelSize)*2) * fontScale;
 }
 
-// UV			: Texture coordinate of the source distance field texture
-// TextureSize	: Size of the source distance field texture
-// Filter		: Enable perspective filter (soften)
+// UV：源距离场纹理的纹理坐标
+// TextureSize：源距离场纹理的大小
+// 滤镜：启用透视滤镜（柔化）
 void ScreenSpaceRatio_float(float2 UV, float TextureSize, bool Filter, out float SSR)
 {
 	if(Filter)
@@ -113,16 +113,16 @@ void ScreenSpaceRatio_float(float2 UV, float TextureSize, bool Filter, out float
 	}
 }
 
-// SSR : Screen Space Ratio
-// SD  : Signed Distance (encoded : Distance / SDR + .5)
-// SDR : Signed Distance Ratio
+// SSR：屏幕空间比率
+// SD：有符号距离（编码：距离 / SDR +.5）
+// SDR：有符号距离比
 //
-// IsoPerimeter : Dilate / Contract the shape
+// IsoPerimeter：扩大/收缩形状
 void ComputeSDF_float(float SSR, float SD, float SDR, float isoPerimeter, float softness, out float outAlpha)
 {
 	softness *= SSR * SDR;
-	float d = (SD - 0.5) * SDR;																				// Signed distance to edge, in Texture space
-	outAlpha = saturate((d * 2.0 * SSR + 0.5 + isoPerimeter * SDR * SSR + softness * 0.5) / (1.0 + softness));	// Screen pixel coverage (alpha)
+	float d = (SD - 0.5) * SDR;																				// 纹理空间中到边缘的有符号距离
+	outAlpha = saturate((d * 2.0 * SSR + 0.5 + isoPerimeter * SDR * SSR + softness * 0.5) / (1.0 + softness));	// 屏幕像素覆盖率（alpha）
 }
 
 void ComputeSDF2_float(float SSR, float SD, float SDR, float2 isoPerimeter, float2 softness, out float2 outAlpha)
@@ -152,14 +152,14 @@ void Composite_float(float4 overlying, float4 underlying, out float4 outColor)
 	outColor = BlendARGB(overlying, underlying);
 }
 
-// Face only
+// 仅面部
 void Layer1_float(float alpha, float4 color0, out float4 outColor)
 {
 	color0.a *= alpha;
 	outColor = color0;
 }
 
-// Face + 1 Outline
+// 脸部 + 1 轮廓
 void Layer2_float(float2 alpha, float4 color0, float4 color1, out float4 outColor)
 {
 	color1.a *= alpha.y;
@@ -168,7 +168,7 @@ void Layer2_float(float2 alpha, float4 color0, float4 color1, out float4 outColo
 	outColor.rgb /= outColor.a;
 }
 
-// Face + 3 Outline
+// 脸部+3 轮廓
 void Layer4_float(float4 alpha, float4 color0, float4 color1, float4 color2, float4 color3, out float4 outColor)
 {
 	color3.a *= alpha.w;

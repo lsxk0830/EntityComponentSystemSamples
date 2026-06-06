@@ -84,10 +84,10 @@ namespace Unity.Physics.Editor
         {
             var templateValueProperty = GetTemplateValueProperty(property);
 
-            // m_CollisionResponse, collision filter foldout, advanced foldout
+            // m_CollisionResponse，碰撞过滤器折页，高级折页
             var height = 3f * EditorGUIUtility.singleLineHeight + 2f * EditorGUIUtility.standardVerticalSpacing;
 
-            // m_BelongsTo, m_CollidesWith
+            // m_BelongsTo、m_CollidesWith
             var group = property.FindPropertyRelative(k_CollisionFilterGroupKey);
             if (group.isExpanded)
                 height += 2f * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
@@ -97,13 +97,13 @@ namespace Unity.Physics.Editor
             if (group.isExpanded)
                 height += 2f * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
-            // m_Template
+            // m_ 模板
             if (property.FindPropertyRelative("m_SupportsTemplate").boolValue)
                 height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-            // m_Friction, m_Restitution
+            // m_ 摩擦，m_ 恢复
             FindToggleAndValueProperties(property, templateValueProperty, "m_CollisionResponse", out _, out var collisionResponse);
-            // Check if regular collider
+            // 检查是否正规 collider
             CollisionResponsePolicy collisionResponseEnum = (CollisionResponsePolicy)collisionResponse.intValue;
             if (collisionResponseEnum == CollisionResponsePolicy.Collide ||
                 collisionResponseEnum == CollisionResponsePolicy.CollideRaiseCollisionEvents)
@@ -160,7 +160,7 @@ namespace Unity.Physics.Editor
 
             SerializedProperty toggle;
 
-            // Check if regular collider
+            // 检查是否正规 collider
             CollisionResponsePolicy collisionResponseEnum = (CollisionResponsePolicy)collisionResponse.intValue;
             if (collisionResponseEnum == CollisionResponsePolicy.Collide ||
                 collisionResponseEnum == CollisionResponsePolicy.CollideRaiseCollisionEvents)
@@ -176,7 +176,7 @@ namespace Unity.Physics.Editor
                 DisplayOverridableProperty(position, Content.RestitutionLabel, toggle, restitution, templateAssigned);
             }
 
-            // collision filter group
+            // 碰撞过滤组
             var collisionFilterGroup = property.FindPropertyRelative(k_CollisionFilterGroupKey);
             position.y = position.yMax + EditorGUIUtility.standardVerticalSpacing;
             position.height = EditorGUIUtility.singleLineHeight;
@@ -199,7 +199,7 @@ namespace Unity.Physics.Editor
                 --EditorGUI.indentLevel;
             }
 
-            // advanced group
+            // 先进集体
             var advancedGroup = property.FindPropertyRelative(k_AdvancedGroupKey);
             position.y = position.yMax + EditorGUIUtility.standardVerticalSpacing;
             position.height = EditorGUIUtility.singleLineHeight;

@@ -16,7 +16,7 @@ namespace HelloCube.FirstPersonController
             state.RequireForUpdate<ExecuteFirstPersonController>();
         }
 
-        // This OnUpdate accesses managed objects and so cannot be Burst-compiled
+        // 此 OnUpdate 访问托管对象，因此无法进行 Burst 编译
         public void OnUpdate(ref SystemState state)
         {
             if (Camera.main != null)

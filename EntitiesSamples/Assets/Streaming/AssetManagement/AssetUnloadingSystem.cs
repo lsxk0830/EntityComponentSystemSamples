@@ -15,21 +15,21 @@ namespace Streaming.AssetManagement
             var referencesArray = query.ToComponentDataArray<References>(Allocator.Temp);
             var loadingArray = query.ToComponentArray<Loading>();
 
-            // We cannot use SystemAPI.Query for this loop because we need to
-            // call methods that make structural changes in the loop.
+            // 我们不能将 SystemAPI.Query 用于此循环，因为我们需要
+            // 调用在循环中进行结构更改的方法。
             for (int index = 0; index < referencesArray.Length; ++index)
             {
                 var refs = referencesArray[index];
                 var loading = loadingArray[index];
 
-                // Unload Entity Scene
+                // 卸载 Entity Scene
                 if (loading.EntityScene != Entity.Null)
                 {
                     SceneSystem.UnloadScene(state.WorldUnmanaged, loading.EntityScene,
                         SceneSystem.UnloadParameters.DestroyMetaEntities);
                 }
 
-                // Unload Entity Prefab
+                // 卸载 Entity Prefab
                 if (loading.EntityPrefabInstance != Entity.Null)
                 {
                     state.EntityManager.DestroyEntity(loading.EntityPrefabInstance);
@@ -41,13 +41,13 @@ namespace Streaming.AssetManagement
                         SceneSystem.UnloadParameters.DestroyMetaEntities);
                 }
 
-                // Unload GameObject Scene
+                // 卸载 GameObject Scene
                 if (loading.GameObjectScene.IsValid())
                 {
                     refs.GameObjectSceneReference.Unload(ref loading.GameObjectScene);
                 }
 
-                // Unload GameObject Prefab
+                // 卸载 GameObject Prefab
                 if (loading.GameObjectPrefabInstance != null)
                 {
                     Object.Destroy(loading.GameObjectPrefabInstance);
@@ -58,7 +58,7 @@ namespace Streaming.AssetManagement
                     refs.GameObjectPrefabReference.Release();
                 }
 
-                // Unload Mesh
+                // 卸载网格
                 if (loading.MeshGameObjectInstance)
                 {
                     var renderer = loading.MeshGameObjectInstance.GetComponent<MeshRenderer>();
@@ -72,7 +72,7 @@ namespace Streaming.AssetManagement
                     refs.MeshReference.Release();
                 }
 
-                // Unload Material
+                // 卸料
                 if (loading.MaterialGameObjectInstance)
                 {
                     GameObject.Destroy(loading.MaterialGameObjectInstance);
@@ -83,7 +83,7 @@ namespace Streaming.AssetManagement
                     refs.MaterialReference.Release();
                 }
 
-                // Unload Texture
+                // 卸载纹理
                 if (loading.TextureGameObjectInstance)
                 {
                     var renderer = loading.TextureGameObjectInstance.GetComponent<MeshRenderer>();
@@ -97,14 +97,14 @@ namespace Streaming.AssetManagement
                     refs.TextureReference.Release();
                 }
 
-                // Unload Shader
+                // 卸载着色器
                 if (refs.ShaderReference.LoadingStatus != ObjectLoadingStatus.None)
                 {
                     refs.ShaderReference.Release();
                 }
             }
 
-            // Remove Loading
+            // 移除加载
             var noLoadingStateQuery = SystemAPI.QueryBuilder()
                 .WithAll<References, Loading, RequestUnload>().Build();
             state.EntityManager.RemoveComponent<Loading>(noLoadingStateQuery);

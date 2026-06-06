@@ -49,8 +49,8 @@ namespace Unity.Physics.Tests
 
         protected override void OnStartRunning()
         {
-            // Read/write the display singleton to register as writing data
-            // to make sure display systems don't interfere with the test
+            // 读/写显示单例以注册为写入数据
+            // 确保显示 systems 不会干扰测试
             if (SystemAPI.HasSingleton<PhysicsDebugDisplayData>())
             {
                 var data = SystemAPI.GetSingleton<PhysicsDebugDisplayData>();
@@ -62,7 +62,7 @@ namespace Unity.Physics.Tests
         {
             if (!m_RecordingBegan)
             {
-                // > 1 because of default static body, logically should be > 0
+                // > 1 因为默认静态主体，逻辑上应该 > 0
                 m_RecordingBegan = SystemAPI.GetSingleton<PhysicsWorldSingleton>().NumBodies > 1;
             }
             else
@@ -78,7 +78,7 @@ namespace Unity.Physics.Tests
         }
     }
 
-    // Only works in standalone build, since it needs synchronous Burst compilation.
+    // 仅适用于独立构建，因为它需要同步 Burst 编译。
 #if (!UNITY_EDITOR && UNITY_PHYSICS_INCLUDE_SLOW_TESTS) || UNITY_PHYSICS_INCLUDE_END2END_TESTS
     [NUnit.Framework.TestFixture]
 #endif

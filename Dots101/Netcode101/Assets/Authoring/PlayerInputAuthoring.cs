@@ -15,15 +15,15 @@ namespace KickBall
             }
         }
     }
-    
-    // We only need set this input component once per frame.
-    // Netcode will append the value to the client's input buffer.
+
+    // 我们只需每帧设置一次输入 component。
+    // Netcode 会将值附加到 client 的输入缓冲区。
     [GhostComponent(PrefabType = GhostPrefabType.AllPredicted)]
     public struct PlayerInput : IInputComponentData
     {
         public float Horizontal;
         public float Vertical;
         public InputEvent KickBall;
-        public InputEvent SpawnBall;   
+        public InputEvent SpawnBall;
     }
 }

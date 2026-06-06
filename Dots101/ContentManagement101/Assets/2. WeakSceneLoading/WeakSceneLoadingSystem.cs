@@ -8,13 +8,13 @@ namespace ContentManagement.Sample
     public partial struct WeakSceneLoadingSystem : ISystem
     {
         private bool init;
-        
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ContentIsReady>();
             state.RequireForUpdate<HighLowWeakScene>();
         }
-        
+
         public void OnUpdate(ref SystemState state)
         {
             var weakScene = SystemAPI.GetSingleton<HighLowWeakScene>();
@@ -28,37 +28,37 @@ namespace ContentManagement.Sample
             if (!init)
             {
                 Debug.Log("Hit Enter to toggle between low and high fidelity");
-                
-                // initial load of the low-fidelity scene
+
+                // 低保真 scene 的初始负载
                 weakScene.LoadedScene = SceneSystem.LoadSceneAsync(state.WorldUnmanaged, weakScene.LowSceneRef.Id.GlobalId.AssetGUID, loadParams);
-                
+
                 SystemAPI.SetSingleton(weakScene);
                 init = true;
                 return;
             }
-            
-            // only switch scenes when user hits enter key
+
+            // 仅当用户按 Enter 键时切换 scenes
             if (!Keyboard.current.enterKey.wasPressedThisFrame)
             {
                 return;
             }
 
-            // toggle between the two scenes
-            SceneSystem.UnloadScene(state.WorldUnmanaged, weakScene.LoadedScene);  // unload current scene
-            
+            // 在两个 scenes 之间切换
+            SceneSystem.UnloadScene(state.WorldUnmanaged, weakScene.LoadedScene);  // 卸载电流 scene
+
             if (weakScene.IsHighLoaded)
             {
-                // load low fidelity
+                // 加载低保真度
                 weakScene.LoadedScene = SceneSystem.LoadSceneAsync(state.WorldUnmanaged, weakScene.LowSceneRef.Id.GlobalId.AssetGUID, loadParams);
                 weakScene.IsHighLoaded = false;
             }
             else
             {
-                // load high fidelity
+                // 加载高保真度
                 weakScene.LoadedScene = SceneSystem.LoadSceneAsync(state.WorldUnmanaged, weakScene.HighSceneRef.GlobalId.AssetGUID, loadParams);
                 weakScene.IsHighLoaded = true;
             }
-            
+
             SystemAPI.SetSingleton(weakScene);
         }
     }

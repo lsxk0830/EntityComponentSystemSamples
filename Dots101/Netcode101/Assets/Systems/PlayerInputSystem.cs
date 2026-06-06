@@ -18,10 +18,10 @@ namespace KickBall
         {
             var moveAction = InputSystem.actions.FindAction("Move");
             var moveValue = moveAction.ReadValue<Vector2>();
-                
-            // WithAll<GhostOwnerIsLocal> so that we only modify the input buffer of the local client, not other clients
-            // (it's possible and sometimes useful for clients to receive copies of each other's input buffers, but even in
-            // those cases we wouldn't want to modify the copies of other players' input buffers)
+
+            // WithAll<GhostOwnerIsLocal> 这样我们只修改本地 client 的输入缓冲区，而不修改其他 clients
+            // （clients 接收彼此输入缓冲区的副本是可能的，有时也是有用的，但即使在
+            // 在这些情况下，我们不想修改其他玩家输入缓冲区的副本）
             foreach (var input in SystemAPI.Query<RefRW<PlayerInput>>()
                          .WithAll<GhostOwnerIsLocal>())
             {
@@ -31,7 +31,7 @@ namespace KickBall
                 // var moveValue = moveAction.ReadValue<Vector2>();
                 //
                 // Debug.Log(moveValue);
-                
+
                 input.ValueRW.Horizontal = moveValue.x;
                 input.ValueRW.Vertical = moveValue.y;
 

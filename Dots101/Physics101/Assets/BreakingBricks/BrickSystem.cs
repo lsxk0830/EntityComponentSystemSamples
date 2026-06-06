@@ -10,7 +10,7 @@ using Random = Unity.Mathematics.Random;
 
 namespace BreakingBricks
 {
-    // the system runs after each iteration of collision detection and the solver
+    // system 在碰撞检测和求解器的每次迭代后运行
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial struct BrickSystem : ISystem
     {
@@ -23,13 +23,13 @@ namespace BreakingBricks
             state.RequireForUpdate<PhysicsWorldSingleton>();
             state.RequireForUpdate<BreakingBricks.Config>();
         }
- 
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var config = SystemAPI.GetSingleton<Config>();
 
-            // spawn bricks
+            // 生成砖块
             if (!hasSpawnedBricks)
             {
                 hasSpawnedBricks = true;
@@ -49,32 +49,32 @@ namespace BreakingBricks
                     color.ValueRW.Value = config.FullHitpointsColor;
                 }
             }
-            
-            // needed to get the collision events
+
+            // 需要获取碰撞事件
             var sim = SystemAPI.GetSingleton<SimulationSingleton>().AsSimulation();
-            
-            // to access the collisions events on main thread, we must sync any outstanding physics sim jobs
-            sim.FinalJobHandle.Complete(); 
-            
-            // needed to get details of the collision events (estimated impulse)
+
+            // 要访问主线程上的碰撞事件，我们必须同步任何出色的物理模拟 jobs
+            sim.FinalJobHandle.Complete();
+
+            // 需要获取碰撞事件的详细信息（估计脉冲）
             var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
 
-            const float minImpactThreshold = 2f; // ignore impacts below this (to effectively ignore resting contacts) 
+            const float minImpactThreshold = 2f; // 忽略低于此的影响（以有效忽略静止接触）
             var strengthModifier = config.ImpactStrength;
-            
+
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             foreach (var collisionEvent in sim.CollisionEvents)
             {
-                // check if one of the two bodies is a brick and the other a ball
+                // 检查两个物体中的一个是否是砖块，另一个是否是球
                 Entity brickEntity;
                 Entity ballEntity;
-                
-                // Note that, in a single physics update, a collision between a pair 
-                // of bodies creates one collision event, not two.
-                // The API makes no guarantee which body is EntityA and which is EntityB,
-                // so you must test for both possibilities.
-                
+
+                // Note 在一次物理更新中，一对之间的碰撞
+                // 物体的数量会产生一次碰撞事件，而不是两次。
+                // API 不保证哪个实体是 EntityA，哪个实体是 EntityB，
+                // 所以你必须测试这两种可能性。
+
                 if (SystemAPI.HasComponent<Brick>(collisionEvent.EntityA) &&
                     SystemAPI.HasComponent<Ball>(collisionEvent.EntityB))
                 {
@@ -91,30 +91,30 @@ namespace BreakingBricks
                 {
                     continue;
                 }
-                
+
                 var details = collisionEvent.CalculateDetails(ref physicsWorld);
 
-                // ignore resting contacts
+                // 忽略休息时的接触
                 if (details.EstimatedImpulse < minImpactThreshold)
                 {
                     continue;
                 }
 
-                // reduce brick hitpoints
+                // 减少砖块生命值
                 var brick = SystemAPI.GetComponentRW<Brick>(brickEntity);
                 brick.ValueRW.Hitpoints -= strengthModifier * details.EstimatedImpulse;
 
-                // destroy brick if hitpoints below 0
+                // 如果生命值低于 0，则摧毁砖块
                 if (brick.ValueRO.Hitpoints <= 0)
                 {
                     ecb.DestroyEntity(brickEntity);
                 }
                 else
                 {
-                    // update color of the hit brick
+                    // 更新被击中的砖块的颜色
                     var color = SystemAPI.GetComponentRW<URPMaterialPropertyBaseColor>(brickEntity);
                     color.ValueRW.Value = math.lerp(config.EmptyHitpointsColor, config.FullHitpointsColor,
-                        brick.ValueRO.Hitpoints);    
+                        brick.ValueRO.Hitpoints);
                 }
             }
 

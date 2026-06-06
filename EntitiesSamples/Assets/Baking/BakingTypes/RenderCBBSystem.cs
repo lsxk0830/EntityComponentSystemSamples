@@ -22,7 +22,7 @@ namespace Baking.BakingTypes
                 var min = bb.ValueRO.MinBBVertex;
                 var max = bb.ValueRO.MaxBBVertex;
 
-                // Draw a bounding box
+                // 绘制边界框
                 Debug.DrawLine(new Vector3(min.x, min.y, min.z), new Vector3(max.x, min.y, min.z));
                 Debug.DrawLine(new Vector3(min.x, max.y, min.z), new Vector3(max.x, max.y, min.z));
                 Debug.DrawLine(new Vector3(min.x, min.y, min.z), new Vector3(min.x, max.y, min.z));

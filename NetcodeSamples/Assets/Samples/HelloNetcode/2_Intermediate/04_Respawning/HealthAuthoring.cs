@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <remarks>
-    /// short is used so that we don't have to deal with floating point imprecision,
-    /// and to ensure that we can go negative, which could come into play if there was healing or similar positive HP operations.
+    /// 使用 short 是为了我们不必处理浮点不精确，
+    /// 并确保我们可以走向消极，如果有治疗或类似的积极 HP 操作，这可能会发挥作用。
     /// </remarks>
     public struct Health : IComponentData
     {

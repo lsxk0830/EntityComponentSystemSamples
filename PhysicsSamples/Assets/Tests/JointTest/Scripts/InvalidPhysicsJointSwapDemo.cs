@@ -67,7 +67,7 @@ public partial struct InvalidPhysicsJointSwapDemoSystem : ISystem
             timer.ValueRW.Tick(deltaTime);
         }
 
-        // swap motion type
+        // 交换运动类型
         foreach (var(timer, bodyPair) in SystemAPI.Query<RefRW<InvalidPhysicsJointSwapTimerEvent>, RefRW<PhysicsConstrainedBodyPair>>().WithAll<InvalidPhysicsJointSwapBodies>())
         {
             if (timer.ValueRW.Fired(true))
@@ -138,17 +138,17 @@ public partial class InvalidPhysicsJointSwapDemoSceneCreationSystem : SceneCreat
 
         float timeToSwap = sceneSettings.TimeToSwap;
 
-        // Add two constrained dynamic bodies that will have their bodies swapped
+        // 添加两个将交换其主体的受约束动态主体
         bool buildThisSection = true;
         if (buildThisSection)
         {
-            // Create a body
+            // 创建一个身体
             Entity bodyA = CreateDynamicBody(new float3(2f, 5.0f, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
             Entity bodyB = CreateDynamicBody(new float3(2f, 6.0f, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
             for (int i = 0; i < 2; i++)
             {
-                // Create the joint
+                // 创建 joint
                 var joint = PhysicsJoint.CreateBallAndSocket(new float3(0, colliderSize, 0), new float3(0, -colliderSize, 0));
                 var jointEntity = CreateJoint(joint, bodyA, bodyB);
 
@@ -158,7 +158,7 @@ public partial class InvalidPhysicsJointSwapDemoSceneCreationSystem : SceneCreat
 
                 if (1 == i)
                 {
-                    // add swap and timer components.
+                    // 添加交换和计时器 components。
                     EntityManager.AddComponentData(jointEntity, new InvalidPhysicsJointSwapBodies {});
                     EntityManager.AddComponentData(jointEntity, new InvalidPhysicsJointSwapTimerEvent { TimeLimit = timeToSwap, Timer = timeToSwap });
                 }
@@ -168,18 +168,18 @@ public partial class InvalidPhysicsJointSwapDemoSceneCreationSystem : SceneCreat
             EntityManager.AddComponentData(bodyA, new InvalidPhysicsJointSwapTimerEvent { TimeLimit = timeToSwap * 2.0f, Timer = timeToSwap * 2.0f });
         }
 
-        // Add constrained static/dynamic body pair that will have their bodies swapped
+        // 添加约束静态/动态主体对，将交换它们的主体
         buildThisSection = true;
         if (buildThisSection)
         {
-            // Create a body
+            // 创建一个身体
             var staticTransform = new RigidTransform(quaternion.identity, new float3(3f, 5.0f, 0));
             Entity bodyS = CreateStaticBody(staticTransform.pos, staticTransform.rot, collider);
             Entity bodyD = CreateDynamicBody(new float3(3f, 6.0f, 0), quaternion.identity, collider, float3.zero, float3.zero, 1.0f);
 
             for (int i = 0; i < 2; i++)
             {
-                // Create the joint
+                // 创建 joint
                 var joint = PhysicsJoint.CreateBallAndSocket(new float3(0, colliderSize, 0), new float3(0, -colliderSize, 0));
                 var jointEntity = CreateJoint(joint, bodyS, bodyD);
 
@@ -188,7 +188,7 @@ public partial class InvalidPhysicsJointSwapDemoSceneCreationSystem : SceneCreat
                 EntityManager.SetComponentData(jointEntity, pair);
             }
 
-            // add swap and timer components.
+            // 添加交换和计时器 components。
             EntityManager.AddComponentData(bodyS, new InvalidPhysicsJointSwapMotionType { OriginalTransform = staticTransform });
             EntityManager.AddComponentData(bodyS, new InvalidPhysicsJointSwapTimerEvent { TimeLimit = timeToSwap, Timer = timeToSwap });
         }

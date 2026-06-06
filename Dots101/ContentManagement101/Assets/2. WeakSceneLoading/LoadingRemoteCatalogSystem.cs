@@ -6,14 +6,14 @@ using UnityEngine;
 namespace ContentManagement.Sample
 {
     /// <summary>
-    /// Enables the Content Management API to retrieve content from a remote source,
-    /// load it into memory, and then connect all references.
+    /// 使内容管理 API 能够从远程源检索内容，
+    /// 将其加载到内存中，然后连接所有引用。
     /// </summary>
     [UpdateBefore(typeof(WeakSceneLoadingSystem))]
     public partial struct LoadingRemoteCatalogSystem : ISystem
     {
         private bool initialized;
-        
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<RemoteContent>();
@@ -21,13 +21,13 @@ namespace ContentManagement.Sample
             initialized = false;
             ContentDeliveryGlobalState.RegisterForContentUpdateCompletion(UpdateStateCallback);
         }
-        
+
         private void UpdateStateCallback(ContentDeliveryGlobalState.ContentUpdateState contentUpdateState)
         {
             Debug.Log($"<color=green>Content Delivery Global State:</color> {contentUpdateState}");
             if (contentUpdateState >= ContentDeliveryGlobalState.ContentUpdateState.ContentReady)
             {
-                // Track the state of your content and set when your content is ready to use
+                // 跟踪内容的状态并设置内容何时可供使用
             }
         }
 
@@ -40,18 +40,18 @@ namespace ContentManagement.Sample
                 var contentPath = Path.Combine( settings.URL.ToString(), WeakSceneListScriptableObject.ContentDir) + "/";
 
                 Debug.Log($"<color=green>Loading Content Delivery From Remote source:</color>{contentPath}");
-                // When the ENABLE_CONTENT_DELIVERY scriptable define is set (https://docs.unity3d.com/6000.2/Documentation/Manual/custom-scripting-symbols.html),
-                // the content catalog must be initialized before any assets are loaded.
-                // We specify the remote content path, the local cache path (for storing downloaded content),
-                // and prevent unnecessary downloads by only fetching content if needed.
-                // The content set name refers to the specific content bundle defined during the build process.
+                // 当设置 ENABLE_CONTENT_DELIVERY 可编写脚本的定义 (https://docs.unity3d.com/6000.2/Documentation/Manual/custom-scripting-symbols.html) 时，
+                // 加载任何资源之前必须初始化内容目录。
+                // 我们指定远程内容路径、本地缓存路径（用于存储下载的内容）、
+                // 并通过仅在需要时获取内容来防止不必要的下载。
+                // 内容集名称是指构建过程中定义的特定内容包。
                 RuntimeContentSystem.LoadContentCatalog(contentPath, WeakSceneListScriptableObject.CachePath,
                     WeakSceneListScriptableObject.ContentSetName, true);
             }
 
-            
+
             var entityQuery = SystemAPI.QueryBuilder().WithAll<ContentIsReady>().Build();
-            
+
             if (entityQuery.CalculateEntityCount() < 1 &&
                 ContentDeliveryGlobalState.CurrentContentUpdateState >=
                 ContentDeliveryGlobalState.ContentUpdateState.ContentReady)

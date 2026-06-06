@@ -3,9 +3,9 @@ using Unity.NetCode.Samples;
 
 namespace Samples.HelloNetcode
 {
-    // System that register the PlayerMovement component to the ClientOnlyComponent collection.
-    // The registration is performed at runtime instead of at creation time (inside the OnCreate) only
-    // because the EnableClientOnlyState condition should be checked.
+    // System 将 PlayerMovement component 注册到 ClientOnlyComponent 集合。
+    // 注册仅在运行时执行，而不是在创建时执行（在 OnCreate 内）
+    // 因为应该检查 EnableClientOnlyState 条件。
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct RegisterClientOnlyComponents : ISystem

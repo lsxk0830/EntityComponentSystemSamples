@@ -20,13 +20,13 @@ namespace Samples.HelloNetcode
                 .WithAll<NetworkId>()
                 .WithNone<GhostConnectionPosition>();
             m_NetworkIdsWithoutGhostConnectionPositionQuery = state.EntityManager.CreateEntityQuery(builder);
-            // Note: CreateEntityQuery ensures we run this system even if we do not have any entities matching this query (i.e. clients),
-            // which allows the EnableImportance flag to still work.
+            // Note: CreateEntityQuery 确保我们 run 这个 system 即使我们没有任何 entities 匹配这个 query (i.e.clients)，
+            // 这允许 EnableImportance 标志仍然有效。
         }
 
         public void OnUpdate(ref SystemState state)
         {
-            // Note: This is handled in OnUpdate as we cannot guarantee that the EnableImportance singleton exists during OnCreate, as it's enabled via a sub-scene.
+            // Note: 这是在 OnUpdate 中处理的，因为我们不能保证 EnableImportance 单例在 OnCreate 期间存在，因为它是通过子 scene 启用的。
             var enableImportance = SystemAPI.GetSingleton<EnableImportance>();
             var hasEnabledImportanceScaling = SystemAPI.TryGetSingletonEntity<GhostImportance>(out var existingImportanceSingletonEntity);
             if (enableImportance.Enabled != hasEnabledImportanceScaling)
@@ -42,12 +42,12 @@ namespace Samples.HelloNetcode
                         GhostImportancePerChunkDataType = ComponentType.ReadOnly<GhostDistancePartitionShared>(),
                     });
 
-                    // Note: If you ALWAYS want the "Distance Importance Scaling" feature enabled:
-                    // - It is safe to move the above code into OnCreate.
-                    // - But, you must delete the EnableImportance component (and Authoring), as you cannot sample it via OnCreate
-                    // (as the sub scene will not be loaded yet, in builds).
+                    // Note: 如果您 ALWAYS 希望启用“距离重要性缩放”功能：
+                    // - 将上述代码移至 OnCreate 中是安全的。
+                    // - 但是，您必须删除 EnableImportance component （和 Authoring），因为您无法通过 OnCreate 对其进行采样
+                    // （因为子 scene 在构建中尚未加载）。
 
-                    // Disable the automatic adding of the importance shared component.
+                    // 禁用自动添加重要性共享 component。
                     GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionSharedComponent = false;
                 }
                 else
@@ -60,9 +60,9 @@ namespace Samples.HelloNetcode
             if (enableImportance.Enabled)
             {
                 state.EntityManager.AddComponent<GhostConnectionPosition>(m_NetworkIdsWithoutGhostConnectionPositionQuery);
-                // Note: In a real game (and assuming your clients character controller moves and/or rotates),
-                // you'd need to update your GhostConnectionPosition values every frame.
-                // In this sample, the character controller is in a fixed position, which happens to be default(float3).
+                // Note: 在真实游戏中（假设您的 clients 角色控制器移动和/或旋转），
+                // 您需要每帧更新 GhostConnectionPosition 值。
+                // 在此示例中，角色控制器位于固定位置，恰好是默认位置（float3）。
             }
         }
 

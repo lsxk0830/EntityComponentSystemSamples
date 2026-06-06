@@ -5,7 +5,7 @@ using Unity.Transforms;
 
 namespace Streaming.SceneManagement.Common
 {
-    // OscillatingSystem will move each oscillating entity in sample
+    // OscillatingSystem 将移动示例中的每个振荡 entity
     public partial struct OscillatingSystem : ISystem
     {
         [BurstCompile]

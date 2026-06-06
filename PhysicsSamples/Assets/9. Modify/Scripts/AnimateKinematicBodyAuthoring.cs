@@ -24,7 +24,7 @@ struct AnimateKinematicBodyCurve : ISharedComponentData, IEquatable<AnimateKinem
         unchecked((int)math.hash(new int2(TranslationCurve?.GetHashCode() ?? 0, OrientationCurve?.GetHashCode() ?? 0)));
 }
 
-// translate a body along the z-axis and rotate about the y-axis following animation curves
+// 沿 z 轴平移主体并按照动画曲线绕 y 轴旋转
 [RequireComponent(typeof(PhysicsBodyAuthoring))]
 class AnimateKinematicBodyAuthoring : MonoBehaviour
 {
@@ -38,7 +38,7 @@ class AnimateKinematicBodyAuthoring : MonoBehaviour
     public Mode AnimateMode;
     #pragma warning restore 649
 
-    // default translates 6 units backward in 1 second at a constant velocity and repeats from the start
+    // 默认在 1 秒内以恒定速度向后平移 6 个单位，并从头开始重复
     public AnimationCurve TranslationCurve = new AnimationCurve(
         new Keyframe(0f, 3f, -6f, -6f),
         new Keyframe(1f, -3f, -6f, -6f)
@@ -48,7 +48,7 @@ class AnimateKinematicBodyAuthoring : MonoBehaviour
         postWrapMode = WrapMode.Loop
     };
 
-    // default repeatedly rotates smoothly between negative and positive 15 degrees about the y-axis over 2 seconds
+    // 默认值在 2 秒内围绕 y 轴在正负 15 度之间重复平滑旋转
     public AnimationCurve OrientationCurve = new AnimationCurve(
         new Keyframe(0f, -15f, 0f, 0f),
         new Keyframe(1f, 15f, 0f, 0f),
@@ -81,11 +81,11 @@ class AnimateKinematicBodyBaker : Baker<AnimateKinematicBodyAuthoring>
 [UpdateBefore(typeof(PhysicsSystemGroup))]
 partial struct AnimateKinematicBodySystem : ISystem
 {
-    // cleanup component used to identify new animated bodies on their first frame
+    // cleanup component 用于识别第一帧上的新动画主体
     struct Initialized : ICleanupComponentData {}
 
-    // sample the animation curves to generate a new position and orientation
-    // curves translate along the z-axis and set an orientation rotated about the y-axis
+    // 对动画曲线进行采样以生成新​​的位置和方向
+    // 曲线沿 z 轴平移并设置绕 y 轴旋转的方向
     static void Sample(in AnimateKinematicBodyCurve curve, in float t, ref float3 position, ref quaternion orientation)
     {
         position.z = curve.TranslationCurve.Evaluate(t);
@@ -98,26 +98,26 @@ partial struct AnimateKinematicBodySystem : ISystem
 
         var commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
-        // teleport all new bodies into place on the first frame
-        // otherwise they may collide with things between their initial location and the first frame of animation
+        // 将所有新物体传送到第一帧上的适当位置
+        // 否则它们可能会与初始位置和动画第一帧之间的物体发生碰撞
 
         foreach (var(transform, curve, entity)
                  in SystemAPI.Query<RefRW<LocalTransform>, AnimateKinematicBodyCurve>().WithEntityAccess().WithNone<Initialized>())
 
         {
-            // sample curves and apply results directly to Translation and Rotation
+            // 采样曲线并将结果直接应用于平移和旋转
 
             Sample(curve, elapsedTime, ref transform.ValueRW.Position, ref transform.ValueRW.Rotation);
 
             commandBuffer.AddComponent<Initialized>(entity);
         }
 
-        // moving kinematic bodies via their Translation and Rotation components will teleport them to the target location
+        // 通过平移和旋转 components 移动运动体会将它们传送到目标位置
 
         foreach (var(transform, mass, curve) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<PhysicsMass>, AnimateKinematicBodyCurve>().WithAll<TeleportKinematicBody, Initialized>())
 
         {
-            // sample curves and apply results directly to Translation and Rotation
+            // 采样曲线并将结果直接应用于平移和旋转
 
             Sample(curve, elapsedTime, ref transform.ValueRW.Position, ref transform.ValueRW.Rotation);
 
@@ -125,27 +125,27 @@ partial struct AnimateKinematicBodySystem : ISystem
 
         var tickSpeed = 1f / SystemAPI.Time.DeltaTime;
 
-        // moving kinematic bodies via their PhysicsVelocity component will generate contact events with any bodies they pass through
+        // 通过 PhysicsVelocity component 移动运动体将与其经过的任何物体生成接触事件
         // use PhysicsVelocity.CalculateVelocityToTarget() to compute the velocity required to move to a desired target position
-        // NOTE: if you want to avoid incorrect contact events, you can teleport kinematic bodies only on frames when there is discontinuity in their motion
-        // if you do so, make sure you also set PhysicsGraphicalSmoothing.ApplySmoothing = 0 on that frame if using it, to prevent incorrect interpolation
+        // NOTE: 如果您想避免不正确的接触事件，则只能在运动不连续时将运动体传送到框架上
+        // 如果这样做，请确保在该框架上设置 PhysicsGraphicalSmoothing.ApplySmoothing = 0（如果使用它），以防止错误的 interpolation
 
         foreach (var(velocity, transform, mass, curve) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRO<LocalTransform>, RefRO<PhysicsMass>, AnimateKinematicBodyCurve>().WithAll<Initialized>().WithNone<TeleportKinematicBody>())
 
         {
-            // sample curves to determine target position and orientation
+            // 采样曲线以确定目标位置和方向
 
             var targetTransform = new RigidTransform(transform.ValueRO.Rotation, transform.ValueRO.Position);
 
             Sample(curve, elapsedTime, ref targetTransform.pos, ref targetTransform.rot);
 
-            // modify PhysicsVelocity to move to the target location
+            // 修改 PhysicsVelocity 移动到目标位置
 
             velocity.ValueRW = PhysicsVelocity.CalculateVelocityToTarget(mass.ValueRO, transform.ValueRO.Position, transform.ValueRO.Rotation, targetTransform, tickSpeed);
 
         }
 
         commandBuffer.Playback(state.EntityManager);
-        commandBuffer.Dispose(); // Can't use using above as getting DCICE002 error
+        commandBuffer.Dispose(); // 无法使用上面的方法，因为出现 DCICE002 错误
     }
 }

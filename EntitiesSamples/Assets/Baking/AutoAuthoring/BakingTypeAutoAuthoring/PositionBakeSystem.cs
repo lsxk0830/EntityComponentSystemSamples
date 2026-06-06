@@ -5,7 +5,7 @@ using Unity.Transforms;
 
 namespace Baking.AutoAuthoring.BakingTypeAutoAuthoring
 {
-    // Bake additional authoring properties that could not be processed in a baker.
+    // 烘焙无法在 baker 中处理的附加 authoring 属性。
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     public partial struct PositionBakeSystem : ISystem
     {

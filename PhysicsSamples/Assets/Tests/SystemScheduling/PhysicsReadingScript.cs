@@ -47,7 +47,7 @@ namespace Unity.Physics.Tests
                 var bodies = PhysicsWorld.Bodies;
                 for (int i = 0; i < bodies.Length; i++)
                 {
-                    //Default tags are 0, 1 should be written in WritingPhysicsTagsSystem to each of them
+                    //默认标签为 0，1 应写入 WritingPhysicsTagsSystem 中的每个标签
                     var body = bodies[i];
                     Assertions.Assert.AreEqual(1, body.CustomTags, "CustomTags should be 1 on all bodies!");
                 }

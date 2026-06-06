@@ -7,8 +7,8 @@ using Unity.Physics.Systems;
 namespace Unity.NetCode
 {
     /// <summary>
-    /// Run the physics step using the Immediate mode. this is usually way faster than running jobs when the number of
-    /// entities is relatively small.
+    /// 使用立即模式运行物理步骤。当数量较多时，这通常比运行 jobs 快得多
+    /// entities 比较小。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation|WorldSystemFilterFlags.ServerSimulation)]
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
@@ -40,7 +40,7 @@ namespace Unity.NetCode
                 SolverStabilizationHeuristicSettings = physicsStep.SolverStabilizationHeuristicSettings,
                 HaveStaticBodiesChanged = buildPhysicData.PhysicsData.HaveStaticBodiesChanged
             };
-            //This can also be executed on a job worker thread technically speaking.
+            //从技术上讲，这也可以在 job 工作线程上执行。
             simulation.ResetSimulationContext(simulationStepInput);
             simulation.Step(simulationStepInput);
         }

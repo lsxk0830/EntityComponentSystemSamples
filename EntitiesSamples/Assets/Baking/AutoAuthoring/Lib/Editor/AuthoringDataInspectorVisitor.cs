@@ -8,9 +8,9 @@ using UnityEngine.UIElements;
 namespace AutoAuthoring
 {
     /// <summary>
-    /// Checks if the type has any Entity fields. The visitation is done recursively in nested types.
+    /// 检查类型是否具有任何 Entity 字段。访问以嵌套类型递归完成。
     /// </summary>
-    /// <remarks>The visitation ends when the first Entity field is found, or after traversing all the fields.</remarks>
+    /// 当找到第一个 Entity 字段，或者遍历完所有 fields.</remarks> 后，<remarks>The 访问结束
     sealed class HasEntityFieldVisitor : IPropertyBagVisitor, IPropertyVisitor
     {
         public bool HasEntity;
@@ -42,7 +42,7 @@ namespace AutoAuthoring
     }
 
     /// <summary>
-    /// Builds the PropertyField structure which can be displayed in the inspector.
+    /// 构建可以在检查器中显示的 PropertyField 结构。
     /// </summary>
     sealed class PropertyFieldBuilderVisitor : IPropertyBagVisitor, IPropertyVisitor
     {
@@ -88,7 +88,7 @@ namespace AutoAuthoring
 
             if (property is Property<TContainer, Entity>)
             {
-                // remap the Entity fields to a slot in the GameObject references array
+                // 将 Entity 字段重新映射到 GameObject 引用数组中的槽
                 var pf = new PropertyField(_ReferencesProperty.GetArrayElementAtIndex(_ReferenceIndex++), ObjectNames.NicifyVariableName(property.Name));
                 _Root.Add(pf);
 
@@ -104,7 +104,7 @@ namespace AutoAuthoring
             }
             else
             {
-                // FIXME: calling this here makes the algorithm N^2. Move outside
+                // FIXME: 在这里调用它使得算法为 N^2。搬到外面去
                 _EntityVisitor.Reset();
                 PropertyContainer.Accept(_EntityVisitor, property.GetValue(ref container));
                 if (!_EntityVisitor.HasEntity)

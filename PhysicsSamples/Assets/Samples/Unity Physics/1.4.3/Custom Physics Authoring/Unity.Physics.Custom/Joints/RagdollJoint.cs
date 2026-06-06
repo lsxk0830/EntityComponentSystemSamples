@@ -10,7 +10,7 @@ namespace Unity.Physics.Authoring
     {
         const int k_LatestVersion = 1;
 
-        // Editor only settings
+        // 仅 Editor 设置
         [HideInInspector]
         public bool EditAxes;
         [HideInInspector]

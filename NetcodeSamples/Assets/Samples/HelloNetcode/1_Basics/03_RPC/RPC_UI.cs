@@ -32,13 +32,13 @@ namespace Samples.HelloNetcode
         {
             if (m_OwnUser == -1 && ClientServerBootstrap.ClientWorld != null)
             {
-                // Non-thin client will always be first in the list
+                // 非瘦 client 永远是列表第一
                 var connectionQuery = ClientServerBootstrap.ClientWorld.EntityManager
                     .CreateEntityQuery(ComponentType.ReadOnly<NetworkId>());
                 var connectionIds = connectionQuery.ToComponentDataArray<NetworkId>(Allocator.Temp);
                 if (connectionIds.Length > 0)
                 {
-                    // Client only has one connection
+                    // Client 只有一个连接
                     m_OwnUser = connectionIds[0].Value;
                 }
             }
@@ -46,14 +46,14 @@ namespace Samples.HelloNetcode
             if (RpcUiData.Messages.Data.IsCreated && RpcUiData.Messages.Data.TryDequeue(out var message))
             {
                 var chatText = Instantiate(m_ChatText, m_ChatContent.transform);
-                // Color the message blue in case this is our own message
+                // 将消息颜色设置为蓝色，以防这是我们自己的消息
                 if (message.ConvertToString().StartsWith($"User {m_OwnUser}"))
                     chatText.text += $"<color=blue>{message}</color>\n";
                 else
                     chatText.text += $"{message}\n";
 
-                // Scroll the chat text to the bottom so you see latest message
-                // (when text does not fit any more in the content space)
+                // 将聊天文本滚动到底部，以便您看到最新消息
+                // （当文本不再适合内容空间时）
                 Canvas.ForceUpdateCanvases();
                 m_ScrollRect.verticalNormalizedPosition = 0f;
             }
@@ -64,7 +64,7 @@ namespace Samples.HelloNetcode
                 userText.text = $"User {user}";
                 m_CurrentUserSlot++;
 
-                // Color the name blue in case this is our own user
+                // 将名称涂成蓝色，以防这是我们自己的用户
                 if (user == m_OwnUser)
                     userText.color = Color.blue;
             }
@@ -89,8 +89,8 @@ namespace Samples.HelloNetcode
         public void SendChatMessage()
         {
             SendRPC(ClientServerBootstrap.ClientWorld, m_InputText.text);
-            // Clear the input text as the message has been sent, and place the UI focus back on it
-            // so it's ready to accept the next message
+            // 消息发送后清除输入文本，然后将 UI 焦点放回到该文本上
+            // 所以它准备好接受下一条消息
             m_InputText.text = "";
             m_InputText.Select();
             m_InputText.ActivateInputField();

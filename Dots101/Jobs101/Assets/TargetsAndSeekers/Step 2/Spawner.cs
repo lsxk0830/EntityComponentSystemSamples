@@ -8,7 +8,7 @@ namespace Tutorials.Jobs.Step2
     {
         public static Transform[] TargetTransforms;
 
-        // Cache the seeker transforms.
+        // 缓存搜索者变换。
         public static Transform[] SeekerTransforms;
 
         public GameObject SeekerPrefab;

@@ -1,108 +1,108 @@
-# HelloNetcode Importance sample
+# HelloNetcode 重要示例
 
-This sample showcase how to set up the built-in **Distance Importance Scaling** feature.
+此示例展示了如何设置内置的**距离重要性缩放**功能。
 
-See
+看
 
-* [Optimization Mode's GhostAuthoringInspector](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/ghost-snapshots.html#authoring-ghosts)
-* [Further reading about this optimization](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/optimizations.html#importance-scaling)
+* [优化模式的 GhostAuthoringInspector](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/ghost-snapshots.html#authoring-ghosts)
+* [有关此优化的进一步阅读](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/optimizations.html#importance-scaling)
 
-## Requirements
+## 要求
 
 * GoInGame
-* Optimization, for barrel spiral spawning logic
+* 优化，桶螺旋生成逻辑
 
-## Sample description
+## 示例描述
 
-This sample spawns a number of barrels rotating in the scene when entering play mode. By using this densely populated scene we demonstrate how the behaviour of importance works.
-The number of barrels spawned can be changed by opening the subscene and changing the parameters on the `BarrelSetup`'s inspector.
+当进入播放模式时，此示例会生成许多在 scene 中旋转的桶。通过使用这个密集的 scene，我们演示了重要性行为是如何工作的。
+可以通过打开 subscene 并更改 `BarrelSetup` 的检查器上的参数来更改生成的桶的数量。
 
-- **Amount Of Circles**: can be used to add an extra circle of barrels when entering play mode.
-- **Spacing**: changes the distance between the barrels for better visibility.
+- **圆圈数量**：可用于在进入游戏模式时添加额外的桶圈。
+- **间距**：更改桶之间的距离以获得更好的可见性。
 
-The barrels are spawned by the server, and do not contain any physics components. 
-Each barrel is being rotated on the server, and therefore, each barrel's transform will be synchronized to the client (which will then render it).
+桶由 server 生成，不包含任何物理 components。
+每个桶都在 server 上旋转，因此每个桶的变换将同步到 client（然后将对其进行渲染）。
 
-When looking at the barrels in the scene view, it is possible to see that some of the barrels in the outer edge of the blob are not rotating as smoothly as the ones towards the center. 
-Depending on the view it might be necessary to zoom out a bit.
+在 scene 视图中查看桶时，可以看到斑点外边缘的一些桶的旋转不如朝向中心的桶那样平滑。
+根据视图的不同，可能需要稍微缩小。
 
-The barrels are automatically grouped by a 3D, `int3` tiling in their Entities chunks. I.e. They are moved into spatially located chunks.
-Then, each of these tiles (i.e. chunks) will be updated according to the distance (of the entire chunk) to each connection, based on an algorithm in `GhostDistanceImportance.Scale`.
+桶会通过 Entities chunks 中的 3D `int3` 平铺自动分组。I.e。它们被移动到空间位置 chunks。
+然后，每个图块（i.e.chunks）将基于 `GhostDistanceImportance.Scale` 中的算法，根据到每个连接的（整个 chunk）距离进行更新。
 
-The setup for importance scaling is in `UpdateConnectionPositionSystem.OnUpdate`. 
-Here, an entity is being created, with two components; namely `GhostDistanceData` and `GhostImportance`. 
-Both of these components are expected by the `GhostDistanceImportance.Scale` callback.
+重要性缩放的设置位于 `UpdateConnectionPositionSystem.OnUpdate` 中。
+这里，正在创建一个 entity，有两个 components；即 `GhostDistanceData` 和 `GhostImportance`。
+这两个 components 都是 `GhostDistanceImportance.Scale` 回调所期望的。
 > ![NOTE]
-> The `EnableImportance` flag component singleton must exist in the scene for this call to be triggered. Importantly, we must put this check in `OnUpdate`, as loading a sub-scene is an async operation most of the time. The exception to this is when in editor, when manually loading a sub-scene.
- 
-The last importance component is `GhostConnectionPosition`, which must be added to all connection entities on the server (see `UpdateConnectionPositionSystem.cs` in this sample).
-This component's value denotes the position that should be considered the most important point for that client, 
-thus allowing the `GhostSendSystem` (and the `GhostChunkSerializer`) the ability to determine the importance center, 
-when building each snapshot for each client.
+> scene 中必须存在 `EnableImportance` 标志 component 单例才能触发此调用。重要的是，我们必须将此检查放在 `OnUpdate` 中，因为加载子 scene 在大多数情况下是异步操作。例外情况是在编辑器中手动加载子 scene 时。
 
-I.e. From this point, the distance based scaling will calculate the distance to each tiles center, 
-thus determining the importance multiplayer to apply for all entities within this tile (i.e. chunk).
+最后一个重要性 component 是 `GhostConnectionPosition`，必须将其添加到 server 上的所有连接 entities（请参阅本示例中的 `UpdateConnectionPositionSystem.cs`）。
+这个 component 的值表示应该被认为是 client 最重要的点的位置，
+从而允许 `GhostSendSystem`（和 `GhostChunkSerializer`）确定重要性中心的能力，
+为每个 client 构建每个 snapshot 时。
 
-## Note
+I.e。从这一点开始，基于距离的缩放将计算到每个图块中心的距离，
+从而确定多人游戏的重要性以应用于此图块内的所有 entities (i.e.chunk)。
+
+## 笔记
 
 > [!NOTE]
-> Your PC specs will determine how many barrels your PC can comfortably spawn, so you may need to tweak spawn values to make this importance scaling more clear.
-> We also recommend testing this with Burst enabled, as the effect that we're trying to demonstrate here is related to latency, and therefore CPU throttling can add unwanted noise.
+> 您的 PC 规格将决定您的 PC 可以轻松生成多少个桶，因此您可能需要调整生成值以使这种重要性缩放更加清晰。
+> 我们还建议在启用 Burst 的情况下对此进行测试，因为我们在这里尝试演示的效果与延迟有关，因此 CPU 限制可能会增加不需要的噪音。
 
-Depending on the PC simulating this sample, the center being updated smoothly might decrease/increase. By spawning less and fewer barrels from the BarrelSetup component in the subscene it can increase/decrease the number of being spawned.
+根据模拟此示例的 PC，平滑更新的中心可能会减少/增加。通过从 subscene 中的 BarrelSetup component 生成越来越少的桶，它可以增加/减少生成的数量。
 
-The tile size configuration can be changed as well to show the impact of these changes.
+也可以更改图块大小配置以显示这些更改的影响。
 
-It is possible to create a custom importance scale implementation, and switch out all components to fit other use cases. The only shipped implementation is the distanced based importance with square tiles as this covers most simple use cases.
+可以创建自定义重要性等级实现，并切换所有 components 以适应其他用例。唯一发布的实现是方形图块的基于距离的重要性，因为这涵盖了大多数简单的用例。
 
-The `GhostConnectionPosition` would in a typical game follow the character around, and it will be necessary to update the `GhostConnectionPosition` component with this information. This will add the behaviour of the barrels closest to the player will be updated more often.
-
-## **BarrelWithoutImportance**
-You probably noticed that the red, sparsely spawned 'BarrelWithoutImportance' barrels are **not** being forced to a lower send rate. 
-They are explicitly filtered out of the importance scaling sub-system.
-
-To opt-out specific ghosts from importance scaling, you must do the following:
-1. Set `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionSharedComponent` to `false` (or use your own, bespoke system). 
-This will disable the `GhostDistancePartitioningSystem`s default behaviour of adding the `GhostDistancePartitionShared` shared component to all ghost instances that meet its criteria.
-2. Do not add the `GhostDistancePartitionShared` to these ghost instances (i.e. note the **absence** of the `EnableImportanceScalingOnThisGhost` authoring on the **BarrelWithoutImportance** prefab).
-
-This sample showcase how to set up the built-in **Distance Importance Scaling** feature.
-* [Optimization Mode's GhostAuthoringInspector](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/ghost-snapshots.html#authoring-ghosts)
-* [Further reading about this optimization](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/optimizations.html#importance-scaling)
-This sample spawns a number of barrels rotating in the scene when entering play mode. By using this densely populated scene we demonstrate how the behaviour of importance works.
-- **Amount Of Circles**: can be used to add an extra circle of barrels when entering play mode.
-The barrels are spawned by the server, and do not contain any physics components. 
-Each barrel is being rotated on the server, and therefore, each barrel's transform will be synchronized to the client (which will then render it).
-When looking at the barrels in the scene view, it is possible to see that some of the barrels in the outer edge of the blob are not rotating as smoothly as the ones towards the center. 
-Depending on the view it might be necessary to zoom out a bit.
-The barrels are automatically grouped by a 3D, `int3` tiling in their Entities chunks. I.e. They are moved into spatially located chunks.
-Then, each of these tiles (i.e. chunks) will be updated according to the distance (of the entire chunk) to each connection, based on an algorithm in `GhostDistanceImportance.Scale`.
-The setup for importance scaling is in `UpdateConnectionPositionSystem.OnUpdate`. 
-Here, an entity is being created, with two components; namely `GhostDistanceData` and `GhostImportance`. 
-Both of these components are expected by the `GhostDistanceImportance.Scale` callback.
-This component's value denotes the position that should be considered the most important point for that client, 
-thus allowing the `GhostSendSystem` (and the `GhostChunkSerializer`) the ability to determine the importance center, 
-when building each snapshot for each client.
-I.e. From this point, the distance based scaling will calculate the distance to each tiles center, 
-thus determining the importance multiplayer to apply for all entities within this tile (i.e. chunk).
+在典型的游戏中，`GhostConnectionPosition` 会跟随角色四处移动，因此有必要使用此信息更新 `GhostConnectionPosition` component。这将增加最接近玩家的桶的行为将更频繁地更新。
 
 ## **BarrelWithoutImportance**
-You probably noticed that the red, sparsely spawned 'BarrelWithoutImportance' barrels are **not** being forced to a lower send rate. 
-They are explicitly filtered out of the importance scaling sub-system.
+您可能注意到，红色的、稀疏生成的“BarrelWithoutImportance”桶**没有**被强制降低发送速率。
+它们被明确地从重要性缩放子 system 中过滤掉。
 
-To opt-out specific ghosts from importance scaling, you must do the following:
-1. Set `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionSharedComponent` to `false` (or use your own, bespoke system). 
-This will disable the `GhostDistancePartitioningSystem`s default behaviour of adding the `GhostDistancePartitionShared` shared component to all ghost instances that meet its criteria.
-2. Do not add the `GhostDistancePartitionShared` to these ghost instances (i.e. note the **absence** of the `EnableImportanceScalingOnThisGhost` authoring on the **BarrelWithoutImportance** prefab).
+要从重要性缩放中选择退出特定的 ghosts，您必须执行以下操作：
+1. 将 `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionSharedComponent` 设置为 `false`（或使用您自己的定制 system）。
+这将禁用 `GhostDistancePartitioningSystem`s 默认行为，即将 `GhostDistancePartitionShared` 共享 component 添加到满足其条件的所有 ghost 实例。
+2. 请勿将 `GhostDistancePartitionShared` 添加到这些 ghost 实例 (i.e。请注意 **`EnableImportanceScalingOnThisGhost` authoring 在 **BarrelWithoutImportance** 上的**缺失** prefab)。
 
-## Importance Visualizer
-The `Importance Visualizer` is a PlaymodeTool's drawer that helps visualize Importance Scaling outcomes.
+此示例展示了如何设置内置的**距离重要性缩放**功能。
+* [优化模式的 GhostAuthoringInspector](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/ghost-snapshots.html#authoring-ghosts)
+* [有关此优化的进一步阅读](https://docs.unity3d.com/Packages/com.unity.netcode@1.0/manual/optimizations.html#importance-scaling)
+当进入播放模式时，此示例会生成许多在 scene 中旋转的桶。通过使用这个密集的 scene，我们演示了重要性行为是如何工作的。
+- **圆圈数量**：可用于在进入游戏模式时添加额外的桶圈。
+桶由 server 生成，不包含任何物理 components。
+每个桶都在 server 上旋转，因此每个桶的变换将同步到 client（然后将对其进行渲染）。
+在 scene 视图中查看桶时，可以看到斑点外边缘的一些桶的旋转不如朝向中心的桶那样平滑。
+根据视图的不同，可能需要稍微缩小。
+桶会通过 Entities chunks 中的 3D `int3` 平铺自动分组。I.e。它们被移动到空间位置 chunks。
+然后，每个图块（i.e.chunks）将基于 `GhostDistanceImportance.Scale` 中的算法，根据到每个连接的（整个 chunk）距离进行更新。
+重要性缩放的设置位于 `UpdateConnectionPositionSystem.OnUpdate` 中。
+这里，正在创建一个 entity，有两个 components；即 `GhostDistanceData` 和 `GhostImportance`。
+这两个 components 都是 `GhostDistanceImportance.Scale` 回调所期望的。
+这个 component 的值表示应该被认为是 client 最重要的点的位置，
+从而允许 `GhostSendSystem`（和 `GhostChunkSerializer`）确定重要性中心的能力，
+为每个 client 构建每个 snapshot 时。
+I.e。从这一点开始，基于距离的缩放将计算到每个图块中心的距离，
+从而确定多人游戏的重要性以应用于此图块内的所有 entities (i.e.chunk)。
 
-Supported modes are:
-* **PerEntityHeatmap** - Draws a per-entity heatmap, denoting the importance scaling applied to this entire chunk.
-  Supports custom importance scaling structs.
-* **PerEntitySpatialChunkStructure** - Assigns a random color for each chunk, and draws said random color for all entities in that chunk, as well as lines linking them to each other.
-  Supports custom importance scaling structs.
-* **DrawGrid** - Draws a flat  heatmap of the GhostDistanceData` tiles used by the `GhostDistancePartitioningSystem`. 
-Thus, only functional when using the default importance scaling function.
+## **BarrelWithoutImportance**
+您可能注意到，红色的、稀疏生成的“BarrelWithoutImportance”桶**没有**被强制降低发送速率。
+它们被明确地从重要性缩放子 system 中过滤掉。
+
+要从重要性缩放中选择退出特定的 ghosts，您必须执行以下操作：
+1. 将 `GhostDistancePartitioningSystem.AutomaticallyAddGhostDistancePartitionSharedComponent` 设置为 `false`（或使用您自己的定制 system）。
+这将禁用 `GhostDistancePartitioningSystem`s 默认行为，即将 `GhostDistancePartitionShared` 共享 component 添加到满足其条件的所有 ghost 实例。
+2. 请勿将 `GhostDistancePartitionShared` 添加到这些 ghost 实例 (i.e。请注意 **`EnableImportanceScalingOnThisGhost` authoring 在 **BarrelWithoutImportance** 上的**缺失** prefab)。
+
+## 重要性可视化工具
+`Importance Visualizer` 是 PlaymodeTool 的抽屉，可帮助可视化重要性缩放结果。
+
+支持的模式有：
+* **PerEntityHeatmap** - 绘制每个 entity 热图，表示应用于整个 chunk 的重要性缩放。
+  支持自定义重要性缩放结构。
+* **PerEntitySpatialChunkStructure** - 为每个 chunk 分配随机颜色，并为该 chunk 中的所有 entities 绘制所述随机颜色，以及将它们相互链接的线条。
+  支持自定义重要性缩放结构。
+* **DrawGrid** - 绘制 GhostDistanceData` tiles used by the `GhostDistancePartitioningSystem` 的平面热图。
+因此，仅在使用默认重要性缩放函数时才起作用。
 

@@ -8,13 +8,13 @@ namespace Elevator
         public float Speed;
         public float MaxHeight;
         public float MinHeight;
-        
+
         class Baker : Baker<ElevatorAuthoring>
         {
             public override void Bake(ElevatorAuthoring authoring)
             {
                 var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                
+
                 AddComponent(entity, new Elevator
                 {
                     Speed = authoring.Speed,
@@ -27,7 +27,7 @@ namespace Elevator
 
     public struct Elevator : IComponentData
     {
-        public float Speed;   // meters per second
+        public float Speed;   // 米每秒
         public float MaxHeight;
         public float MinHeight;
     }

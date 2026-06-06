@@ -14,7 +14,7 @@ namespace HelloCube.GameObjectSync
             state.RequireForUpdate<ExecuteGameObjectSync>();
         }
 
-        // This OnUpdate accesses managed objects, so it cannot be burst compiled.
+        // 这个 OnUpdate 访问托管对象，因此无法进行突发编译。
         public void OnUpdate(ref SystemState state)
         {
             var directory = SystemAPI.ManagedAPI.GetSingleton<DirectoryManaged>();
@@ -31,7 +31,7 @@ namespace HelloCube.GameObjectSync
                 transform.ValueRW = transform.ValueRO.RotateY(
                     speed.ValueRO.RadiansPerSecond * deltaTime);
 
-                // Update the associated GameObject's transform to match.
+                // 更新关联的 GameObject 的转换以匹配。
                 go.Value.transform.rotation = transform.ValueRO.Rotation;
             }
         }

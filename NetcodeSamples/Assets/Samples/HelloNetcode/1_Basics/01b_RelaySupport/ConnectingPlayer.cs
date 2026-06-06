@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Responsible for joining relay server using join code retrieved from <see cref="HostServer"/>.
+    /// 负责使用从 <see cref="HostServer"/> 检索的加入代码加入中继 server。
     /// </summary>
     [DisableAutoCreation]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -142,14 +142,14 @@ namespace Samples.HelloNetcode
 
         static ClientStatus BindToRelay(Task<JoinAllocation> joinTask, out RelayServerData relayClientData)
         {
-            // Collect and convert the Relay data from the join response
+            // 从连接响应中收集并转换 Relay 数据
             var allocation = joinTask.Result;
 #if !UNITY_WEBGL
             var connectionType = "dtls";
 #else
             var connectionType = "wss";
 #endif
-            // Format the server data, based on desired connectionType
+            // 根据所需的 connectionType 格式化 server 数据
             try
             {
                 relayClientData = PlayerRelayData(allocation, connectionType);
@@ -172,22 +172,22 @@ namespace Samples.HelloNetcode
                 return ClientStatus.GetJoinCodeFromHost;
             }
 
-            // Send the join request to the Relay service
+            // 发送加入请求到 Relay 服务
             joinTask = RelayService.Instance.JoinAllocationAsync(hostServerJoinCode);
             return ClientStatus.WaitForJoin;
         }
 
         static RelayServerData PlayerRelayData(JoinAllocation allocation, string connectionType = "dtls")
         {
-            // Select endpoint based on desired connectionType
+            // 根据所需的 connectionType 选择端点
             var endpoint = RelayUtilities.GetEndpointForConnectionType(allocation.ServerEndpoints, connectionType);
             if (endpoint == null)
             {
                 throw new Exception($"endpoint for connectionType {connectionType} not found");
             }
 
-            // Prepare the Relay server data and compute the nonce values
-            // A player joining the host passes its own connectionData as well as the host's
+            // 准备 Relay server 数据并计算随机数值
+            // 加入主机的玩家会传递自己的 connectionData 以及主机的 connectionData
             var relayServerData = new RelayServerData(endpoint.Host, (ushort)endpoint.Port,
                 allocation.AllocationIdBytes, allocation.ConnectionData, allocation.HostConnectionData, allocation.Key,
                 endpoint.Secure, connectionType == "wss");

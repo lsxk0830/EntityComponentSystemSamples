@@ -8,54 +8,54 @@ using Unity.Transforms;
 namespace Unity.Physics.Extensions
 {
     /// <summary>
-    /// Utility functions acting on physics components.
+    /// 作用于物理 components 的效用函数。
     /// </summary>
     public static class PhysicsSamplesExtensions
     {
         #region CompoundCollider Utilities
         /// <summary>
-        /// Given the root Collider of a hierarchy and a ColliderKey referencing a child in that hierarchy,
-        /// this function returns the ColliderKey referencing the parent Collider.
+        /// 给定层次结构的根 Collider 和引用该层次结构中的子级的 ColliderKey，
+        /// 该函数返回引用父级 Collider 的 ColliderKey。
         /// </summary>
-        /// <param name="rootColliderPtr">A <see cref="Collider"/> at the root of a Collider hierarchy.</param>
-        /// <param name="childColliderKey">A <see cref="ColliderKey"/> referencing a child Collider somewhere in the hierarchy below rootColliderPtr.</param>
-        /// <param name="parentColliderKey">A <see cref="ColliderKey"/> referencing the parent of the child Collider. Will be ColliderKey.Empty if the parameters where invalid.</param>
-        /// <returns>Whether the parent was successfully found in the hierarchy.</returns>
+        /// <param name="rootColliderPtr">A <see cref="Collider"/> 位于 Collider hierarchy.</param> 的根部
+        /// <param name="childColliderKey">A <see cref="ColliderKey"/> 引用 Collider 层次结构中低于 rootColliderPtr.</param> 的子 Collider
+        /// <param name="parentColliderKey">A <see cref="ColliderKey"/> 引用子 Collider 的父级。如果参数为 invalid.</param>，则为 ColliderKey.Empty
+        /// <returns>Whether 已成功在 hierarchy.</returns> 中找到父级
         public static unsafe bool TryGetParentColliderKey(Collider* rootColliderPtr, ColliderKey childColliderKey, out ColliderKey parentColliderKey)
         {
             var childColliderPtr = rootColliderPtr;
             var childColliderKeyNumBits = childColliderPtr->NumColliderKeyBits;
 
-            // Start with an Empty collider key and push sub keys onto it as we traverse down the compound hierarchy.
+            // 从空的 collider 键开始，并在我们向下遍历复合层次结构时将子键推到它上面。
             var parentColliderKeyPath = ColliderKeyPath.Empty;
 
-            // On the way down, the childColliderKey pops of sub keys and pushes them onto the parentColliderKeyPath
+            // 在下降过程中，childColliderKey 弹出子键并将它们推送到 parentColliderKeyPath
             do
             {
                 childColliderKey.PopSubKey(childColliderKeyNumBits, out var childIndex);
                 switch (childColliderPtr->Type)
                 {
                     case ColliderType.Compound:
-                        // Get the next child down and loop again
+                        // 让下一个孩子下来并再次循环
                         parentColliderKeyPath.PushChildKey(new ColliderKeyPath(new ColliderKey(childColliderKeyNumBits, childIndex), childColliderKeyNumBits));
                         childColliderPtr = ((CompoundCollider*)childColliderPtr)->Children[(int)childIndex].Collider;
                         childColliderKeyNumBits = childColliderPtr->NumColliderKeyBits;
                         break;
                     case ColliderType.Mesh:
                     case ColliderType.Terrain:
-                        // We've hit a Terrain or Mesh collider so there should only be PolygonColliders below this.
-                        // At this point the childColliderKey should be Empty and childIndex should be the index of the polygon.
+                        // 我们已经击中了地形或网格 collider，因此下面应该只有 PolygonColliders。
+                        // 此时，childColliderKey 应为空，childIndex 应为多边形的索引。
                         if (!childColliderKey.Equals(ColliderKey.Empty))
                         {
-                            // We've reached the bottom without popping all the child keys.
-                            // The given childColliderKey doesn't fit this hierarchy!
+                            // 我们已经到达底部，但没有弹出所有子键。
+                            // 给定的 childColliderKey 不适合此层次结构！
                             parentColliderKey = ColliderKey.Empty;
                             return false;
                         }
                         break;
                     default:
-                        // We've hit a Convex collider, so rootColliderPtr must not have been
-                        // the root of a hierarchy in the first place and so there is no parent!
+                        // 我们已经击中了凸 collider，所以 rootColliderPtr 一定不是
+                        // 首先是层次结构的根，因此没有父级！
                         parentColliderKey = ColliderKey.Empty;
                         return false;
                 }
@@ -64,19 +64,19 @@ namespace Unity.Physics.Extensions
                    && !childColliderPtr->CollisionType.Equals(CollisionType.Convex));
 
             parentColliderKey = parentColliderKeyPath.Key;
-            // childColliderKey should be Empty at this point.
-            // However, if it isn't then we reached a leaf without finding the child collider!
+            // 此时 childColliderKey 应为空。
+            // 然而，如果不是，那么我们到达一片叶子时却找不到孩子 collider！
             return childColliderKey.Equals(ColliderKey.Empty);
         }
 
         /// <summary>
-        /// Given the root Collider of a hierarchy and a ColliderKey referencing a child in that hierarchy,
-        /// this function returns the ChildCollider requested.
+        /// 给定层次结构的根 Collider 和引用该层次结构中的子级的 ColliderKey，
+        /// 该函数返回请求的 ChildCollider。
         /// </summary>
-        /// <param name="rootColliderPtr">A <see cref="Collider"/> at the root of a Collider hierarchy.</param>
-        /// <param name="childColliderKey">A <see cref="ColliderKey"/> referencing a child Collider somewhere in the hierarchy below rootColliderPtr.</param>
-        /// <param name="childCollider">A valid <see cref="ChildCollider"/> returned from the hierarchy, if found.</param>
-        /// <returns>Whether a specified ColliderKey was successfully found in the hierarchy.</returns>
+        /// <param name="rootColliderPtr">A <see cref="Collider"/> 位于 Collider hierarchy.</param> 的根部
+        /// <param name="childColliderKey">A <see cref="ColliderKey"/> 引用 Collider 层次结构中低于 rootColliderPtr.</param> 的子 Collider
+        /// <param name="childCollider">A 从层次结构返回有效的 <see cref="ChildCollider"/>，如果 found.</param>
+        /// <returns>Whether 在 hierarchy.</returns>中成功找到指定的 ColliderKey
         public static unsafe bool TryGetChildInHierarchy(Collider* rootColliderPtr, ColliderKey childColliderKey, out ChildCollider childCollider)
         {
             //public static unsafe bool GetLeafCollider(Collider* root, RigidTransform rootTransform, ColliderKey key, out ChildCollider leaf)
@@ -93,10 +93,10 @@ namespace Unity.Physics.Extensions
         }
 
         /// <summary>
-        /// Sets the Entity references in a CompoundCollider according to the provided collider key entity pairs.
+        /// 根据提供的 collider 密钥 entity 对设置 CompoundCollider 中的 Entity 引用。
         /// </summary>
         /// <param name="compoundColliderPtr">A <see cref="CompoundCollider"/>.</param>
-        /// <param name="keyEntityPairs">An array of <see cref="ColliderKey"/> and <see cref="Entity"/> pairs.</param>
+        /// <param name="keyEntityPairs">An <see cref="ColliderKey"/> 和 <see cref="Entity"/> pairs.</param> 的数组
         public static unsafe void RemapColliderEntityReferences(
             CompoundCollider* compoundColliderPtr, in NativeArray<PhysicsColliderKeyEntityPair> keyEntityPairs) =>
             RemapCompoundColliderEntityReferences(compoundColliderPtr, keyEntityPairs, ColliderKey.Empty);

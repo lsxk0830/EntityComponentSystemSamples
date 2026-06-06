@@ -1,7 +1,7 @@
-// The purpose of this code is to build a grid of tiles (from prefabs). Each tile has a TileTriggerCounter component.
-// The Sphere GameObject can be moved along the grid. Walls prevent the Sphere from rolling off the grid. Trigger events
-// are recorded in the TileTriggerCounter component when the Sphere collides with a tile. Reactions to the trigger events
-// are handled in the SpawnColliderFromTriggerSystem.
+// 此代码的目的是构建一个图块网格（来自prefab）。每个图块都有一个 TileTriggerCounter component。
+// 球体 GameObject 可以沿着网格移动。墙壁可以防止球体滚出网格。Trigger 事件
+// 当球体与瓷砖碰撞时，记录在 TileTriggerCounter component 中。对 trigger 事件的反应
+// 在 SpawnColliderFromTriggerSystem 中处理。
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -31,7 +31,7 @@ namespace Unity.Physics
             {
                 var initialTransform = entityManager.GetComponentData<LocalTransform>(creator.ValueRO.GridEntity);
 
-                int gridSize = 14; // Create 14x14 grid
+                int gridSize = 14; // 创建 14x14 网格
                 var positions = ComputeGridPositions(gridSize, creator.ValueRO.SpawningPosition);
 
                 var spawnedEntities = new NativeArray<Entity>(gridSize * gridSize, Allocator.Temp);
@@ -50,8 +50,8 @@ namespace Unity.Physics
                     i++;
                 }
 
-                // Instantiate the Walls entity. Note that this prefab contains child entities, therefore we cannot
-                // update the position this pass. Will need a separate pass to do this
+                // 实例化墙 entity。请注意，此 prefab 包含子 entities，因此我们不能
+                // 更新本次传递的位置。需要单独的通行证才能执行此操作
                 var wallPrefabInstance = ecb.Instantiate(creator.ValueRO.WallEntity);
                 ecb.SetComponent(wallPrefabInstance, new LocalTransform
                 {
@@ -59,7 +59,7 @@ namespace Unity.Physics
                     Scale = initialTransform.Scale,
                     Rotation = initialTransform.Rotation
                 });
-                ecb.AddComponent(wallPrefabInstance, new WallsTagComponent()); // Tag the wall so the entity is easy to find next pass
+                ecb.AddComponent(wallPrefabInstance, new WallsTagComponent()); // 在墙上贴上标签，以便轻松找到下一个通行证 entity
 
                 spawnedEntities.Dispose();
                 positions.Dispose();
@@ -68,8 +68,8 @@ namespace Unity.Physics
             ecb.Playback(entityManager);
             ecb.Dispose();
 
-            // Perform a second pass to update the position of the Walls entity. Need to use the output from the first
-            // ECB playback here.
+            // 执行第二遍以更新墙 entity 的位置。需要使用第一个的输出
+            // ECB 在这里播放。
             wallQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
             {
                 All = new[]
@@ -111,7 +111,7 @@ namespace Unity.Physics
         {
         }
 
-        // Create a grid of tiles. The startingPoint marks the middle of the grid
+        // 创建一个瓷砖网格。startingPoint 标记网格的中间
         internal static NativeList<float3> ComputeGridPositions(int gridSize, float3 startingPosition)
         {
             var arrayPositions = new NativeList<float3>(gridSize * gridSize, Allocator.Temp);

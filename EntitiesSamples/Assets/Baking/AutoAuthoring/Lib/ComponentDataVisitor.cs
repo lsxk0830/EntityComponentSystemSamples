@@ -5,14 +5,14 @@ using UnityEngine;
 namespace AutoAuthoring
 {
     /// <summary>
-    /// Counts the number of Entity fields in a type. It recursively traverses nested types.
+    /// 计算类型中 Entity 字段的数量。它递归地遍历嵌套类型。
     /// </summary>
     class EntityFieldCountVisitor : IPropertyBagVisitor, IPropertyVisitor
     {
         int _EntityFieldCount = 0;
 
         /// <summary>
-        /// The number of Entity fields found during visitation.
+        /// 访问期间找到的 Entity 字段的数量。
         /// </summary>
         public int EntityFieldCount => _EntityFieldCount;
 
@@ -39,7 +39,7 @@ namespace AutoAuthoring
     }
 
     /// <summary>
-    /// Bakes the GameObject references and sets the value on the Entity fields of the traversed component.
+    /// 烘焙 GameObject 引用并在遍历的 component 的 Entity 字段上设置值。
     /// </summary>
     class ComponentDataPatcher : IPropertyBagVisitor, IPropertyVisitor
     {
@@ -73,7 +73,7 @@ namespace AutoAuthoring
             if (property is Property<TContainer, Entity> entityProperty && !property.HasAttribute<HideInInspector>())
             {
                 var reference = _References[_Index++];
-                // TODO: Review if TransformUsageFlags.Dynamic is correct in this case
+                // TODO: 检查 TransformUsageFlags.Dynamic 在这种情况下是否正确
                 var entity = _Baker.GetEntity(reference, TransformUsageFlags.Dynamic);
 
                 entityProperty.SetValue(ref container, entity);

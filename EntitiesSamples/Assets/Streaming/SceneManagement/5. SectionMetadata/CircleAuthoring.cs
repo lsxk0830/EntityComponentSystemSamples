@@ -24,7 +24,7 @@ namespace Streaming.SceneManagement.SectionMetadata
 
     public struct Circle : IComponentData
     {
-        public float Radius; // Proximity radius within which to consider loading a section
+        public float Radius; // 考虑加载截面的邻近半径
         public float3 Center;
     }
 }

@@ -40,11 +40,11 @@ namespace Asteroids.Client
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                // This job is not written to support queries with enableable component types.
+                // 此 job 不是为了支持可启用 component 类型的查询而编写的。
                 UnityEngine.Assertions.Assert.IsFalse(useEnabledMask);
 
-                // We update the server values infrequently, as we only need the updated
-                // LocalTransform positions for distance importance scaling & relevancy calculations.
+                // 我们很少更新 server 值，因为我们只需要更新的
+                // LocalTransform 位置用于距离重要性缩放和相关性计算。
                 if (isServer && (chunk.SequenceNumber + tick.TickIndexForValidTick) % roundRobinFrequency >= simulationStepBatchSize) return;
 
                 var localTransforms = chunk.GetNativeArray(ref localTransformsHandle).AsSpan();
@@ -75,7 +75,7 @@ namespace Asteroids.Client
                 tick = networkTime.InterpolationTick,
                 tickFraction = networkTime.InterpolationTickFraction,
                 simulationStepBatchSize = (uint) networkTime.SimulationStepBatchSize,
-                roundRobinFrequency = (uint) (tickRate.SimulationTickRate * 30), // Seconds.
+                roundRobinFrequency = (uint) (tickRate.SimulationTickRate * 30), // 秒。
                 frameTime = tickRate.SimulationFixedTimeStep,
                 isServer = state.WorldUnmanaged.IsServer(),
             };

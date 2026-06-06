@@ -1,6 +1,6 @@
-// This system runs once on startup to initialize the TreeComponent data for each tree prefab and then deletes itself
-// The number of trees spawned is calculated from the tree density and ground size. Apart from the forest of trees that
-// are spawned, a single immortal tree and a single dead tree are also spawned.
+// 这个 system 在启动时运行一次，初始化每棵树 prefab 的 TreeComponent 数据，然后删除自身
+// 生成的树木数量是根据树木密度和地面大小计算的。除了树林之外
+// 生成后，还会生成一棵不朽树和一棵死树。
 
 using System;
 using Unity.Burst;
@@ -27,7 +27,7 @@ namespace Unity.Physics
 
         public void OnStartRunning(ref SystemState state)
         {
-            // set up the dead tree material
+            // 设置死树材质
             var spawner = SystemAPI.GetSingleton<TreeSpawnerComponent>();
             GetDeadTreeMaterialIndex(state.EntityManager, spawner.TreeEntity, spawner.DeadTreeMaterial, out spawner.DeadTreeMaterialIndex);
             SystemAPI.SetSingleton(spawner);
@@ -40,7 +40,7 @@ namespace Unity.Physics
         static void GetDeadTreeMaterialIndex(EntityManager manager, Entity treePrefab, UnityObjectRef<UnityEngine.Material> deadTreeMaterial, out int deadTreeMaterialIndex)
         {
             deadTreeMaterialIndex = 0;
-            // find tree top and register material
+            // 找到树顶并注册材料
             if (manager.HasBuffer<LinkedEntityGroup>(treePrefab))
             {
                 var leg = manager.GetBuffer<LinkedEntityGroup>(treePrefab);
@@ -72,19 +72,19 @@ namespace Unity.Physics
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            ProfilerMarker pm = new ProfilerMarker("Profile: TreeSpawnerSystem.OnUpdate"); //PROFILE
-            pm.Begin(); //PROFILE
+            ProfilerMarker pm = new ProfilerMarker("Profile: TreeSpawnerSystem.OnUpdate"); //ZXQXLQRM 摩托车 ZHCZXQ
+            pm.Begin(); //ZXQXLQRM 摩托车 ZHCZXQ
 
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             var creator = SystemAPI.GetSingletonRW<TreeSpawnerComponent>();
 
-            // Set world size. To further increase size, modify Floor xz dimensions and the max cap.
+            // 设置 world 大小。要进一步增加尺寸，请修改地板 xz 尺寸和最大上限。
             var groundSize = creator.ValueRO.GroundSize;
             float groundHalfSize = groundSize * 0.5f;
 
-            // Determine the tree count based on the tree density
+            // 根据树木密度确定树木数量
             var treeDensity = creator.ValueRO.TreeDensity;
             var treeCount = (int)math.round(groundSize * groundSize * treeDensity);
             Debug.Log($"Trees spawned: {treeCount}. Colliders spawned: {treeCount * 2}");
@@ -120,22 +120,22 @@ namespace Unity.Physics
                     RegrowTimer = (int)regrowInCounts,
                     LifeCycleTracker = LifeCycleStates.IsGrowing
                 });
-                ecb.AddComponent(tree, new TreeState() { Value = TreeState.States.Default }); //ID the tree root
+                ecb.AddComponent(tree, new TreeState() { Value = TreeState.States.Default }); //ID 树根
             }
 
             ecb.Playback(entityManager);
             ecb.Dispose();
 
             ecb = new EntityCommandBuffer(Allocator.Temp);
-            // Perform a second pass to update the position of the Tree entities. Need to use the output from the first
-            // ECB playback here.
+            // 执行第二遍以更新树 entities 的位置。需要使用第一个的输出
+            // ECB 在这里播放。
             foreach (var(treeComponent, entity) in SystemAPI
                      .Query<RefRW<TreeComponent>>()
                      .WithEntityAccess())
             {
                 var treeSpawnPosition = treeComponent.ValueRO.SpawningPosition;
 
-                // Update for the prefab entity itself:
+                // prefab entity 本身的更新：
                 var localTransform = entityManager.GetComponentData<LocalTransform>(entity);
                 entityManager.SetComponentData(entity,  new LocalTransform
                 {
@@ -178,7 +178,7 @@ namespace Unity.Physics
 
             state.Enabled = false;
 
-            pm.End(); //PROFILE
+            pm.End(); //ZXQXLQRM 摩托车 ZHCZXQ
         }
 
         [BurstCompile]

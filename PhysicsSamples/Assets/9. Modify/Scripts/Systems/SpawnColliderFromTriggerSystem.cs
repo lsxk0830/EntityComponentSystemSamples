@@ -9,7 +9,7 @@ using Unity.Transforms;
 using UnityEngine;
 using Material = Unity.Physics.Material;
 
-// This class must use SystemBase because of the UnityEngine Materials and Meshes, and the RenderMeshArray
+// 由于 UnityEngine 材质和网格以及 RenderMeshArray，此类必须使用 SystemBase
 [BurstCompile]
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -19,7 +19,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
     private EntityQuery m_MeshCreationResourcesQuery;
 
     private UnityEngine.Mesh engineMeshA;
-    private UnityEngine.Mesh engineMeshB;  //also used by prototypeC
+    private UnityEngine.Mesh engineMeshB;  //也被 prototypeC 使用
 
     private Entity prototypeA;
     private Entity prototypeB;
@@ -27,7 +27,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
     private PhysicsCollider colliderA;
     private PhysicsCollider colliderB;
     private PhysicsCollider colliderC;
-    private NativeList<BlobAssetReference<Unity.Physics.Collider>> CreatedColliderBlobs; //Must keep track of manually created blobs
+    private NativeList<BlobAssetReference<Unity.Physics.Collider>> CreatedColliderBlobs; //必须跟踪手动创建的 blob
 
     [BurstCompile]
     protected override void OnCreate()
@@ -43,7 +43,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
             },
         });
 
-        // Get the RenderMeshArray data that was baked from CreateMeshFromResourcesAuthoring
+        // 获取从 CreateMeshFromResourcesAuthoring 烘焙的 RenderMeshArray 数据
         m_MeshCreationResourcesQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[]
@@ -54,7 +54,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
         });
 
         RequireForUpdate<TileTriggerCounter>();
-        RequireForUpdate(m_MeshCreationResourcesQuery); // don't bother updating system if the mesh resources aren't there
+        RequireForUpdate(m_MeshCreationResourcesQuery); // 如果网格资源不存在，请不要更新 system
     }
 
     [BurstCompile]
@@ -68,17 +68,17 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
 
         EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-        // Data shared between the two prototypes:
+        // 两个原型之间共享的数据：
         var worldIndex = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorldIndex;
         var renderMeshDescription = new RenderMeshDescription(UnityEngine.Rendering.ShadowCastingMode.Off);
-        var meshResourcesEntity = meshResourcesEntities[0]; // Only care about the first one
+        var meshResourcesEntity = meshResourcesEntities[0]; // 只关心第一个
         var renderMeshResources = entityManager.GetSharedComponentManaged<RenderMeshArray>(meshResourcesEntity);
 
-        // Create Prototype A and test first utility function:
+        // 创建原型 A 并测试第一个实用函数：
         prototypeA = entityManager.CreateEntity();
         ecb.AddSharedComponent<PhysicsWorldIndex>(prototypeA, worldIndex);
 
-        // Populate base entity with the components required by Entities Graphics
+        // 使用 Entities Graphics 所需的 components 填充基础 entity
         RenderMeshUtility.AddComponents(
             prototypeA,
             entityManager,
@@ -89,11 +89,11 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
 
         engineMeshA = renderMeshResources.MeshReferences[0];
         var colliderBlob =
-            Unity.Physics.MeshCollider.Create(engineMeshA, CollisionFilter.Default, Material.Default); // Test function
+            Unity.Physics.MeshCollider.Create(engineMeshA, CollisionFilter.Default, Material.Default); // 测试功能
         CreatedColliderBlobs.Add(colliderBlob);
         colliderA = new PhysicsCollider() { Value = colliderBlob, };
 
-        // Create Prototype B and test second utility function
+        // 创建原型 B 并测试第二个实用函数
         prototypeB = entityManager.CreateEntity();
         ecb.AddSharedComponent<PhysicsWorldIndex>(prototypeB, worldIndex);
         RenderMeshUtility.AddComponents(
@@ -105,13 +105,13 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
         entityManager.AddComponentData(prototypeB, new LocalToWorld());
 
         engineMeshB = renderMeshResources.MeshReferences[1];
-        var engineMeshDataArray = UnityEngine.Mesh.AcquireReadOnlyMeshData(engineMeshB); //Test function
+        var engineMeshDataArray = UnityEngine.Mesh.AcquireReadOnlyMeshData(engineMeshB); //测试功能
         colliderBlob =
             Unity.Physics.MeshCollider.Create(engineMeshDataArray, CollisionFilter.Default, Material.Default);
         CreatedColliderBlobs.Add(colliderBlob);
         colliderB = new PhysicsCollider() { Value = colliderBlob, };
 
-        // Create Prototype C and test third utility function
+        // 创建 Prototype C 并测试第三个实用函数
         prototypeC = entityManager.CreateEntity();
         ecb.AddSharedComponent<PhysicsWorldIndex>(prototypeC, worldIndex);
         RenderMeshUtility.AddComponents(
@@ -164,7 +164,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
                 TilePosition = tilePosition,
                 Ecb = ecb.AsParallelWriter(),
             }.Schedule(entities.Length, 128);
-            spawnJob.Complete(); // this runs at the start of a frame, so we don't have a job dependency to wait on
+            spawnJob.Complete(); // 它在帧的开头运行，因此我们没有 job 依赖项来等待
 
             ecb.Playback(EntityManager);
             ecb.Dispose();
@@ -176,14 +176,14 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
     [BurstCompile]
     struct SpawnCollidersFromTriggerJob : IJobParallelFor
     {
-        public Entity PrototypeEntityA;                         // Entities to use as prototypes for the spawned entities
+        public Entity PrototypeEntityA;                         // Entities 用作生成的 entities 的原型
         public Entity PrototypeEntityB;
         public Entity PrototypeEntityC;
         public PhysicsCollider ColliderA;
         public PhysicsCollider ColliderB;
         public PhysicsCollider ColliderC;
-        public NativeArray<TileTriggerCounter> TileTriggerInfo; // Need the tile trigger count and max count
-        public NativeArray<LocalTransform> TilePosition;        // LocalTransform of the tile
+        public NativeArray<TileTriggerCounter> TileTriggerInfo; // 需要图块 trigger 数量和最大数量
+        public NativeArray<LocalTransform> TilePosition;        // 瓷砖的 LocalTransform
         public EntityCommandBuffer.ParallelWriter Ecb;
 
         public void Execute(int index)
@@ -198,32 +198,32 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
                 {
                     body = Ecb.Instantiate(index, PrototypeEntityA);
                     verticalOffset = new float3(0, 3, 0);
-                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderA);  //Add physics collider created earlier
+                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderA);  //添加之前创建的物理 collider
                 }
                 else if (tiles.TriggerCount == 2)
                 {
                     body = Ecb.Instantiate(index, PrototypeEntityB);
                     verticalOffset = new float3(0, 4, 0);
-                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderB);  //Add physics collider created earlier
+                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderB);  //添加之前创建的物理 collider
                 }
                 else if (tiles.TriggerCount == 3)
                 {
                     body = Ecb.Instantiate(index, PrototypeEntityC);
                     verticalOffset = new float3(0, 5, 0);
-                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderC);  //Add physics collider created earlier
+                    Ecb.AddComponent<PhysicsCollider>(index, body, ColliderC);  //添加之前创建的物理 collider
                 }
                 else
                 {
                     return;
                 }
 
-                //Add transform, scale, localToWorld
-                var position = TilePosition[index].Position + verticalOffset;   //Spawn above the tile of trigger event
+                //添加变换、缩放、localToWorld
+                var position = TilePosition[index].Position + verticalOffset;   //生成在 trigger 事件的图块上方
                 var tl = LocalTransform.FromPositionRotationScale(position, quaternion.identity, 0.25f);
                 Ecb.AddComponent<LocalTransform>(index, body, tl);
                 Ecb.AddComponent<LocalToWorld>(index, body, new LocalToWorld { Value = tl.ToMatrix() });
 
-                //Note: mesh-mesh collider collisions are expensive. Keep static if possible (ref: SceneCreationSystem.CreateBody)
+                //Note: 网格-网格 collider 碰撞的成本很高。如果可能的话保持静态（参考：SceneCreationSystem.CreateBody）
                 bool isDynamic = false;
                 if (isDynamic)
                 {
@@ -246,7 +246,7 @@ public partial class SpawnColliderFromTriggerSystem : SystemBase
     [BurstCompile]
     protected override void OnDestroy()
     {
-        // Need to manually dispose all the BlobAssetReferences that were manually created
+        // 需要手动处置所有手动创建的 BlobAssetReferences
         foreach (var collider in CreatedColliderBlobs)
         {
             if (collider.IsCreated)

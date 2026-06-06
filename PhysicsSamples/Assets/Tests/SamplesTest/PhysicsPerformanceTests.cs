@@ -24,7 +24,7 @@ namespace Unity.Physics.Tests.PerformanceTests
         private static string[] s_FilteredOutScenes =
         {
 #if UNITY_STANDALONE_LINUX
-            // [DOTS-9376] Currently hanging with Unity.Physics.Tests.PerformanceTests.Havok_PerformanceTest_Parallel.LoadScenes
+            // [DOTS-9376] 目前与 Unity.Physics.Tests.PerformanceTests.Havok_PerformanceTest_Parallel.LoadScenes 一起悬挂
             "/ConvexCollisionPerformanceTest.unity",
             "/RagdollPerformanceTest.unity",
             "/SphereCollisionPerformanceTest.unity",
@@ -34,7 +34,7 @@ namespace Unity.Physics.Tests.PerformanceTests
             "/RagdollPerformanceTest.unity",
 #endif
 #if UNITY_PS4 || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_WIN
-            // DOTS-10319 - Crashing on PS4, Linux, and Windows
+            // DOTS-10319 - 在 PS4、Linux 和 Windows 上崩溃
             "/TreeLifetimePerformanceTest.unity",
 #endif
         };
@@ -47,7 +47,7 @@ namespace Unity.Physics.Tests.PerformanceTests
         private static string[] s_SubsteppedFilterInOnly =
         {
 #if UNITY_STANDALONE_LINUX
-            // [DOTS-9376] Currently hanging with Unity.Physics.Tests.PerformanceTests.Havok_PerformanceTest_Parallel.LoadScenes
+            // [DOTS-9376] 目前与 Unity.Physics.Tests.PerformanceTests.Havok_PerformanceTest_Parallel.LoadScenes 一起悬挂
             "/ChainTestWithMassPerformanceTest.unity",
 #else
             "/SphereCollisionPerformanceTest.unity",
@@ -81,20 +81,20 @@ namespace Unity.Physics.Tests.PerformanceTests
                 while (!Application.isPlaying && PerformanceTest.Active == null && attempt++ < maxAttempts);
 
                 var frameSampleGroup = new SampleGroup("FrameTime");
-                // sample time for requested profiler markers
+                // 请求的分析器标记的采样时间
                 using (Measure.ProfilerMarkers(sampleGroups.ToArray()))
                 {
                     for (var i = 0; i < frameCount; ++i)
                     {
-                        // sample frame time
+                        // 示例帧时间
                         using (Measure.Scope(frameSampleGroup))
                         {
                             yield return null;
                         }
 
-#if false // DOTS-10456: disabled for now until we can get a way to obtain this data reliably.
+#if false // DOTS-10456：暂时禁用，直到我们找到可靠地获取此数据的方法。
 #if UNITY_EDITOR
-                        // add low level marker timings
+                        // 添加低电平标记计时
                         foreach (var marker in lowLevelMarkers)
                         {
                             var accumulatedTime = GetAccumulatedTime(marker);
@@ -104,10 +104,10 @@ namespace Unity.Physics.Tests.PerformanceTests
 #endif
                     }
 
-                    // Note taken from FramesMeasurement.Run() in package com.unity.test-framework.performance@3.0.3,
-                    // which this function here is inspired from:
-                    // WaitForEndOfFrame coroutine is not invoked on the editor in batch mode
-                    // This may lead to unexpected behavior and is better to avoid
+                    // Note 取自 package com.unity.test-framework.performance@3.0.3 中的 FramesMeasurement.Run()，
+                    // 这里这个函数的灵感来自于：
+                    // 批处理模式下编辑器上不调用 WaitForEndOfFrame 协程
+                    // 这可能会导致意外行为，最好避免
                     // https://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
                     if (!Application.isBatchMode && Application.isPlaying)
                     {
@@ -144,11 +144,11 @@ namespace Unity.Physics.Tests.PerformanceTests
         }
 
         /// <summary>
-        /// Get accumulated time for a specific marker in the last simulation frame using raw frame data access.
-        /// This is currently required to obtain timing data for C# jobs.
+        /// 使用原始帧数据访问获取最后一个模拟帧中特定标记的累积时间。
+        /// 当前需要获取 C# jobs 的时序数据。
         /// </summary>
-        /// <param name="markerName">Name of the profiler marker to access time of</param>
-        /// <returns>Accumulated time in ms</returns>
+        /// 探查器标记的 <param name="markerName">Name 访问时间 of</param>
+        /// <returns>Accumulated ms</returns> 时间
         static float GetAccumulatedTime(string markerName)
         {
             bool dataFound = false;
@@ -158,10 +158,10 @@ namespace Unity.Physics.Tests.PerformanceTests
             do
             {
                 dataFound = GetAccmulatedTimeAtFrame(markerName, frameIndex--, out accumulatedTime);
-                // If no data was found in the current frame, try the previous frame.
-                // The data is recorded asynchronously and might not be available yet.
-                // We do recognize that this is not ideal and will potentially cause repetitions in the data readings,
-                // but the results would still be representative of the performance of the system.
+                // 如果当前帧中没有找到数据，请尝试上一帧。
+                // 数据是异步记录的，可能尚不可用。
+                // 我们确实认识到这并不理想，并且可能会导致数据读数重复，
+                // 但结果仍能代表 system 的性能。
             }
             while (!dataFound && frameIndex > -1);
             if (!dataFound)
@@ -199,11 +199,11 @@ namespace Unity.Physics.Tests.PerformanceTests
                 var scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
                 if (scenePath.Contains("Tests/Performance"))
                 {
-                    // Skip scenes included in the filter
+                    // 跳过过滤器中包含的 scenes
                     if (s_FilteredOut.Length > 0 && s_FilteredOut.Any(filter => scenePath.Contains(filter)))
                         continue;
 
-                    // Add only scenes included in the filter
+                    // 仅添加过滤器中包含的 scenes
                     if (s_FilteredOnly.Length > 0)
                     {
                         if (s_FilteredOnly.Any(filter => scenePath.Contains(filter)))
@@ -215,10 +215,10 @@ namespace Unity.Physics.Tests.PerformanceTests
                         continue;
                     }
 
-                    // Include any scene that contains the specified path if no filters are applied
+                    // 如果未应用过滤器，则包括包含指定路径的任何 scene
                     var sceneName = Path.GetFileName(scenePath);
 
-                    // Add two test cases for this scene: one with and one without incremental static broadphase enabled.
+                    // 为此 scene 添加两个测试用例：一个启用增量静态宽相，另一个不启用。
                     if (scenePath.Contains("/TreeLifetimePerformanceTest.unity"))
                     {
                         scenes.Add(PerformanceTestFixture.CreateIncrementalBroadphaseTestFixtureData(sceneName, scenePath, true));

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Unity.NetCode.Samples.PlayerList
 {
-    /// <summary>Simple IMGUI example rendering of a player scoreboard with connect/disconnect notifications.</summary>
+    /// <summary>Simple IMGUI 具有连接/断开连接的玩家记分板的示例渲染 notifications.</summary>
     public class RenderPlayerListMb : MonoBehaviour
     {
         public AnimationCurve notificationOpacityCurve = AnimationCurve.Linear(0, 1, 1, 0);
@@ -91,7 +91,7 @@ namespace Unity.NetCode.Samples.PlayerList
 
             GUILayout.BeginHorizontal();
             {
-                // Clients:
+                // Clients：
                 foreach (var worldKvp in m_WorldCaches)
                 {
                     GUILayout.BeginVertical();

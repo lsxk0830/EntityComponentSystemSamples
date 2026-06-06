@@ -6,10 +6,10 @@ namespace Tutorials.Jobs.Step1
     {
         public void Update()
         {
-            // Find nearest Target.
-            // When comparing distances, it's cheaper to compare
-            // the squares of the distances because doing so
-            // avoids computing square roots.
+            // 找到最近的目标。
+            // 比较距离时，比较便宜
+            // 距离的平方，因为这样做
+            // 避免计算平方根。
             Vector3 nearestTargetPosition = default;
             float nearestDistSq = float.MaxValue;
             foreach (var targetTransform in Spawner.TargetTransforms)

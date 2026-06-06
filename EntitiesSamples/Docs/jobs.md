@@ -1,130 +1,130 @@
-# The C# Job system
+# C# Job system
 
-In this page:
+在此页面中：
 
-- [Unmanaged Collections](#unmanaged-collections)
+- [非托管集合](#unmanaged-collections)
 - [C# Jobs](#c-jobs-and-job-dependencies)
-- [Job Dependencies](#c-jobs-and-job-dependencies)
-- [Job Safety Checks](#job-safety-checks)
-- [Parallel Jobs](#parallel-jobs)
+- [Job 依赖项](#c-jobs-and-job-dependencies)
+- [Job 安全检查](#job-safety-checks)
+- [并行 Jobs](#parallel-jobs)
 
-Further reading:
+进一步阅读：
 
-1. [Blog post: Improving Job System Performance part 1](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-1)
-1. [Blog post: Improving Job System Performance part 2](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-2)
-
-<br/>
-
-# Unmanaged collections
-
-The unmanaged collection types of `Unity.Collections` have a few advantages over normal C# managed collections:
-
-- Unmanaged objects can be used in Burst-compiled code.
-- Unmanaged objects can be used in jobs, whereas using managed objects in jobs is not always safe.
-- The `Native-` collection types have safety checks to help enforce thread-safety in jobs.
-- Unmanaged objects are not garbage collected and so induce no garbage collection overhead.
-
-On the downside, you are responsible for calling `Dispose()` on every unmanaged collection once it's no longer needed. Neglecting to dispose a collection creates a memory leak, and the disposal safety checks will throw an error.
-
-*[See more information about unmanaged collections](./cheatsheet/collections.md).*
-
-## Allocators
-
-When instantiating an unmanaged collection, you must specify an *allocator*. Different allocators organize and track their memory in different ways. Three of the most-commonly used allocators are:
-
-- `Allocator.Persistent`: **The slowest allocator. Used for indefinite lifetime allocations.** You must call `Dispose()` to deallocate a Persistent-allocated collection when you no longer need it.
-- `Allocator.Temp`: **The fastest allocator. Used for short-lived allocations.** Each frame, the main thread creates a Temp allocator which is deallocated in its entirety at the end of the frame. Because a Temp allocator gets discarded as a whole, you don't actually need to manually deallocate your Temp allocations, and in fact, calling `Dispose()` on a Temp-allocated collection is a no-op.
-- `Allocator.TempJob`: *(discussed [below](#allocations-within-jobs))*
+1. [博客文章：改进 Job System 性能第 1 部分](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-1)
+1. [博客文章：改进 Job System 性能第 2 部分](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-2)
 
 <br/>
 
-# C# Jobs and Job Dependencies
+# 非托管集合
 
-&#x1F579;  *[See example jobs](../Assets/ExampleCode/Jobs.cs).*
+`Unity.Collections` 的非托管集合类型比普通 C# 托管集合有一些优势：
 
-The C# Jobs system allows us to schedule work to be executed in a pool of worker threads:
+- 非托管对象可以在 Burst 编译的代码中使用。
+- 非托管对象可以在 jobs 中使用，而在 jobs 中使用托管对象并不总是安全的。
+- `Native-` 集合类型具有安全检查，有助于在 jobs 中强制执行线程安全。
+- 非托管对象不会被垃圾回收，因此不会产生垃圾回收开销。
 
-- When a worker thread finishes its current work, the thread will pull a waiting job off the queue and invoke the job's `Execute()` method to run the job.
-- A job type is created by defining a struct that implements [`IJob`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.IJob.html) or one of the other job interfaces (`IJobParallelFor`, `IJobEntity`, `IJobChunk`...).
-- To put a job instance on the job queue, call the extension method `Schedule()`. Jobs can only be scheduled from the main thread, not from within other jobs.
+不利的一面是，一旦不再需要每个非托管集合，您就有责任对它调用 `Dispose()`。忽略处置集合会导致内存泄漏，并且处置安全检查将引发错误。
 
-<br>
+*[查看有关非托管集合的更多信息](./cheatsheet/collections.md)。*
 
-## Dependencies
+## 分配器
 
-`Schedule()` returns a [`JobHandle`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.html) representing the scheduled job. If a `JobHandle` is passed to `Schedule()`, the new job will *depend* upon the job represented by the handle.
+实例化非托管集合时，必须指定*分配器*。不同的分配器以不同的方式组织和跟踪它们的内存。三种最常用的分配器是：
 
-**A worker thread will not pull a job off the job queue until the job's dependencies have all finished execution.** So we can use dependencies to prescribe the execution order amongst the scheduled jobs.
-
-Although `Schedule()` only takes one `JobHandle` argument, we can use [`JobHandle.CombineDependencies()`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.CombineDependencies.html)'s to combine multiple handles into one logical handle, thus allowing a job to have multiple direct dependencies.
-
-<br>
-
-## Completing jobs
-
-At some point after scheduling a job, the main thread should call the `JobHandle`'s [`Complete()`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.Complete.html) method on the main thread. Completing a job does a few things in this order:
-
-1. Recursively completes all dependencies of the job.
-1. Waits for the job to finish execution if it hasn't finished already. 
-1. Removes all remaining references of the job from the job queue.
-
-Effectively, once `Complete()` returns, the job and all its dependencies are guaranteed to have finished execution and to have been removed from the queue.
-
-Also note:
-
-- Calling `Complete()` on the handle of an already completed job does nothing and throws no error.
-- Like with scheduling, jobs can only be completed from the main thread, not from within other jobs. 
-- Though a job can be completed immediately after scheduling, it's usually best to hold off completing a job until the latest possible moment when the work actually needs to be done. In general, the longer the gaps between the scheduling of each job and its completion, the less likely the main thread and worker threads will spend time needlessly sitting idle.
-
-<br>
-
-## Data access in jobs
-
-In the large majority of cases:
-
-- A job should not perform I/O.
-- A job should not access managed objects.
-- A job should only access static fields if they are readonly.
-
-Scheduling a job creates a private copy of the struct that will be visible only to the running job. Consequently, any modifications to the fields in the job will be visible only within the job. However, because an unmanaged collection struct stores its *content* externally instead of in the struct itself, modifications to the content of a collection field will be visible outside the job.
-
-<br>
-
-## Allocations within jobs
-
-Collections passed to a job must be allocated with `Allocator.Persistent`, `Allocator.TempJob`, or another thread-safe allocator.
-
-Collections allocated with `Allocator.Temp` *cannot* be passed into jobs. However, each thread of a job is given its own Temp allocator, so `Allocator.Temp` is safe to use *within* jobs. All Temp allocations in a job will be disposed automatically at the end of the job.
-
-Allocations made with `Allocator.TempJob` must be manually disposed. The disposal safety checks, if enabled, will throw an exception when any allocation made with `Allocator.TempJob` is not disposed within 4 frames after allocation.
-
+- `Allocator.Persistent`：**最慢的分配器。用于无限期的生命周期分配。** 当您不再需要持久分配的集合时，您必须调用 `Dispose()` 来释放它。
+- `Allocator.Temp`：**最快的分配器。用于短期分配。** 每个帧，主线程都会创建一个临时分配器，该分配器在帧结束时全部释放。因为 Temp 分配器会作为一个整体被丢弃，所以您实际上不需要手动取消 Temp 分配，事实上，在 Temp 分配的集合上调用 `Dispose()` 是无操作的。
+- `Allocator.TempJob`：*（[下面讨论]（#allocations-within-jobs））*
 
 <br/>
 
+# C# Jobs 和 Job 依赖项
 
-# Job Safety Checks
+&#x1F579;  *[参见示例 jobs](../Assets/ExampleCode/Jobs.cs)。*
 
-For any two jobs which access the same data, it's generally undesirable for their execution to overlap or for their execution order to be indeterminate. For example, if two jobs read and write the content of a native array, we should ensure that one of the two jobs finishes execution before the other starts. Otherwise, when either job modifies the array, that change may interfere with the results of the other job, depending upon the happenstance of which job runs before the other and whether their execution overlaps.
+C# Jobs system 允许我们在工作线程池中执行 schedule 工作：
 
-So when you have such a data conflict between two jobs, you should either:
+- 当工作线程完成当前工作时，该线程会将等待的 job 从队列中拉出，并调用 job 的 `Execute()` 方法到 run 和 job。
+- job 类型是通过定义实现 [`IJob`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.IJob.html) 或其他 job 接口之一（`IJobParallelFor`、`IJobEntity`、`IJobChunk`...）。
+- 要将 job 实例放入 job 队列中，请调用扩展方法 `Schedule()`。Jobs 只能从主线程调度，不能从其他 jobs 内部调度。
 
-- Schedule and complete one job before scheduling the other...
-- ...or schedule one job as a dependency of the other.
+<br>
 
-When you call `Schedule()`, the job safety checks (if enabled) will throw an exception if they detect a potential race condition. For instance, an exception will be thrown if you first schedule a job that uses a native array and then schedule a second job which uses that same native array but which does not depend upon the first job.
+## 依赖关系
 
-As a special case, it's always safe for two jobs to access the same data if both jobs only *read* the data. Because neither job modifies the data, they won't interfere with each other. We can indicate that a native array or collection will only be read in a job by marking the struct field with the [`[ReadOnly]`](https://docs.unity3d.com/ScriptReference/Unity.Collections.ReadOnlyAttribute.html) attribute. The job safety checks will not consider two jobs to conflict if all native arrays or collections they share are marked `[ReadOnly]` in both jobs.
+`Schedule()` 返回表示计划的 job 的 [`JobHandle`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.html)。如果将 `JobHandle` 传递给 `Schedule()`，则新的 job 将*依赖于由句柄表示的 job。
 
-In some cases, you may wish to disable the job safety checks entirely for a specific native array or collection used in a job. This can be done by marking it with the [`[NativeDisableContainerSafetyRestriction]`](https://docs.unity3d.com/ScriptReference/Unity.Collections.LowLevel.Unsafe.NativeDisableContainerSafetyRestrictionAttribute.html) attribute. Just be sure that you're not creating a race condition!
+**工作线程不会将 job 从 job 队列中拉出，直到 job 的依赖项全部完成执行。**因此，我们可以使用依赖项来规定调度的 jobs 之间的执行顺序。
 
-While a native collection is in use by any currently scheduled jobs, the safety checks will throw an exception if you attempt to read or modify that native collection on the main thread. As a special case, the main thread can *read* from a native collection if it is marked `[ReadOnly]` in the scheduled jobs.
+虽然 `Schedule()` 仅采用一个 `JobHandle` 参数，但我们可以使用 [`JobHandle.CombineDependencies()`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.CombineDependencies.html) 将多个句柄组合成一个逻辑句柄，从而允许 job 具有多个直接依赖项。
+
+<br>
+
+## 正在完成 jobs
+
+在调度 job 后的某个时刻，主线程应该在主线程上调用 `JobHandle` 的 [`Complete()`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.JobHandle.Complete.html) 方法。完成 job 会按以下顺序执行一些操作：
+
+1. 递归完成 job 的所有依赖。
+1. 如果 job 尚未完成，则等待其完成执行。
+1. 从 job 队列中删除 job 的所有剩余引用。
+
+实际上，一旦 `Complete()` 返回，job 及其所有依赖项就保证已完成执行并已从队列中删除。
+
+另请注意：
+
+- 在已完成的 job 的句柄上调用 `Complete()` 不会执行任何操作，也不会引发任何错误。
+- 与调度一样，jobs 只能从主线程完成，而不能从其他 jobs 内部完成。
+- 尽管 job 可以在计划后立即完成，但通常最好推迟完成 job，直到实际需要完成工作的最晚可能时刻。一般来说，每个 job 的调度与其完成之间的间隔越长，主线程和工作线程花费不必要的空闲时间的可能性就越小。
+
+<br>
+
+## jobs 中的数据访问
+
+在绝大多数情况下：
+
+- job 不应执行 I/O。
+- job 不应访问托管对象。
+- job 应该只访问只读的静态字段。
+
+调度 job 会创建该结构的私有副本，该副本仅对正在运行的 job 可见。因此，对 job 中字段的任何修改仅在 job 中可见。但是，由于非托管集合结构将其*内容*存储在外部而不是存储在结构本身中，因此对集合字段内容的修改将在 job 外部可见。
+
+<br>
+
+## jobs 内的分配
+
+传递给 job 的集​​合必须使用 `Allocator.Persistent`、`Allocator.TempJob` 或其他线程安全分配器进行分配。
+
+使用 `Allocator.Temp` 分配的集合*不能*传递到 jobs 中。然而，job 的每个线程都有自己的临时分配器，因此 `Allocator.Temp` 可以安全地在*jobs 内使用。job 中的所有临时分配将在 job 末尾自动处置。
+
+使用 `Allocator.TempJob` 进行的分配必须手动处置。如果启用了处置安全检查，则当使用 `Allocator.TempJob` 进行的任何分配在分配后 4 帧内未处置时，将引发异常。
+
 
 <br/>
 
 
-# Parallel Jobs
+# Job 安全检查
 
-To split the work of processing an array or list across multiple threads, we can define a job with the [`IJobParallelFor`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.IJobParallelFor.html) interface:
+对于访问相同数据的任何两个 jobs，通常不希望它们的执行重叠或执行顺序不确定。例如，如果两个 jobs 读写一个原生数组的内容，我们应该确保两个 jobs 之一在另一个开始之前完成执行。否则，当 job 修改数组时，该更改可能会干扰另一个 job 的结果，具体取决于 job 在另一个之前运行的情况以及它们的执行是否重叠。
+
+因此，当两个 jobs 之间存在此类数据冲突时，您应该：
+
+- Schedule 并在安排另一项之前完成一项 job...
+- ...或 schedule 一个 job 作为另一个的依赖项。
+
+当您调用 `Schedule()` 时，如果 job 安全检查（如果启用）检测到潜在的竞争条件，它们将引发异常。例如，如果您首先使用本机数组的 schedule 一个 job，然后使用 schedule 另一个使用相同本机数组但不依赖于第一个 job 的 job，则会引发异常。
+
+作为一种特殊情况，如果两个 jobs 都只“读取”数据，那么两个 jobs 访问相同的数据总是安全的。因为 job 都不修改数据，所以不会互相干扰。我们可以通过使用 [`[ReadOnly]`](https://docs.unity3d.com/ScriptReference/Unity.Collections.ReadOnlyAttribute.html) 属性标记结构字段来指示只能在 job 中读取本机数组或集合。如果两个 jobs 共享的所有本机数组或集合在两个 jobs 中都标记为 `[ReadOnly]`，则 job 安全检查不会认为两个 jobs 发生冲突。
+
+在某些情况下，您可能希望对 job 中使用的特定本机数组或集合完全禁用 job 安全检查。这可以通过使用 [`[NativeDisableContainerSafetyRestriction]`](https://docs.unity3d.com/ScriptReference/Unity.Collections.LowLevel.Unsafe.NativeDisableContainerSafetyRestrictionAttribute.html) 属性对其进行标记来完成。只要确保您没有创建竞争条件即可！
+
+当任何当前计划的 jobs 使用本机集合时，如果您尝试在主线程上读取或修改该本机集合，安全检查将引发异常。作为一种特殊情况，如果在调度的 jobs 中标记为 `[ReadOnly]`，主线程可以从本机集合“读取”。
+
+<br/>
+
+
+# 并行 Jobs
+
+要将处理数组或列表的工作拆分到多个线程中，我们可以使用 [`IJobParallelFor`](https://docs.unity3d.com/ScriptReference/Unity.Jobs.IJobParallelFor.html) 接口定义 job：
 
 ```csharp
 [BurstCompile]
@@ -140,8 +140,8 @@ public struct SquareNumbersJob : IJobParallelFor
 }
 ```
 
-When we schedule the job, we specify an index count and batch size:
- 
+当我们 schedule job 时，我们指定索引计数和批量大小：
+
 ```csharp
 // ... scheduling the job
 var job = new SquareNumbersJob { Nums = myArray };
@@ -150,17 +150,17 @@ JobHandle handle = job.Schedule(
         100);              // batch size
 ```
 
-When the job runs, its `Execute()` will be called *`count`* times, with all values from 0 up to *count* passed to `index`.
+当 job 运行时，其 `Execute()` 将被调用 *`count`* 次，所有从 0 到 *count* 的值都会传递给 `index`。
 
-The indexes of the job get split into batches determined by the batch size, and the worker threads then can grab these batches off the queue. Effectively, the separate batches may be processed concurrently on separate threads, but all indexes of an individual batch will be processed together within a single thread.
+job 的索引被分成由批次大小确定的批次，然后工作线程可以从队列中获取这些批次。实际上，单独的批次可以在单独的线程上同时处理，但单个批次的所有索引将在单个线程中一起处理。
 
-In this example, if the array length is, say, 250, then the job will be split into three batches: the first covering indexes 0 through 99; the second covering indexes 100 through 199; and the last batch covering the remainder, indexes 200 through 249. Because the job is split into three batches, it will effectively be processed at most across three worker threads. If we want to split the job up across more threads, we must pick a smaller batch size.
+在此示例中，如果数组长度为 250，则 job 将分为三批：第一批覆盖索引 0 到 99；第二批覆盖索引 0 到 99。第二覆盖索引 100 到 199；最后一个批次覆盖其余部分，索引 200 到 249。由于 job 被分为三个批次，因此最多将在三个工作线程中进行有效处理。如果我们想将 job 拆分到更多线程，我们必须选择较小的批量大小。
 
 | &#x1F4DD; NOTE |
 | :- |
-| The choice of a good batch size isn’t an exact science! In the extreme case, we could pick a batch size of 1 and thereby split each individual index into its own batch, but keep in mind that having too many small batches might incur significant job system overhead. In general, you should pick a batch size that seems not too big but not too small and then experiment to find a size that seems optimal for each specific job. |
+| 选择好的批量大小并不是一门精确的科学！在极端情况下，我们可以选择批量大小为 1，从而将每个单独的索引拆分为自己的批量，但请记住，拥有太多小批量可能会产生大量的 job system 开销。一般来说，您应该选择一个看起来不太大但也不太小的批量大小，然后尝试找到对于每个特定 job 来说似乎最佳的大小。 |
 
-When a batch is processed, it should only access array or list indexes of its own batch. To enforce this, the safety checks throw an exception if we index an array or list with any value other than the `index` parameter:
+当处理一个批次时，它应该只访问自己批次的数组或列表索引。为了强制执行此操作，如果我们使用除 `index` 参数之外的任何值对数组或列表进行索引，安全检查将引发异常：
 
 ```csharp
 [BurstCompile]
@@ -176,4 +176,4 @@ public struct MyJob : IJobParallelFor
 }
 ```
 
-This restriction does not apply to array and list fields marked with the `[ReadOnly]` attribute. For an array or list field you need to write in the job, you can disable the restriction by marking the field with `[NativeDisableParallelForRestriction]`. Just be careful that you're not creating a race condition!
+此限制不适用于标有 `[ReadOnly]` 属性的数组和列表字段。对于需要在 job 中写入的数组或列表字段，可以通过将字段标记为 `[NativeDisableParallelForRestriction]` 来禁用限制。只是要小心，不要创造竞争条件！

@@ -146,7 +146,7 @@ SubShader {
             float4	color           : COLOR;
             float2	atlas           : TEXCOORD0;
             float	weight          : TEXCOORD1;
-            float2	mask            : TEXCOORD2;		// Position in object space(xy)
+            float2	mask            : TEXCOORD2;		// 物体空间中的位置(xy)
             float3	viewDir         : TEXCOORD3;
 
             #if (UNDERLAY_ON || UNDERLAY_INNER)
@@ -157,7 +157,7 @@ SubShader {
             float4 textures         : TEXCOORD5;
         };
 
-        // Used by Unity internally to handle Texture Tiling and Offset.
+        // 由 Unity 在内部使用来处理纹理平铺和偏移。
         float4 _FaceTex_ST;
         float4 _OutlineTex_ST;
         float _UIMaskSoftnessX;
@@ -198,10 +198,10 @@ SubShader {
             float2 bOffset = float2(x, y);
             #endif
 
-            // Generate UV for the Masking Texture
+            // 为遮罩纹理生成 UV
             float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
 
-            // Support for texture tiling and offset
+            // 支持纹理平铺和偏移
             float2 textureUV = input.texcoord1;
             float2 faceUV = TRANSFORM_TEX(textureUV, _FaceTex);
             float2 outlineUV = TRANSFORM_TEX(textureUV, _OutlineTex);
@@ -298,7 +298,7 @@ SubShader {
             faceColor.rgb += glowColor.rgb * glowColor.a;
             #endif
 
-            // Alternative implementation to UnityGet2DClipping with support for softness.
+            // UnityGet2DClipping 的替代实现，支持软性。
             #if UNITY_UI_CLIP_RECT
             half2 maskSoftness = half2(max(_UIMaskSoftnessX, _MaskSoftnessX), max(_UIMaskSoftnessY, _MaskSoftnessY));
             float2 maskZW = 0.25 / (0.25 * maskSoftness + 1 / scale);

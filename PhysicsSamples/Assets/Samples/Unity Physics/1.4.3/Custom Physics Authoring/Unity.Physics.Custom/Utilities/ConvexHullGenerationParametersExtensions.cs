@@ -6,7 +6,7 @@ namespace Unity.Physics.Authoring
 {
     public static class ConvexHullGenerationParametersExtensions
     {
-        // recommended simplification tolerance is at least 1 centimeter
+        // 建议简化公差至少 1 厘米
         internal const float k_MinRecommendedSimplificationTolerance = 0.01f;
 
         internal static void InitializeToRecommendedAuthoringValues(
@@ -25,7 +25,7 @@ namespace Unity.Physics.Authoring
                 k_MinRecommendedSimplificationTolerance,
                 ConvexHullGenerationParameters.Default.SimplificationTolerance * math.cmax(bounds.Extents)
             );
-            // TODO: initialize other properties based on input points?
+            // TODO: 根据输入点初始化其他属性？
         }
 
         internal static void OnValidate(ref this ConvexHullGenerationParameters generationParameters, float maxAngle = 180f)

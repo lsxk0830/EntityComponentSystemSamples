@@ -60,7 +60,7 @@ namespace Asteroids.Server
             ghostRelevancy.GhostRelevancyMode = GhostRelevancyMode.SetIsRelevant;
             if (settings.levelData.enableGhostImportanceScaling)
             {
-                // Relevancy is achieved via GhostDistanceImportance.BatchScaleWithRelevancy.
+                // 相关性是通过 GhostDistanceImportance.BatchScaleWithRelevancy 实现的。
                 relevantSet.Clear();
                 return;
             }

@@ -8,23 +8,23 @@ using UnityEngine.Rendering.Universal;
 
 public class RenderGraphAutoAdoption : IPreprocessBuildWithReport
 {
-    public int callbackOrder => int.MinValue + 99; // just before URPPreprocessBuild
+    public int callbackOrder => int.MinValue + 99; // 就在 URPPreprocessBuild 之前
 
     void IPreprocessBuildWithReport.OnPreprocessBuild(BuildReport report)
     {
         if (GraphicsSettings.currentRenderPipelineAssetType != typeof(UniversalRenderPipelineAsset))
             return;
 
-        //changing the boolean through serialization as it is private
+        //通过序列化更改布尔值，因为它是私有的
         var settings = GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>();
         var global = GraphicsSettings.GetSettingsForRenderPipeline<UniversalRenderPipeline>();
         var so = new SerializedObject(global);
         SerializedProperty settingsProperty = null;
 
-        //finding back RenderGraphSettings in global settings serilized object
-        var propertyIterator = so.FindProperty("m_Settings.m_SettingsList.m_List"); //start from the root of settings collection
+        //在全局设置序列化对象中找到 RenderGraphSettings
+        var propertyIterator = so.FindProperty("m_Settings.m_SettingsList.m_List"); //从设置集合的根开始
         var end = propertyIterator.GetEndProperty();
-        propertyIterator.NextVisible(true); //enter collection
+        propertyIterator.NextVisible(true); //进入收藏
         while (!SerializedProperty.EqualContents(propertyIterator, end))
         {
             if (propertyIterator?.boxedValue == settings)
@@ -37,7 +37,7 @@ public class RenderGraphAutoAdoption : IPreprocessBuildWithReport
         if (settingsProperty == null)
             throw new BuildFailedException("Missing RenderGraphSettings in UniversalRenderPipeline's IRenderPipelineGraphicsSettings");
 
-        //update to use RenderGraph
+        //更新为使用 RenderGraph
         var flag = settingsProperty.FindPropertyRelative("m_EnableRenderCompatibilityMode");
         if (!flag.boolValue)
             return;

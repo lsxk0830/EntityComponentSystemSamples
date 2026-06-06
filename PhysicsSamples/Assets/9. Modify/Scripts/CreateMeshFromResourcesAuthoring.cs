@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unity.Physics
 {
-    // Takes the Materials and Meshes specified in the GameObject and writes that data into a RenderMeshArray component
+    // 获取 GameObject 中指定的材质和网格并将该数据写入 RenderMeshArray component
     public class CreateMeshFromResourcesAuthoring : MonoBehaviour
     {
         public UnityEngine.Material MaterialA;
@@ -34,6 +34,6 @@ namespace Unity.Physics
         }
     }
 
-    // Use as a tag to more easily identify the entity that has the RenderMeshArray data for the loaded resources
+    // 用作标签可以更轻松地识别具有加载资源的 RenderMeshArray 数据的 entity
     public struct ResourcesLoadedTag : IComponentData {}
 }

@@ -34,7 +34,7 @@ namespace Asteroids.Client
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Should ideally not be a hard-coded value
+            // 理想情况下不应是硬编码值
             float astrScale = 30;
 
             m_Pulse += m_PulseDelta * SystemAPI.Time.DeltaTime;

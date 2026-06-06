@@ -71,7 +71,7 @@ namespace Unity.Physics.Authoring
                 }
             }
 
-            // do not simply use GameObject.activeInHierarchy because it will be false when instantiating a prefab
+            // 不要简单地使用 GameObject.activeInHierarchy 因为实例化 prefab 时它将为 false
             var t = child.transform;
             var activeInHierarchy = t.gameObject.activeSelf;
             while (activeInHierarchy && t != m_Root)

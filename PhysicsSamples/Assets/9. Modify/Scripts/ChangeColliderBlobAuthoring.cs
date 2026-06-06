@@ -1,6 +1,6 @@
-// This script is used in the `5g1. Change Collider Material - Bouncy Boxes` demo and it is based
-// off the ChangeBoxColliderSizeAuthoring.cs script, but it expands on this behaviour by also
-// changing the physics material properties based on if the box is growing or shrinking.
+// 该脚本用于 `5g1. Change Collider Material - Bouncy Boxes` 演示中，它基于
+// 关闭 ChangeBoxColliderSizeAuthoring.cs 脚本，但它还扩展了此行为
+// 根据盒子是否增大或缩小来更改物理材料属性。
 // The material (colour) is also changed to reflect modifications to the blob data.
 using System.Collections.Generic;
 using Unity.Burst;
@@ -48,9 +48,9 @@ class ChangeColliderBaker : Baker<ChangeColliderBlobAuthoring>
 }
 
 /// <summary>
-/// This system needs to run in the BeforePhysicsSystemGroup, after the EnsureUniqueColliderSystem. The
-/// EnsureUniqueColliderSystem is responsible for updating unique collider flags on any prefabs. By running the
-/// EnsureUniqueColliderSystem first, it ensures that the unique colliders are available when modifying the blobs here
+/// 这个 system 需要在 BeforePhysicsSystemGroup 中的 run，在 EnsureUniqueColliderSystem 之后。这
+/// EnsureUniqueColliderSystem 负责更新任何prefab上唯一的 collider 标志。通过运行
+/// 首先是 EnsureUniqueColliderSystem，它确保在修改此处的 blob 时唯一的 colliders 可用
 /// </summary>
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
@@ -58,10 +58,10 @@ public partial struct ChangeColliderBlobSystem : ISystem
 {
     const float k_GrowingRestitution = 0.75f;
     /// <summary>
-    /// This job changes the size of the box collider (similar to ChangeBoxColliderSizeJob) but expands
-    /// on it by also changing the physics material restitution.
-    /// If the box is shrinking, then the restitution = 0
-    /// If the box is growing, then the restitution = 0.75
+    /// 这个 job 改变了盒子 collider 的大小（类似于 ChangeBoxColliderSizeJob）但是扩展
+    /// 还可以通过改变物理材料恢复来实现。
+    /// 如果盒子缩小，则恢复 = 0
+    /// 如果盒子正在增长，则恢复 = 0.75
     /// </summary>
     [BurstCompile]
     public partial struct ChangeColliderBlobJob : IJobEntity
@@ -69,7 +69,7 @@ public partial struct ChangeColliderBlobSystem : ISystem
         public void Execute(ref PhysicsCollider collider, ref ChangeColliderBlob size,
             ref PostTransformMatrix postTransformMatrix)
         {
-            // make sure we are dealing with boxes
+            // 确保我们正在处理盒子
             if (collider.Value.Value.Type != ColliderType.Box) return;
 
             float3 oldSize = 1.0f;
@@ -78,13 +78,13 @@ public partial struct ChangeColliderBlobSystem : ISystem
 
             unsafe
             {
-                // Update the size of the box
-                // grab the box pointer
+                // 更新盒子的大小
+                // 抓住盒子指针
                 BoxCollider* bxPtr = (BoxCollider*)collider.ColliderPtr;
                 oldSize = bxPtr->Size;
                 newSize = math.lerp(oldSize, size.Target, 0.05f);
 
-                // if we have reached the target size, get a new target
+                // 如果我们达到了目标大小，则获取新目标
                 float3 newTargetSize = math.select(size.Min, size.Max, size.Target == size.Min);
                 size.Target = math.select(size.Target, newTargetSize,
                     math.abs(newSize - size.Target) < new float3(0.1f));
@@ -93,16 +93,16 @@ public partial struct ChangeColliderBlobSystem : ISystem
                 boxGeometry.Size = newSize;
                 bxPtr->Geometry = boxGeometry;
 
-                // Modify physics material restitution
+                // 修改物理材质恢复
                 var oldRestitution = collider.Value.Value.GetRestitution();
                 var newRestitution = oldRestitution;
 
                 var sizeChange = CheckIfGrowing(oldSize, newSize);
-                if (sizeChange > 0) //growing
+                if (sizeChange > 0) //生长
                 {
                     newRestitution = k_GrowingRestitution;
                 }
-                else if (sizeChange < 0) //shrinking
+                else if (sizeChange < 0) //缩小
                 {
                     newRestitution = k_ShrinkingRestitution;
                 }
@@ -114,7 +114,7 @@ public partial struct ChangeColliderBlobSystem : ISystem
                 }
             }
 
-            // now tweak the graphical representation of the box
+            // 现在调整盒子的图形表示
             float3 newScale = newSize / oldSize;
             postTransformMatrix.Value.c0 *= newScale.x;
             postTransformMatrix.Value.c1 *= newScale.y;
@@ -174,7 +174,7 @@ public partial struct ChangeColliderBlobSystem : ISystem
         var blobJob = new ChangeColliderBlobJob().Schedule(state.Dependency);
         blobJob.Complete();
 
-        // Change the colour of the colliders based on their restitution (which was changed by the blob job)
+        // 根据 colliders 的恢复情况更改其颜色（由 blob job 更改）
         var entityArray = m_MaterialQuery.ToEntityArray(Allocator.Temp);
         if (entityArray.Length == 0) return;
         var materials = state.EntityManager.GetSharedComponentManaged<ColliderMaterialsComponent>(entityArray[0]);

@@ -22,7 +22,7 @@ namespace Streaming.SceneManagement.StreamingVolume
                     CameraOffset = authoring.CameraOffset
                 });
 
-                // In the "Complete" sample, tiles closer to the relevant entities are loaded at higher LODs.
+                // 在“完整”示例中，更接近相关 entities 的图块会以更高的 LODs 加载。
                 AddComponent<Relevant>(entity);
             }
         }
@@ -30,7 +30,7 @@ namespace Streaming.SceneManagement.StreamingVolume
 
     struct Player : IComponentData
     {
-        public float Speed; // meters per second
+        public float Speed; // 米每秒
         public float3 CameraOffset;
     }
 }

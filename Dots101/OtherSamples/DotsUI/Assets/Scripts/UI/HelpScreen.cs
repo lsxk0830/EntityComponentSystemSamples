@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.DotsUISample
 {
-    // displays the game instructions and tips
+    // 显示游戏说明和提示
     public class HelpScreen : UIScreen
     {
         Button m_CloseButton;

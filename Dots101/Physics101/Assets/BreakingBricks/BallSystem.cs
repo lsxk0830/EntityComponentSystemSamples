@@ -23,7 +23,7 @@ namespace BreakingBricks
         {
             var config = SystemAPI.GetSingleton<Config>();
 
-            // spawn balls
+            // 产卵球
             if (spawnTimer <= 0)
             {
                 spawnTimer = config.BallSpawnInterval;
@@ -50,7 +50,7 @@ namespace BreakingBricks
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-            // decrement ball when they fall below a certain Y-axis position 
+            // 当球落到某个 Y 轴位置以下时减少球
             foreach (var (ballTransform, entity) in
                      SystemAPI.Query<RefRO<LocalTransform>>()
                          .WithAll<Ball>()

@@ -43,7 +43,7 @@ public partial class CreateSimpleTerrainSystem : SceneCreationSystem<CreateSimpl
         float3 position = new float3(15.0f, -1.0f, -5.0f);
         CreateTerrainBody(position, collider);
 
-        // Mark this one CollisionResponse.None
+        // 标记这个 CollisionResponse.None
         var material = Material.Default;
         material.CollisionResponse = CollisionResponsePolicy.None;
         collider = TerrainCollider.Create(heights, size, scale, TerrainCollider.CollisionMethod.VertexSamples, CollisionFilter.Default, material);

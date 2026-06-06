@@ -5,8 +5,8 @@ using Unity.Entities;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Stores a sorted list of player join & disconnect events (I.e. Notifications).
-    ///     Events last for <see cref="EnablePlayerListsFeature.EventListEntryDurationSeconds" />.
+    ///     存储玩家加入和断开连接事件的排序列表（I.e。通知）。
+    ///     活动持续时间为 <see cref="EnablePlayerListsFeature.EventListEntryDurationSeconds" />。
     /// </summary>
     public struct PlayerListNotificationBuffer : IBufferElementData
     {

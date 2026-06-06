@@ -7,21 +7,21 @@ namespace Unity.DotsUISample
     public struct Event : IComponentData
     {
     }
-    
+
     public struct PickupEvent : IComponentData
     {
     }
-    
+
     public struct CollectableProximityEvent : IComponentData
     {
         public float3 Position;
     }
-    
+
     public struct CauldronProximityEvent : IComponentData
     {
         public float3 Position;
     }
-    
+
     public struct UIScreens : IComponentData
     {
         public UnityObjectRef<SplashScreen> SplashScreen;
@@ -33,7 +33,7 @@ namespace Unity.DotsUISample
         public UnityObjectRef<HintScreen> HintScreen;
         public UnityObjectRef<Camera> Camera;
     }
-    
+
     public struct CameraRef : IComponentData
     {
         public UnityObjectRef<Camera> Camera;

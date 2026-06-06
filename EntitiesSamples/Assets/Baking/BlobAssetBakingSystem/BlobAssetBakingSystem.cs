@@ -32,12 +32,12 @@ namespace Baking.BlobAssetBakingSystem
 
         public void OnUpdate(ref SystemState state)
         {
-            // Get the BlobAssetStore from the BakingSystem
+            // 从 BakingSystem 获取 BlobAssetStore
             var blobAssetStore = state.World.GetExistingSystemManaged<BakingSystem>().BlobAssetStore;
 
-            // Collect the BlobAssets that
-            // - haven't already been processed in this run
-            // - aren't already known to the BlobAssetStore from previous runs (if they are known, save the BlobAssetReference for later)
+            // 收集 BlobAssets
+            // - 尚未在此 run 中进行处理
+            // - BlobAssetStore 在之前的运行中尚不知道（如果已知，请保存 BlobAssetReference 以供以后使用）
             foreach (var (rawMesh, entity) in
                      SystemAPI.Query<RefRO<RawMesh>>().WithAll<MeshBB>()
                          .WithEntityAccess())
@@ -56,7 +56,7 @@ namespace Baking.BlobAssetBakingSystem
                 }
             }
 
-            // Create the BlobAssets and BlobAssetReference for each new, unique BlobAsset
+            // 为每个新的、唯一的 BlobAsset 创建 BlobAssets 和 BlobAssetReference
             new ComputeBlobDataJob()
             {
                 BlobAssetReferences = m_BlobAssetReferences,
@@ -65,7 +65,7 @@ namespace Baking.BlobAssetBakingSystem
                 ComponentLookup = SystemAPI.GetComponentLookup<RawMesh>(),
             }.Schedule(m_EntitiesToProcess.Length, 1).Complete();
 
-            // Assign the BlobAssetReferences to all the entities that have a different BlobAsset than last run
+            // 将 BlobAssetReferences 分配给具有与最后一个 run 不同的 BlobAsset 的所有 entities
             foreach (var (rawMesh, meshBB) in
                      SystemAPI.Query<RefRO<RawMesh>, RefRW<MeshBB>>())
             {

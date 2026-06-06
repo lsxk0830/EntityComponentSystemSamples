@@ -5,14 +5,14 @@ using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-// Mike's GDC Talk on 'A Data Oriented Approach to Using Component Systems'
-// is a great reference for dissecting the Boids sample code:
+// Mike 的 GDC 演讲“使用 Component Systems 的面向数据的方法”
+// 是剖析 Boids 示例代码的一个很好的参考：
 // https://youtu.be/p65Yt20pw0g?t=1446
-// It explains a slightly older implementation of this sample but almost all the
-// information is still relevant.
+// 它解释了此示例的稍微旧的实现，但几乎所有的
+// 信息仍然相关。
 
 // The targets (2 red fish) and obstacle (1 shark) move based on the ActorAnimation tab
-// in the Unity UI, so that they are moving based on key-framed animation.
+// 在 Unity UI 中，以便它们根据关键帧动画移动。
 
 namespace Boids
 {
@@ -35,9 +35,9 @@ namespace Boids
             state.EntityManager.GetAllUniqueSharedComponents(out NativeList<Boid> uniqueBoidTypes, world.UpdateAllocator.ToAllocator);
             float dt = math.min(0.05f, SystemAPI.Time.DeltaTime);
 
-            // Each variant of the Boid represents a different value of the SharedComponentData and is self-contained,
-            // meaning Boids of the same variant only interact with one another. Thus, this loop processes each
-            // variant type individually.
+            // Boid 的每个变体代表 SharedComponentData 的不同值，并且是独立的，
+            // 这意味着同一变体的 Boids 只能相互交互。因此，这个循环处理每个
+            // 单独的变体类型。
             foreach (var boidSettings in uniqueBoidTypes)
             {
                 boidQuery.AddSharedComponentFilter(boidSettings);
@@ -45,16 +45,16 @@ namespace Boids
                 var boidCount = boidQuery.CalculateEntityCount();
                 if (boidCount == 0)
                 {
-                    // Early out. If the given variant includes no Boids, move on to the next loop.
-                    // For example, variant 0 will always exit early bc it's it represents a default, uninitialized
-                    // Boid struct, which does not appear in this sample.
+                    // 早点出去。如果给定的变体不包含 Boids，则继续下一个循环。
+                    // 例如，变体 0 总是会提前退出，它代表默认的、未初始化的
+                    // Boid 结构体，该结构体未出现在本示例中。
                     boidQuery.ResetFilter();
                     continue;
                 }
 
-                // The following calculates spatial cells of neighboring Boids
-                // note: working with a sparse grid and not a dense bounded grid so there
-                // are no predefined borders of the space.
+                // 下面计算相邻 Boid 的空间单元
+                // note: 使用稀疏网格而不是密集有界网格，所以有
+                // 没有预定义的空间边界。
 
                 var hashMap                   = new NativeParallelMultiHashMap<int, int>(boidCount, world.UpdateAllocator.ToAllocator);
                 var cellIndices               = CollectionHelper.CreateNativeArray<int, RewindableAllocator>(boidCount, ref world.UpdateAllocator);
@@ -68,9 +68,9 @@ namespace Boids
                 var copyTargetPositions       = CollectionHelper.CreateNativeArray<float3, RewindableAllocator>(targetCount, ref world.UpdateAllocator);
                 var copyObstaclePositions     = CollectionHelper.CreateNativeArray<float3, RewindableAllocator>(obstacleCount, ref world.UpdateAllocator);
 
-                // These jobs extract the relevant position, heading component
-                // to NativeArrays so that they can be randomly accessed by the `MergeCells` and `Steer` jobs.
-                // These jobs are defined using the IJobEntity syntax.
+                // 这些 jobs 提取相关位置，标题为 component
+                // 到 NativeArrays，以便 `MergeCells` 和 `Steer` jobs 可以随机访问它们。
+                // 这些 jobs 是使用 IJobEntity 语法定义的。
                 var initialBoidJob = new InitialPerBoidJob
                 {
                     CellAlignment = cellAlignment,
@@ -117,9 +117,9 @@ namespace Boids
                 };
                 var mergeCellsJobHandle = mergeCellsJob.Schedule(hashMap, 64, mergeCellsBarrierJobHandle);
 
-                // This reads the previously calculated boid information for all the boids of each cell to update
-                // the `localToWorld` of each of the boids based on their newly calculated headings using
-                // the standard boid flocking algorithm.
+                // 这里读取之前计算出的每个 cell 的所有 boid 的 boid 信息进行更新
+                // 每个 boid 的 `localToWorld` 基于其新计算的航向，使用
+                // 标准 boid 集群算法。
                 var steerBoidJob = new SteerBoidJob
                 {
                     CellIndices = cellIndices,
@@ -137,13 +137,13 @@ namespace Boids
                 };
                 var steerBoidJobHandle = steerBoidJob.ScheduleParallel(boidQuery, mergeCellsJobHandle);
 
-                // Dispose allocated containers with dispose jobs.
+                // 使用 dispose jobs 来处置分配的容器。
                 state.Dependency = steerBoidJobHandle;
 
-                // We pass the job handle and add the dependency so that we keep the proper ordering between the jobs
-                // as the looping iterates. For our purposes of execution, this ordering isn't necessary; however, without
-                // the add dependency call here, the safety system will throw an error, because we're accessing multiple
-                // pieces of boid data and it would think there could possibly be a race condition.
+                // 我们传递 job 句柄并添加依赖项，以便我们在 jobs 之间保持正确的顺序
+                // 随着循环迭代。出于我们执行的目的，此顺序不是必需的；然而，没有
+                // 此处添加依赖项调用，安全性 system 会抛出错误，因为我们正在访问多个
+                // boid 数据片段，它会认为可能存在竞争条件。
 
                 boidQuery.AddDependency(state.Dependency);
                 boidQuery.ResetFilter();
@@ -151,21 +151,21 @@ namespace Boids
             uniqueBoidTypes.Dispose();
         }
 
-        // In this sample there are 3 total unique boid variants, one for each unique value of the
+        // 在此示例中，共有 3 个独特的 boid 变体，每个变体对应一个唯一的值
         // Boid SharedComponent (note: this includes the default uninitialized value at
-        // index 0, which isn't actually used in the sample).
+        // 索引 0，示例中实际未使用）。
 
-        // This accumulates the `positions` (separations) and `headings` (alignments) of all the boids in each cell to:
-        // 1) count the number of boids in each cell
-        // 2) find the nearest obstacle and target to each boid cell
-        // 3) track which array entry contains the accumulated values for each boid's cell
-        // In this context, the cell represents the hashed bucket of boids that are near one another within cellRadius
-        // floored to the nearest int3.
-        // Note: `IJobNativeParallelMultiHashMapMergedSharedKeyIndices` is a custom job to iterate safely/efficiently over the
-        // NativeContainer used in this sample (`NativeParallelMultiHashMap`). Currently, these kinds of changes or additions of
-        // custom jobs generally require access to data/fields that aren't available through the `public` API of the
-        // containers. This is why the custom job type `IJobNativeParallelMultiHashMapMergedSharedKeyIndicies` is declared in
-        // the DOTS package (which can see the `internal` container fields) and not in the Boids sample.
+        // 这会累积每个单元中所有 boids 的 `positions`（分离）和 `headings`（对齐）：
+        // 1）统计每个单元格中 boid 的数量
+        // 2）找到距离每个 boid cell 最近的障碍物和目标
+        // 3) 跟踪哪个数组条目包含每个 boid 单元格的累积值
+        // 在这种情况下，单元代表 cellRadius 内彼此靠近的 boids 的散列桶
+        // 取整至最接近的 int3。
+        // Note: `IJobNativeParallelMultiHashMapMergedSharedKeyIndices` 是一个自定义的 job，用于安全/高效地迭代
+        // 本示例中使用了 NativeContainer (`NativeParallelMultiHashMap`)。目前，这些类型的更改或添加
+        // 自定义 jobs 通常需要访问通过 `public` API 无法获得的数据/字段
+        // 容器。这就是为什么自定义 job 类型 `IJobNativeParallelMultiHashMapMergedSharedKeyIndicies` 声明于
+        // DOTS package（可以看到 `internal` 容器字段）而不是在 Boids 示例中。
         [BurstCompile]
         struct MergeCells : IJobNativeParallelMultiHashMapMergedSharedKeyIndices
         {
@@ -195,7 +195,7 @@ namespace Boids
                 nearestDistance = math.sqrt(nearestDistance);
             }
 
-            // Resolves the distance of the nearest obstacle and target and stores the cell index.
+            // 解析最近障碍物和目标的距离并存储单元索引。
             public void ExecuteFirst(int index)
             {
                 var position = cellSeparation[index] / cellCount[index];
@@ -214,9 +214,9 @@ namespace Boids
                 cellIndices[index] = index;
             }
 
-            // Sums the alignment and separation of the actual index being considered and stores
-            // the index of this first value where we're storing the cells.
-            // note: these items are summed so that in `Steer` their average for the cell can be resolved.
+            // 对正在考虑的实际索引的对齐和分离求和并存储
+            // 我们存储单元格的第一个值的索引。
+            // note: 将这些项目相加，以便在 `Steer` 中可以解析它们的单元平均值。
             public void ExecuteNext(int cellIndex, int index)
             {
                 cellCount[cellIndex]      += 1;
@@ -237,12 +237,12 @@ namespace Boids
             {
                 CellAlignment[entityIndexInQuery] = localToWorld.Forward;
                 CellSeparation[entityIndexInQuery] = localToWorld.Position;
-                // Populates a hash map, where each bucket contains the indices of all Boids whose positions quantize
-                // to the same value for a given cell radius so that the information can be randomly accessed by
-                // the `MergeCells` and `Steer` jobs.
-                // This is useful in terms of the algorithm because it limits the number of comparisons that will
-                // actually occur between the different boids. Instead of for each boid, searching through all
-                // boids for those within a certain radius, this limits those by the hash-to-bucket simplification.
+                // 填充哈希图，其中每个桶包含位置量化的所有 Boid 的索引
+                // 对于给定的小区半径为相同的值，以便可以通过以下方式随机访问信息
+                // `MergeCells` 和 `Steer` jobs。
+                // 这对于算法而言很有用，因为它限制了比较的次数，
+                // 实际上发生在不同的主体之间。不是针对每个 boid，而是搜索所有 boid
+                // 对于特定半径内的 boids，这通过哈希到桶的简化来限制那些。
                 var hash = (int)math.hash(new int3(math.floor(localToWorld.Position * InverseBoidCellRadius)));
                 ParallelHashMap.Add(hash, entityIndexInQuery);
             }
@@ -285,7 +285,7 @@ namespace Boids
             public float MoveDistance;
             void Execute([EntityIndexInQuery] int entityIndexInQuery, ref LocalToWorld localToWorld)
             {
-                // temporarily storing the values for code readability
+                // 临时存储代码可读性的值
                 var forward                           = localToWorld.Forward;
                 var currentPosition                   = localToWorld.Position;
                 var cellIndex                         = CellIndices[entityIndexInQuery];
@@ -298,49 +298,49 @@ namespace Boids
                 var nearestObstaclePosition           = ObstaclePositions[nearestObstaclePositionIndex];
                 var nearestTargetPosition             = TargetPositions[nearestTargetPositionIndex];
 
-                // Setting up the directions for the three main biocrowds influencing directions adjusted based
-                // on the predefined weights:
-                // 1) alignment - how much should it move in a direction similar to those around it?
-                // note: we use `alignment/neighborCount`, because we need the average alignment in this case; however
-                // alignment is currently the summation of all those of the boids within the cellIndex being considered.
+                // 设置影响方向的三个主要生物群的方向，根据调整
+                // 在预定义的权重上：
+                // 1）对齐——它应该沿着与周围相似的方向移动多少？
+                // note: 我们使用 `alignment/neighborCount`，因为在这种情况下我们需要平均对齐；然而
+                // 对齐目前是正在考虑的 cellIndex 内所有 boids 的总和。
                 var alignmentResult     = CurrentBoidVariant.AlignmentWeight
                                           * math.normalizesafe((alignment / neighborCount) - forward);
-                // 2) separation - how close is it to other boids and are there too many or too few for comfort?
-                // note: here separation represents the summed possible center of the cell. We perform the multiplication
-                // so that both `currentPosition` and `separation` are weighted to represent the cell as a whole and not
-                // the current individual boid.
+                // 2）分离——它与其他物体的距离有多近，是否太多或太少而不舒服？
+                // note: 这里的间隔代表单元的可能中心的总和。我们执行乘法
+                // 这样 `currentPosition` 和 `separation` 都被加权以代表整个单元格，而不是
+                // 当前的个人 boid。
                 var separationResult    = CurrentBoidVariant.SeparationWeight
                                           * math.normalizesafe((currentPosition * neighborCount) - separation);
-                // 3) target - is it still towards its destination?
+                // 3) 目标 - 是否仍在朝着目的地前进？
                 var targetHeading       = CurrentBoidVariant.TargetWeight
                                           * math.normalizesafe(nearestTargetPosition - currentPosition);
 
-                // creating the obstacle avoidant vector s.t. it's pointing towards the nearest obstacle
-                // but at the specified 'ObstacleAversionDistance'. If this distance is greater than the
-                // current distance to the obstacle, the direction becomes inverted. This simulates the
-                // idea that if `currentPosition` is too close to an obstacle, the weight of this pushes
-                // the current boid to escape in the fastest direction; however, if the obstacle isn't
-                // too close, the weighting denotes that the boid doesnt need to escape but will move
-                // slower if still moving in that direction (note: we end up not using this move-slower
-                // case, because of `targetForward`'s decision to not use obstacle avoidance if an obstacle
-                // isn't close enough).
+                // 创建避障向量 s.t。它指向最近的障碍物
+                // 但在指定的“ObstacleAversionDistance”。如果这个距离大于
+                // 到障碍物的当前距离，方向会反转。这模拟了
+                // 如果 `currentPosition` 太靠近障碍物，则其重量会推动
+                // 当前机体向最快的方向逃跑；但是，如果障碍不是
+                // 太近，权重表示主体不需要逃脱但会移动
+                // 如果仍然朝那个方向移动，则速度会更慢（注意：我们最终不会使用这个 move-slower
+                // 在这种情况下，因为 `targetForward` 决定在遇到障碍物时不使用避障功能
+                // 还不够接近）。
                 var obstacleSteering                  = currentPosition - nearestObstaclePosition;
                 var avoidObstacleHeading              = (nearestObstaclePosition + math.normalizesafe(obstacleSteering)
                     * CurrentBoidVariant.ObstacleAversionDistance) - currentPosition;
 
-                // the updated heading direction. If not needing to be avoidant (ie obstacle is not within
-                // predefined radius) then go with the usual defined heading that uses the amalgamation of
-                // the weighted alignment, separation, and target direction vectors.
+                // 更新后的航向。如果不需要回避（即障碍物不在范围内）
+                // 预定义的半径），然后使用通常定义的航向，该航向使用以下组合
+                // 加权对齐、分离和目标方向向量。
                 var nearestObstacleDistanceFromRadius = nearestObstacleDistance - CurrentBoidVariant.ObstacleAversionDistance;
                 var normalHeading                     = math.normalizesafe(alignmentResult + separationResult + targetHeading);
                 var targetForward                     = math.select(normalHeading, avoidObstacleHeading, nearestObstacleDistanceFromRadius < 0);
 
-                // updates using the newly calculated heading direction
+                // 使用新计算的航向进行更新
                 var nextHeading                       = math.normalizesafe(forward + DeltaTime * (targetForward - forward));
                 localToWorld = new LocalToWorld
                 {
                     Value = float4x4.TRS(
-                        // TODO: precalc speed*dt
+                        // TODO: 预计算速度*dt
                         new float3(localToWorld.Position + (nextHeading * MoveDistance)),
                         quaternion.LookRotationSafe(nextHeading, math.up()),
                         new float3(1.0f, 1.0f, 1.0f))

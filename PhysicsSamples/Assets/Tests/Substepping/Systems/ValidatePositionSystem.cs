@@ -162,7 +162,7 @@ public partial struct ExportDataJob : IJobEntity
 
         const string path = "Assets/Tests/Substepping/ValidatePositionSystemResults.txt";
 
-        System.IO.File.Delete(path);         //clear contents by deleting the file
+        System.IO.File.Delete(path);         //通过删除文件清除内容
         using (var fileStream = System.IO.File.OpenWrite(path))
         using (var writer = new System.IO.StreamWriter(fileStream, Encoding.ASCII))
         {
@@ -184,6 +184,6 @@ public partial struct ExportDataJob : IJobEntity
             Debug.Log("File write is complete. Stop playmode");
         }
 
-        quantitativeData.DataWritten = true;     //only write to file once
+        quantitativeData.DataWritten = true;     //只写入文件一次
     }
 }

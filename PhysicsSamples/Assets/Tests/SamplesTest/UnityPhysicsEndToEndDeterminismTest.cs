@@ -55,8 +55,8 @@ namespace Unity.Physics.Tests
 
         protected override void OnStartRunning()
         {
-            // Read/write the display singleton to register as writing data
-            // to make sure display systems don't interfere with the test
+            // 读/写显示单例以注册为写入数据
+            // 确保显示 systems 不会干扰测试
             if (SystemAPI.HasSingleton<PhysicsDebugDisplayData>())
             {
                 var data = SystemAPI.GetSingleton<PhysicsDebugDisplayData>();
@@ -68,7 +68,7 @@ namespace Unity.Physics.Tests
         {
             if (!m_RecordingBegan)
             {
-                // > 1 because of default static body, logically should be > 0
+                // > 1 因为默认静态主体，逻辑上应该 > 0
                 m_RecordingBegan = SystemAPI.GetSingleton<PhysicsWorldSingleton>().NumBodies > 1;
             }
             else
@@ -84,7 +84,7 @@ namespace Unity.Physics.Tests
         }
     }
 
-    // Only works in standalone build, since it needs synchronous Burst compilation.
+    // 仅适用于独立构建，因为它需要同步 Burst 编译。
 #if (!UNITY_EDITOR && UNITY_PHYSICS_INCLUDE_SLOW_TESTS) || UNITY_PHYSICS_INCLUDE_END2END_TESTS
     [TestFixture]
 #endif
@@ -93,8 +93,8 @@ namespace Unity.Physics.Tests
         protected static World DefaultWorld => World.DefaultGameObjectInjectionWorld;
         protected const int k_BusyWaitPeriodInSeconds = 1;
 
-        // Disposing the world before the first scene is loaded causes problems as of Entities 0.17.0-preview.35
-        // The workaround is to avoid calling SwitchWorld() when the first scene is being loaded
+        // 自 Entities 0.17.0-preview.35 起，在加载第一个 world 之前处理 scene 会导致问题
+        // 解决方法是避免在加载第一个 scene 时调用 SwitchWorld()
         protected bool FirstSceneLoad = true;
 
         protected virtual IDeterminismTestSystem GetTestSystem() => DefaultWorld.GetExistingSystemManaged<UnityPhysicsDeterminismTestSystem>();
@@ -112,12 +112,12 @@ namespace Unity.Physics.Tests
             DefaultWorldInitialization.Initialize("Default World", false);
         }
 
-        // Demos that make no sense to be tested for determinism
+        // 进行确定性测试没有意义的演示
         private static string[] s_FilteredOutDemos =
         {
             "InitTestScene", "LoaderScene", "SingleThreadedRagdoll",
 
-            // Removing 1c. Conversion since it has no ECS data, it would cause timeouts in EndToEndDeterminismTest
+            // 删除 1c。转换由于没有 ECS 数据，所以会导致 EndToEndDeterminismTest 超时
             "1c. Conversion"
         };
 
@@ -161,8 +161,8 @@ namespace Unity.Physics.Tests
             World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>().Enabled = false;
             foreach (var system in World.DefaultGameObjectInjectionWorld.Systems)
             {
-                // MouseHoverSystem can effect End To End Determinism
-                // Can't find the type at this point so just check by name
+                // MouseHoverSystem 可以实现端到端确定性
+                // 目前无法找到类型，因此只需按名称检查
                 if (system.ToString().Contains("MouseHoverSystem") || system.ToString().Contains("SmoothlyTrackCameraTarget"))
                     system.Enabled = false;
             }
@@ -196,26 +196,26 @@ namespace Unity.Physics.Tests
             SwitchWorlds();
         }
 
-        // Only works in standalone build, since it needs synchronous Burst compilation.
+        // 仅适用于独立构建，因为它需要同步 Burst 编译。
 #if (!UNITY_EDITOR && UNITY_PHYSICS_INCLUDE_SLOW_TESTS) || UNITY_PHYSICS_INCLUDE_END2END_TESTS
         [UnityTest]
 #endif
         public virtual IEnumerator LoadScenes([ValueSource(nameof(GetScenes))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
             List<RigidTransform> expected = null;
             List<RigidTransform> actual = null;
 
-            // First run
+            // 第一个 run
             {
-                // Load scene
+                // 加载 scene
                 LoadSceneIntoNewWorld(scenePath);
 
-                // Wait for ECS to finish distributing entities on chunks
-                // Todo: find a better solution for this
+                // 等待 ECS 在 chunks 上分发完 entities
+                // Todo: 为此找到更好的解决方案
                 yield return new WaitForSeconds(1);
 
                 StartTest();
@@ -230,13 +230,13 @@ namespace Unity.Physics.Tests
                 expected = EndTest();
             }
 
-            // Second run
+            // 第二个 run
             {
-                //Load scene
+                //加载 scene
                 LoadSceneIntoNewWorld(scenePath);
 
-                // Wait for ECS to finish distributing entities on chunks
-                // Todo: find a better solution for this
+                // 等待 ECS 在 chunks 上分发完 entities
+                // Todo: 为此找到更好的解决方案
                 yield return new WaitForSeconds(1);
 
                 StartTest();
@@ -251,9 +251,9 @@ namespace Unity.Physics.Tests
                 actual = EndTest();
             }
 
-            // Compare results
+            // 比较结果
             {
-                // Verification
+                // 确认
 
                 Assert.IsTrue(expected.Count > 0);
                 Assert.IsTrue(actual.Count > 0);

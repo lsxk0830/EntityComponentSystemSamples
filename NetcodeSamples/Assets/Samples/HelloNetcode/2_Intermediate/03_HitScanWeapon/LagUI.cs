@@ -60,11 +60,11 @@ namespace Samples.HelloNetcode
     {
         public void OnUpdate(ref SystemState state)
         {
-            // Process requests to toggle lag compensation
+            // 处理切换延迟补偿的请求
             var cmdBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (toggleRO, entity) in SystemAPI.Query<RefRO<ToggleLagCompensationRequest>>().WithEntityAccess())
             {
-                // Find the correct control entity
+                // 找到正确的控件 entity
                 var toggle= toggleRO.ValueRO;
                 switch (toggle.Enable)
                 {

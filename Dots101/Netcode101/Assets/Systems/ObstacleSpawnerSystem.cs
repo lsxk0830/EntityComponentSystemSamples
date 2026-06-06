@@ -25,12 +25,12 @@ namespace KickBall
             var prefabs = SystemAPI.GetSingleton<EntityPrefabs>();
             var obstacleConfig = SystemAPI.GetSingleton<ObstacleConfig>();
 
-            // For simplicity and consistency, we'll use a fixed random seed value.
+            // 为了简单性和一致性，我们将使用固定的随机种子值。
             var rand = new Random(123);
 
             var prefabTransform = state.EntityManager.GetComponentData<LocalTransform>(prefabs.Obstacle);
 
-            // Spawn the obstacles in a grid.
+            // 在网格中生成障碍物。
             for (int column = 0; column < obstacleConfig.NumColumns; column++)
             {
                 for (int row = 0; row < obstacleConfig.NumRows; row++)
@@ -42,8 +42,8 @@ namespace KickBall
                         x = (column * obstacleConfig.GridCellSize) + rand.NextFloat(obstacleConfig.Offset),
                         y = 0,
                         z = (row * obstacleConfig.GridCellSize) + rand.NextFloat(obstacleConfig.Offset)
-                    }; 
-                    
+                    };
+
                     state.EntityManager.SetComponentData(obstacle, prefabTransform);
                 }
             }

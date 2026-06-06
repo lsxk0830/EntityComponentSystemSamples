@@ -11,14 +11,14 @@ public class CameraMovement : MonoBehaviour
     private static float TooFar = 500.0f;
     private static float SpeedFactor = 1.0f;
 
-    // Start is called before the first frame update
+    // Start 在第一帧更新之前调用
     void Start()
     {
-        // Just move away from the origin
+        // 只要远离原点
         m_direction = transform.position.normalized;
     }
 
-    // Update is called once per frame
+    // 每帧调用一次更新
     void Update()
     {
         float distance = transform.position.magnitude;
@@ -27,9 +27,9 @@ public class CameraMovement : MonoBehaviour
             m_direction = -m_direction;
         }
 
-        // Make speed comparable to the distance to make the LOD transitions happen quicker
+        // 使速度与距离相当，以使 LOD 转换发生得更快
         float speed = SpeedFactor * distance;
-        
+
         Vector3 translation = speed * Time.deltaTime * m_direction;
         transform.Translate(translation, Space.World);
     }

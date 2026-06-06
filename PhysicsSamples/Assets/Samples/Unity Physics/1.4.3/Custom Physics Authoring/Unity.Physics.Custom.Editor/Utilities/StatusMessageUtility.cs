@@ -17,7 +17,7 @@ namespace Unity.Physics.Editor
             var numChildTargets = 0;
             foreach (Component c in targets)
             {
-                // hierarchy roots and leaf shapes do not emit a message
+                // 层次结构的根和叶形状不会发出消息
                 if (
                     c == null
                     || c.transform.parent == null

@@ -14,16 +14,16 @@ namespace Unity.Physics.Editor
 
         public static bool IsBackfaced(float3 localPos, float3 localTangent, float3 localBinormal, Axes axes, bool isCameraInsideBox)
         {
-            // if inside the box then ignore back facing alpha multiplier (otherwise all handles will look disabled)
+            // 如果在盒子内，则忽略背面的 alpha 乘数（否则所有手柄将看起来被禁用）
             if (isCameraInsideBox || axes != Axes.All)
                 return false;
 
-            // use tangent and binormal to calculate normal in case handle matrix is skewed
+            // 使用正切和副法线来计算法线，以防处理矩阵倾斜
             float3 worldTangent = math.normalize(Handles.matrix.MultiplyVector(localTangent));
             float3 worldBinormal = math.normalize(Handles.matrix.MultiplyVector(localBinormal));
             float3 worldDir = math.normalize(math.cross(worldTangent, worldBinormal));
 
-            // adjust color if handle is back facing
+            // 如果手柄朝后，则调整颜色
             float cosV;
 
             var currentCamera = Camera.current;
@@ -74,13 +74,13 @@ namespace Unity.Physics.Editor
             var ctr = center + normal;
             size -= new float3(cornerRadius);
 
-            // check if our face is a point
+            // 检查我们的脸是否是一个点
             if (math.abs(size[c]) < kDistanceEpsilon &&
                 math.abs(size[b]) < kDistanceEpsilon)
                 return;
 
             Vector3[] points;
-            // check if our face is a line or not
+            // 检查我们的脸是否是一条线
             if (math.abs(size[c]) >= kDistanceEpsilon &&
                 math.abs(size[b]) >= kDistanceEpsilon)
             {
@@ -155,7 +155,7 @@ namespace Unity.Physics.Editor
             var axisy = new float3(0f, 1f, 0f);
             var axisz = new float3(0f, 0f, 1f);
 
-            // a vector pointing away from the center of the corner
+            // 一个远离角点中心的向量
             var cornerNormal = math.normalize(math.mul(orientation, new float3(1f, 1f, 1f)));
 
             var axes = math.mul(new float3x3(orientation), new float3x3(axisx, axisy, axisz));
@@ -168,10 +168,10 @@ namespace Unity.Physics.Editor
 
         public static void CalculateCornerHorizon(float3 cornerPosition, float3x3 axes, float3 cornerNormal, float3 cameraCenter, float3 cameraForward, bool cameraOrtho, float radius, out Corner corner)
         {
-            var cameraToCenter          = cornerPosition - cameraCenter; // vector from camera to center
+            var cameraToCenter          = cornerPosition - cameraCenter; // 从相机到中心的向量
             var sqrRadius               = radius * radius;
             var sqrDistCameraToCenter   = math.lengthsq(cameraToCenter);
-            var sqrOffset               = (sqrRadius * sqrRadius / sqrDistCameraToCenter);  // squared distance from actual center to drawn disc center
+            var sqrOffset               = (sqrRadius * sqrRadius / sqrDistCameraToCenter);  // 实际中心到绘制圆盘中心的平方距离
 
             if (!cameraOrtho)
                 cameraForward = cameraToCenter;
@@ -321,7 +321,7 @@ namespace Unity.Physics.Editor
                     }
                 }
 
-                // check for singularity
+                // 检查奇点
                 if (math.all(axesBackfaced))
                     axesBackfaced = corner.isBackFaced;
 

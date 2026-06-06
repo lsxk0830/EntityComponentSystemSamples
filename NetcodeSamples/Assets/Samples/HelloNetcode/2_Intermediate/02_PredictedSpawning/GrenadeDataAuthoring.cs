@@ -20,7 +20,7 @@ namespace Samples.HelloNetcode
             public override void Bake(GrenadeDataAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                // Prevent predicted spawned grenades from predicting that they should be destroyed, by setting DestroyTimer to inf.
+                // 通过将 DestroyTimer 设置为 inf，防止 predicted 生成的手榴弹预测它们应该被销毁。
                 AddComponent(entity, new GrenadeData { DestroyTimer = float.PositiveInfinity });
             }
         }

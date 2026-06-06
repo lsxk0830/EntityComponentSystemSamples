@@ -1,19 +1,19 @@
-# HelloNetcode Go In Game sample
+# HelloNetcode 进入游戏示例
 
-Going in game means enabling ghost snapshot synchronization. A client needs to be ready to receive the snapshots from the server before this can be done (like loading the appropriate level running on the server already). It has to be done on both the server connection to the client and on himself.
+进入游戏意味着启用 ghost snapshot 同步。在完成此操作之前，client 需要准备好从 server 接收 snapshots（例如加载在 server 上运行的适当级别）。必须在 server 与 client 的连接以及他自己上完成此操作。
 
-See
+看
 
-* _Tie it together_ section in the [Getting Started](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/getting-started.html) guide
-* [Network Connection](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
-* _Prespawned ghosts_ section in the [Ghost snapshot](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/ghost-snapshots.html) docs.
+* [入门](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/getting-started.html) 指南中的 _ 将其结合在一起 _ 部分
+* [网络连接](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
+* [Ghost snapshot](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/ghost-snapshots.html) 文档中的 _Prespawned Ghosts_ 部分。
 
-## Requirements
+## 要求
 
-Needs an established connection.
+需要建立连接。
 
-* Connection
+* 联系
 
-## Sample description
+## 示例描述
 
-Here a system just watches for new uninitialized connections and adds the `NetworkStreamInGame` component to them immediately when it sees them (and marks in initialized).
+这里，system 只是监视新的未初始化连接，并在看到它们时立即将 `NetworkStreamInGame` component 添加到它们（并标记为已初始化）。

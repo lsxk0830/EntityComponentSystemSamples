@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unity.Physics
 {
-    // When a sphere reaches the EndingPosition it will be teleported back to the StartingPosition
+    // 当球体到达 EndingPosition 时，它将被传送回 StartingPosition
     public struct TeleportObject : IComponentData
     {
         public float3 StartingPosition;
@@ -13,7 +13,7 @@ namespace Unity.Physics
 
     public class TeleportObjectAuthoring : MonoBehaviour
     {
-        public float Offset = 15f; // Offset subtracted from the y position of the sphere
+        public float Offset = 15f; // 从球体的 y 位置减去偏移量
 
         class TeleportObjectBaker : Baker<TeleportObjectAuthoring>
         {

@@ -12,18 +12,18 @@ namespace HelloCube.FixedTimestep
         {
             float fixedFps = GetComponent<Slider>().value;
 
-            // WARNING: accessing World.DefaultGameObjectInjectionWorld is a broken pattern in non-trivial projects.
-            // GameObject interaction with ECS should generally go in the other direction: rather than having
-            // GameObjects access ECS data and code, ECS systems should access GameObjects.
+            // WARNING: 在重要的项目中，访问 World.DefaultGameObjectInjectionWorld 是一种破坏模式。
+            // GameObject 与 ECS 的交互通常应该朝另一个方向进行：而不是
+            // GameObjects 访问 ECS 数据和代码，ECS systems 应访问 GameObjects。
 
             var fixedSimulationGroup = World.DefaultGameObjectInjectionWorld
                 ?.GetExistingSystemManaged<FixedStepSimulationSystemGroup>();
             if (fixedSimulationGroup != null)
             {
-                // The group timestep can be set at runtime:
+                // 组时间步长可以在运行时设置：
                 fixedSimulationGroup.Timestep = 1.0f / fixedFps;
 
-                // The current timestep can also be retrieved:
+                // 还可以检索当前时间步长：
                 SliderValueText.text = $"{(int)(1.0f / fixedSimulationGroup.Timestep)} updates/sec";
             }
         }

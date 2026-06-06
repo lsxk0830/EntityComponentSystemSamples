@@ -31,12 +31,12 @@ namespace Unity.Physics.Authoring
                 float3 axisInA = math.normalize(authoring.AxisOfRotation);
 
                 RigidTransform bFromA = math.mul(math.inverse(authoring.worldFromB), authoring.worldFromA);
-                authoring.PositionInConnectedEntity = math.transform(bFromA, authoring.PivotPosition); //position of motored body pivot relative to Connected Entity in world space
-                authoring.HingeAxisInConnectedEntity = math.mul(bFromA.rot, axisInA); //motor axis in Connected Entity space
+                authoring.PositionInConnectedEntity = math.transform(bFromA, authoring.PivotPosition); //电动主体枢轴相对于 world 空间中连接的 Entity 的位置
+                authoring.HingeAxisInConnectedEntity = math.mul(bFromA.rot, axisInA); //连接 Entity 空间中的电机轴
 
-                // Always calculate the perpendicular axes
+                // 始终计算垂直轴
                 Math.CalculatePerpendicularNormalized(axisInA, out var perpendicularLocal, out _);
-                authoring.PerpendicularAxisInConnectedEntity = math.mul(bFromA.rot, perpendicularLocal); //perp motor axis in Connected Entity space
+                authoring.PerpendicularAxisInConnectedEntity = math.mul(bFromA.rot, perpendicularLocal); //连接 Entity 空间中的 perp 电机轴
 
                 var joint = PhysicsJoint.CreateRotationalMotor(
                     new BodyFrame

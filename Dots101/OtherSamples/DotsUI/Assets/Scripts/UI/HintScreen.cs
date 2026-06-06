@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.DotsUISample
 {
-    // hint text that appears next to the nearest collectable or cauldron when in range
+    // 在范围内时出现在最近的收藏品或大锅旁边的提示文本
     public class HintScreen : UIScreen
     {
         public static HintScreen Instantiate(VisualElement root)

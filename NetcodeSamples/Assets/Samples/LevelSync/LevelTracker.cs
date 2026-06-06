@@ -6,7 +6,7 @@ using Unity.Scenes;
 
 public struct LoadNextLevelCommand : IRpcCommand { }
 
-// For tracking when a scene has finished loading, when loading starts it's added here, removed when unloaded
+// 用于跟踪 scene 何时完成加载，加载开始时将其添加到此处，卸载时将其删除
 public struct TrackedSubScene : IBufferElementData
 {
     public Entity SceneEntity;
@@ -27,7 +27,7 @@ public partial class ServerLevelTracker : SystemBase
 
     protected override void OnUpdate()
     {
-        // Handle RPCs from client with next level load commands
+        // 使用下一级加载命令处理来自 client 的 RPCs
         var ecb = new EntityCommandBuffer(Allocator.Temp);
         var shouldLoadNext = false;
         foreach (var (level, req, entity) in SystemAPI.Query<LoadNextLevelCommand, ReceiveRpcCommandRequest>().WithEntityAccess())
@@ -45,7 +45,7 @@ public partial class ServerLevelTracker : SystemBase
             SystemAPI.SetSingleton(levelState);
             UnityEngine.Debug.Log($"[{World.Name}] trigger loading of level {levelState.CurrentLevel}");
 
-            // Disable sync on all connections
+            // 禁用所有连接上的同步
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             FixedString32Bytes worldName = World.Name;
             foreach (var (netId, entity) in SystemAPI.Query<NetworkId>().WithEntityAccess().WithAll<NetworkStreamInGame>())
@@ -88,7 +88,7 @@ public partial class ClientLevelTracker : SystemBase
 public partial class LevelLoader : SystemBase
 {
     private NativeParallelMultiHashMap<int, Level> m_Levels;
-    // When using manual loading/unloading of individual levels the automatic sync flow needs to be disabled
+    // 当使用手动加载/卸载各个关卡时，需要禁用自动同步流程
     private bool m_DisableLevelSync;
 
     public struct Level {
@@ -158,7 +158,7 @@ public partial class LevelLoader : SystemBase
             }
             if (allScenesLoaded)
             {
-                // Notify levelsync logic that we're ready for next step
+                // 通知 levelsync 逻辑我们已准备好进行下一步
                 levelState.State = LevelSyncState.LevelLoaded;
                 SystemAPI.SetSingleton(levelState);
 
@@ -193,10 +193,10 @@ public partial class LevelLoader : SystemBase
             Entity sceneEntity = Entity.Null;
 
             if (level.flags == Level.Flags.Client)
-            { // GO only
+            { // 仅限 GO
 
-                // This doesn't actually do anything or change the outcome of the tests running this code.
-                // Removing this, since the feature to use LoadAsGOScene is gone. Leaving this here to preserve some context for when netcode updates or removes this.
+                // 这实际上不会做任何事情或改变运行此代码的测试的结果。
+                // 删除这个，因为使用 LoadAsGOScene 的功能已经消失了。将其保留在此处是为了在Netcode更新或删除它时保留一些上下文。
                 //var loadParams = new SceneSystem.LoadParameters {Flags = SceneLoadFlags.LoadAsGOScene};
                 //sceneEntity = SceneSystem.LoadSceneAsync(World.Unmanaged, level.guid, loadParams);
             }
@@ -226,9 +226,9 @@ public partial class LevelLoader : SystemBase
             Entity sceneEntity = Entity.Null;
 
             if (level.flags == Level.Flags.Client)
-            { // GO only
-                // This doesn't actually do anything or change the outcome of the tests running this code.
-                // Removing this, since the feature to use LoadAsGOScene is gone. Leaving this here to preserve some context for when netcode updates or removes this.
+            { // 仅限 GO
+                // 这实际上不会做任何事情或改变运行此代码的测试的结果。
+                // 删除这个，因为使用 LoadAsGOScene 的功能已经消失了。将其保留在此处是为了在Netcode更新或删除它时保留一些上下文。
                 //var loadParams = new SceneSystem.LoadParameters {Flags = SceneLoadFlags.LoadAsGOScene};
                 //sceneEntity = SceneSystem.LoadSceneAsync(World.Unmanaged, level.guid, loadParams);
             }
@@ -255,7 +255,7 @@ public partial class LevelLoader : SystemBase
         {
             if (level.flags == Level.Flags.Client) continue; // GO Scene
 
-            // atm subscenes must be completely obliterated (not just unloaded) to properly trigger prespawn cleanup
+            // atm subscenes 必须完全消除（而不仅仅是卸载）才能正确进行 trigger 生成前清理
             UnityEngine.Debug.Log($"[{World.Name}] unloading {level.guid}");
             var sceneEntity = SceneSystem.GetSceneEntity(World.Unmanaged, level.guid);
             SceneSystem.UnloadScene(World.Unmanaged, level.guid);

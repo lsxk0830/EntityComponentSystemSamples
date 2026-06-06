@@ -255,7 +255,7 @@ namespace Unity.Physics.Authoring
 
         #region ShapeInputHash
 #if !(UNITY_ANDROID && !UNITY_64) // !Android32
-        // Getting memory alignment errors from HashUtility.Hash128 on Android32
+        // 在 Android32 上从 HashUtility.Hash128 获取内存对齐错误
         [BurstCompile]
 #endif
         internal struct GetShapeInputsHashJob : IJob

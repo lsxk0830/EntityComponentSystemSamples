@@ -13,9 +13,9 @@ public class CameraControl : MonoBehaviour
 
     private void Start()
     {
-        // x - right    pitch
-        // y - up       yaw
-        // z - forward  roll
+        // x - 右螺距
+        // y 向上偏航
+        // z - 前滚翻
         yaw = transform.eulerAngles.y;
         pitch = transform.eulerAngles.x;
     }
@@ -27,13 +27,13 @@ public class CameraControl : MonoBehaviour
         if (Input.touchCount > 0)
         {
             float touchToMouseScale = 0.25f;
-            // look around with first touch
+            // 第一次接触时环顾四周
             Touch t0 = Input.GetTouch(0);
             yaw += lookSpeedH * touchToMouseScale * t0.deltaPosition.x;
             pitch -= lookSpeedV * touchToMouseScale * t0.deltaPosition.y;
             transform.eulerAngles = new Vector3(pitch, yaw, 0f);
 
-            // and if have extra touch, also fly forward
+            // 如果有额外的接触，也向前飞
             if (Input.touchCount > 1)
             {
                 Touch t1 = Input.GetTouch(1);
@@ -43,7 +43,7 @@ public class CameraControl : MonoBehaviour
         }
         else
         {
-            //Look around with Right Mouse
+            //用鼠标右键环顾四周
             if (Input.GetMouseButton(1))
             {
                 yaw += lookSpeedH * Input.GetAxis("Mouse X");
@@ -64,13 +64,13 @@ public class CameraControl : MonoBehaviour
                 transform.Translate(offset, Space.Self);
             }
 
-            //drag camera around with Middle Mouse
+            //使用鼠标中键拖动相机
             if (Input.GetMouseButton(2))
             {
                 transform.Translate(-Input.GetAxisRaw("Mouse X") * Time.deltaTime * dragSpeed, -Input.GetAxisRaw("Mouse Y") * Time.deltaTime * dragSpeed, 0);
             }
 
-            //Zoom in and out with Mouse Wheel
+            //使用鼠标滚轮放大和缩小
             transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, Space.Self);
         }
     }

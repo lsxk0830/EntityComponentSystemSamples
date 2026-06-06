@@ -148,7 +148,7 @@ namespace Unity.Physics.Tests.Authoring
                         Assume.That(compoundCollider->Children, Has.Length.EqualTo(1));
                         Assume.That(compoundCollider->Children[0].Collider->Type, Is.EqualTo(ColliderType.Box));
 
-                        // Make sure compound mass properties are calculated properly
+                        // 确保正确计算化合物质量属性
                         Assert.That(compoundCollider->MassProperties.Volume > 0.0f);
                         Assert.That(math.all(math.isfinite(compoundCollider->MassProperties.MassDistribution.Transform.pos)));
                         Assert.That(math.all(math.isfinite(compoundCollider->MassProperties.MassDistribution.Transform.rot.value)));
@@ -240,7 +240,7 @@ namespace Unity.Physics.Tests.Authoring
             if (Child.GetComponent(shapeType) is UnityEngine.MeshCollider meshCollider)
                 meshCollider.sharedMesh = ReadableMesh;
 
-            // conversion presumed to create valid PhysicsCollider under default conditions
+            // 假定在默认条件下创建有效的 PhysicsCollider 的转换
             TestConvertedSharedData<PhysicsCollider, PhysicsWorldIndex>(c => Assert.That(c.IsValid, Is.True), k_DefaultWorldIndex);
         }
 
@@ -262,8 +262,8 @@ namespace Unity.Physics.Tests.Authoring
             else
                 (c as PhysicsShapeAuthoring).enabled = false;
 
-            // conversion presumed to create valid PhysicsCollider under default conditions
-            // covered by corresponding test ConversionSystems_WhenGOHasShape_GOIsActive_AuthoringComponentEnabled_AuthoringDataConverted
+            // 假定在默认条件下创建有效的 PhysicsCollider 的转换
+            // 相应测试 ConversionSystems_WhenGOHasShape_GOIsActive_AuthoringComponentEnabled_AuthoringDataConverted 涵盖
             VerifyNoDataProduced<PhysicsCollider>();
         }
 
@@ -285,8 +285,8 @@ namespace Unity.Physics.Tests.Authoring
             var numInactiveNodes = Root.GetComponentsInChildren<Transform>(true).Count(t => t.gameObject.activeSelf);
             Assume.That(numInactiveNodes, Is.EqualTo(2));
 
-            // conversion presumed to create valid PhysicsCollider under default conditions
-            // covered by corresponding test ConversionSystems_WhenGOHasShape_GOIsActive_AuthoringComponentEnabled_AuthoringDataConverted
+            // 假定在默认条件下创建有效的 PhysicsCollider 的转换
+            // 相应测试 ConversionSystems_WhenGOHasShape_GOIsActive_AuthoringComponentEnabled_AuthoringDataConverted 涵盖
             VerifyNoDataProduced<PhysicsCollider>();
         }
 
@@ -395,27 +395,27 @@ namespace Unity.Physics.Tests.Authoring
                             .ToArray();
                         Assert.That(childTypes, Is.EquivalentTo(expectedColliderTypes));
 
-                        // make sure we have a collider key entity pair buffer with the right size
+                        // 确保我们有一个大小合适的 collider 密钥 entity 对缓冲区
                         Assert.That(w.EntityManager.HasBuffer<PhysicsColliderKeyEntityPair>(e), Is.True);
                         var buffer = w.EntityManager.GetBuffer<PhysicsColliderKeyEntityPair>(e);
                         Assert.That(buffer.Length, Is.EqualTo(compoundCollider->NumChildren));
 
-                        // make sure the content of the buffer is correct
+                        // 确保缓冲区的内容正确
                         for (int i = 0; i < buffer.Length; ++i)
                         {
                             var bufferElement = buffer[i];
 
-                            // make sure the referenced entity exists
+                            // 确保引用的 entity 存在
                             Assert.That(w.EntityManager.Exists(bufferElement.Entity), Is.True);
 
-                            // make sure the collider key works, that is, we have a valid child collider for each key in the buffer
+                            // 确保 collider 密钥有效，也就是说，缓冲区中的每个密钥都有一个有效的子 collider
                             Assert.IsTrue(compoundCollider->GetChild(ref bufferElement.Key, out var childLookup));
 
-                            // Make sure the entity is correct.
-                            // Note: we expect it to be set to Null within the collider blob because in the blob the entity
-                            // can not be automatically updated when its internal ID changes, as opposed to when it appears in a component or buffer
-                            // such as the PhysicsColliderKeyEntityPair. It is set to Entity.Null to avoid having an invalid entity reference.
-                            // It can still be used as user data for user-created compound colliders.
+                            // 确保 entity 正确。
+                            // Note: 我们希望它在 collider blob 中设置为 Null，因为在 blob 中 entity
+                            // 当其内部 ID 更改时（与出现在 component 或缓冲区中时不同），无法自动更新
+                            // 例如 PhysicsColliderKeyEntityPair。它设置为 Entity.Null 以避免出现无效的 entity 引用。
+                            // 它仍然可以用作用户创建的化合物 colliders 的用户数据。
                             var childInCompound = compoundCollider->Children[i];
                             Assert.That(Entity.Null, Is.EqualTo(childInCompound.Entity));
                             Assert.That(Entity.Null, Is.EqualTo(childLookup.Entity));
@@ -472,7 +472,7 @@ namespace Unity.Physics.Tests.Authoring
                 SetDefaultShape(shape, shapeType);
                 shape.ForceUnique = false;
             }
-            // Root will get mesh from Parent (with offset) and Child will get mesh from itself (no offset)
+            // 根将从父级获取网格（有偏移），子级将从自身获取网格（无偏移）
             Parent.transform.localPosition = TransformConversionUtils.k_SharedDataChildTransformation.pos;
             Parent.transform.localRotation = TransformConversionUtils.k_SharedDataChildTransformation.rot;
 
@@ -504,8 +504,8 @@ namespace Unity.Physics.Tests.Authoring
                 shape.ForceUnique = false;
             }
 
-            // Modify scale of one collider. Note that the collider geometry will not be affected if the scale is uniform.
-            // In this case we expect the LocalTransform.Scale to contain the provided scale value.
+            // 修改 1 个 collider 的比例。请注意，如果比例统一，collider 几何体将不会受到影响。
+            // 在这种情况下，我们期望 LocalTransform.Scale 包含提供的比例值。
 
             const float kScale = 2f;
             if (uniformScale)
@@ -520,17 +520,17 @@ namespace Unity.Physics.Tests.Authoring
             var expectedUniqueColliders = uniformScale ? 1 : 2;
             TestConvertedSharedData<PhysicsCollider, PhysicsWorldIndex>((world, entities, colliders) =>
             {
-                // make sure we have the expected number of uniformly scaled colliders
+                // 确保我们有预期数量的统一缩放的 colliders
                 int foundUniformScaleCount = 0;
                 foreach (var e in entities)
                 {
-                    // expect the LocalTransform.Scale to be set correctly
+                    // 期望 LocalTransform.Scale 设置正确
                     var localTransform = world.EntityManager.GetComponentData<LocalTransform>(e);
                     foundUniformScaleCount += math.abs(localTransform.Scale - kScale) < 1e-5 ? 1 : 0;
                 }
                 Assert.That(foundUniformScaleCount, Is.EqualTo(uniformScale ? 1 : 0));
 
-                // make sure we have the expected number of unique colliders
+                // 确保我们有预期数量的唯一 colliders
                 var uniqueColliders = new HashSet<IntPtr>();
                 foreach (var c in colliders)
                 {
@@ -588,12 +588,12 @@ namespace Unity.Physics.Tests.Authoring
             {
                 worldFromParent = new Math.MTransform();
 
-                // does nothing
+                // 什么都不做
             }
 
             public void PopCompositeCollider(uint numCompositeKeyBits, Math.MTransform worldFromParent)
             {
-                // does nothing
+                // 什么都不做
             }
         }
 
@@ -672,7 +672,7 @@ namespace Unity.Physics.Tests.Authoring
                 new[] { typeof(PhysicsBodyAuthoring), typeof(PhysicsShapeAuthoring), typeof(MeshFilter), typeof(MeshRenderer) }
             );
 
-            // Set mesh in mesh filter so that we can get a default size for all shapes via auto-fitting in SetDefaultShape()
+            // 在网格过滤器中设置网格，以便我们可以通过 SetDefaultShape() 中的自动拟合获得所有形状的默认尺寸
             Child.GetComponent<MeshFilter>().sharedMesh = ReadableMesh;
 
             var physicsShape = Child.GetComponent<PhysicsShapeAuthoring>();
@@ -680,15 +680,15 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when game object contains uniform scale, the resultant entity's local transform has the expected scale and the
-        /// baked collider geometry is not affected by the scale.
+        /// 测试当游戏对象包含统一比例时，生成的 entity 的局部变换具有预期的比例和
+        /// 烘焙后的 collider 几何形状不受比例影响。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystems_WhenGOIsUniformlyScaled_LocalTransformHasScale_ColliderIsNotScaled([Values] ShapeType shapeType)
         {
             CreateHierarchyWithChildShape(shapeType);
 
-            // uniformly transform the child collider
+            // 统一变换子 collider
             const float k_UniformScale = 2f;
             Child.transform.localScale = new float3(k_UniformScale);
 
@@ -697,22 +697,22 @@ namespace Unity.Physics.Tests.Authoring
             {
                 Assert.That(transform.Scale, Is.PrettyCloseTo(k_UniformScale));
 
-                // make sure baked collider geometry is not affected by the uniform scale
+                // 确保烘焙的 collider 几何体不受统一比例的影响
                 switch (shapeType)
                 {
                     case ShapeType.Box:
                         {
-                            // compare shape's box properties with baked BoxCollider properties and expect them to be identical
+                            // 将形状的盒子属性与烘焙的 BoxCollider 属性进行比较，并期望它们相同
                             var boxGeometry = shape.GetBoxProperties();
 
                             var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
                             unsafe
                             {
                                 var boxCollider = (BoxCollider*)physicsCollider.ColliderPtr;
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(boxCollider->Type, Is.EqualTo(ColliderType.Box));
 
-                                // compare box properties
+                                // 比较框属性
                                 Assert.That(boxCollider->Size, Is.PrettyCloseTo(boxGeometry.Size));
                                 Assert.That(boxCollider->Center, Is.PrettyCloseTo(boxGeometry.Center));
                                 Assert.That(boxCollider->Orientation, Is.OrientedEquivalentTo(boxGeometry.Orientation));
@@ -722,15 +722,15 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.Capsule:
                         {
-                            // compare shape's capsule properties with baked CapsuleCollider properties and expect them to be identical
+                            // 将 shape 的胶囊属性与烘焙的 CapsuleCollider 属性进行比较，并期望它们相同
                             var capsuleGeometry = shape.GetCapsuleProperties();
                             unsafe
                             {
                                 var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(physicsCollider.ColliderPtr->Type, Is.EqualTo(ColliderType.Capsule));
 
-                                // compare capsule properties
+                                // 比较胶囊特性
                                 var capsuleCollider = (CapsuleCollider*)physicsCollider.ColliderPtr;
                                 var actualCenter = 0.5f * (capsuleCollider->Vertex0 + capsuleCollider->Vertex1);
                                 var actualHeight = math.distance(capsuleCollider->Vertex0, capsuleCollider->Vertex1) + 2 * capsuleCollider->Radius;
@@ -745,15 +745,15 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.Cylinder:
                         {
-                            // compare shape's cylinder properties with baked CylinderCollider properties and expect them to be identical
+                            // 将形状的圆柱体属性与烘焙的 CylinderCollider 属性进行比较，并期望它们相同
                             var cylinderGeometry = shape.GetCylinderProperties();
                             unsafe
                             {
                                 var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(physicsCollider.ColliderPtr->Type, Is.EqualTo(ColliderType.Cylinder));
 
-                                // compare cylinder properties
+                                // 比较气缸特性
                                 var cylinderCollider = (CylinderCollider*)physicsCollider.ColliderPtr;
                                 Assert.That(cylinderCollider->Radius, Is.PrettyCloseTo(cylinderGeometry.Radius));
                                 Assert.That(cylinderCollider->Height, Is.PrettyCloseTo(cylinderGeometry.Height));
@@ -765,15 +765,15 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.Sphere:
                         {
-                            // compare shape's sphere properties with baked SphereCollider properties and expect them to be identical
+                            // 将形状的球体属性与烘焙的 SphereCollider 属性进行比较，并期望它们相同
                             var sphereGeometry = shape.GetSphereProperties(out quaternion orientation);
                             unsafe
                             {
                                 var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(physicsCollider.ColliderPtr->Type, Is.EqualTo(ColliderType.Sphere));
 
-                                // compare sphere properties
+                                // 比较球体属性
                                 var sphereCollider = (SphereCollider*)physicsCollider.ColliderPtr;
                                 Assert.That(sphereCollider->Radius, Is.PrettyCloseTo(sphereGeometry.Radius));
                                 Assert.That(sphereCollider->Center, Is.PrettyCloseTo(sphereGeometry.Center));
@@ -782,17 +782,17 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.Plane:
                         {
-                            // compare shape's plane properties with baked PolygonCollider properties and expect them to be identical
+                            // 将形状的平面属性与烘焙的 PolygonCollider 属性进行比较，并期望它们相同
                             shape.GetPlaneProperties(out var center, out var size, out EulerAngles orientation);
                             PhysicsShapeExtensions.GetPlanePoints(center, size, orientation, out var vertex0, out var vertex1, out var vertex2, out var vertex3);
 
                             unsafe
                             {
                                 var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(physicsCollider.ColliderPtr->Type, Is.EqualTo(ColliderType.Quad));
 
-                                // compare collider properties
+                                // 比较 collider 属性
                                 var polygonCollider = (PolygonCollider*)physicsCollider.ColliderPtr;
                                 Assert.That(polygonCollider->IsQuad);
 
@@ -806,18 +806,18 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.Mesh:
                         {
-                            // compare shape's mesh properties with baked MeshCollider properties and expect them to be unaffected by scale.
-                            // Note: for simplicity we are using the mesh bounds here for comparison.
+                            // 将形状的网格属性与烘焙的 MeshCollider 属性进行比较，并期望它们不受比例的影响。
+                            // Note: 为简单起见，我们在这里使用网格边界进行比较。
 
                             var expectedBounds = ReadableMesh.bounds;
                             var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
                             unsafe
                             {
                                 var meshCollider = (MeshCollider*)physicsCollider.ColliderPtr;
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(meshCollider->Type, Is.EqualTo(ColliderType.Mesh));
 
-                                // compare  bounds
+                                // 比较界限
                                 var actualBounds = meshCollider->CalculateAabb();
                                 Assert.That(actualBounds.Center, Is.PrettyCloseTo(expectedBounds.center));
                                 Assert.That(actualBounds.Extents, Is.PrettyCloseTo(expectedBounds.size));
@@ -827,18 +827,18 @@ namespace Unity.Physics.Tests.Authoring
                         }
                     case ShapeType.ConvexHull:
                         {
-                            // compare shape's convex hull properties with baked ConvexCollider properties and expect them to be unaffected by scale.
-                            // Note: for simplicity we are using the mesh bounds here for comparison.
+                            // 将形状的凸包属性与烘焙的 ConvexCollider 属性进行比较，并期望它们不受比例的影响。
+                            // Note: 为简单起见，我们在这里使用网格边界进行比较。
 
                             var expectedBounds = ReadableMesh.bounds;
                             var physicsCollider = world.EntityManager.GetComponentData<PhysicsCollider>(entity);
                             unsafe
                             {
                                 var convexCollider = (ConvexCollider*)physicsCollider.ColliderPtr;
-                                // make sure the collider type is as expected
+                                // 确保 collider 类型符合预期
                                 Assert.That(convexCollider->Type, Is.EqualTo(ColliderType.Convex));
 
-                                // compare bounds
+                                // 比较界限
                                 var actualBounds = convexCollider->CalculateAabb();
                                 Assert.That(actualBounds.Center, Is.PrettyCloseTo(expectedBounds.center));
                                 Assert.That(actualBounds.Extents, Is.PrettyCloseTo(expectedBounds.size).Within(1e-2f));
@@ -853,8 +853,8 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when game object contains non uniform scale, the resultant entity's local transform has identity scale and the
-        /// PostTransformMatrix contains the non uniform scale.
+        /// 测试当游戏对象包含非均匀尺度时，生成的 entity 的局部变换具有恒等尺度，并且
+        /// PostTransformMatrix 包含非均匀比例。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsNonUniformlyScaled_LocalTransformHasNoScale(
@@ -862,19 +862,19 @@ namespace Unity.Physics.Tests.Authoring
         {
             CreateHierarchyWithChildShape(shapeType);
 
-            // uniformly transform the child collider
+            // 统一变换子 collider
             var k_NonUniformScale = new Vector3(1, 2, 3);
             Child.transform.localScale = k_NonUniformScale;
 
             TestConvertedData<LocalTransform>((world, transform, entity) =>
             {
-                // expect the local transform scale to be identity
+                // 期望局部变换尺度为恒等
                 Assert.That(transform.Scale, Is.PrettyCloseTo(1));
 
-                // expect there to be a PostTransformMatrix component
+                // 期望有一个 PostTransformMatrix component
                 Assert.That(world.EntityManager.HasComponent<PostTransformMatrix>(entity), Is.True);
 
-                // expect the PostTransformMatrix to represent the same scale as the local transform
+                // 期望 PostTransformMatrix 表示与局部变换相同的比例
                 var postTransformMatrix = world.EntityManager.GetComponentData<PostTransformMatrix>(entity);
                 Assert.That(postTransformMatrix.Value, Is.PrettyCloseTo(float4x4.Scale(k_NonUniformScale)));
 
@@ -883,9 +883,9 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when a game object contains shear in world space, the resultant entity's local transform has identity scale and the
+        /// 测试当游戏对象在 world 空间中包含剪切时，所得 entity 的局部变换具有恒等尺度且
         /// PostTransformMatrix (containing the shear) and LocalTransform (containing the rigid body transform) components
-        /// together represent the same world transform as the game object.
+        /// 一起表示与游戏对象相同的 world 变换。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsSheared_LocalTransformHasNoScale(
@@ -893,7 +893,7 @@ namespace Unity.Physics.Tests.Authoring
         {
             CreateHierarchyWithChildShape(shapeType);
 
-            // create a hierarchy that leads to shear in the child's world transform
+            // 创建一个层次结构，导致子级 world 变换发生剪切
             Root.transform.localPosition = new Vector3(1f, 2f, 3f);
             Root.transform.localRotation = Quaternion.Euler(30f, 60f, 90f);
             Root.transform.localScale = new Vector3(3f, 5f, 7f);
@@ -909,18 +909,18 @@ namespace Unity.Physics.Tests.Authoring
 
             TestConvertedData<LocalTransform>((world, transform, entity) =>
             {
-                // expect the local transform scale to be identity
+                // 期望局部变换尺度为恒等
                 var localTransform = transform;
                 Assert.That(localTransform.Scale, Is.PrettyCloseTo(1));
 
-                // expect there to be a PostTransformMatrix component
+                // 期望有一个 PostTransformMatrix component
                 Assert.That(world.EntityManager.HasComponent<PostTransformMatrix>(entity), Is.True);
 
                 var postTransformMatrix = world.EntityManager.GetComponentData<PostTransformMatrix>(entity);
-                // expect the post transform matrix to have shear
+                // 期望后变换矩阵有剪切
                 Assert.That(postTransformMatrix.Value.HasShear());
 
-                // check if world transform of the collider is as expected
+                // 检查 collider 的 world 变换是否符合预期
                 var actualColliderWorldTransform = math.mul(localTransform.ToMatrix(), postTransformMatrix.Value);
                 Assert.That(expectedColliderWorldTransform, Is.PrettyCloseTo(actualColliderWorldTransform));
 
@@ -929,8 +929,8 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when a game object contains non-uniform scale in world space, a box or mesh collider
-        /// have the non-uniform scale baked in.
+        /// 测试当游戏对象在 world 空间中包含非均匀缩放时，盒子或网格 collider
+        /// 烘烤不均匀的比例。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsNonUniformlyScaled_ColliderHasBakedScale(
@@ -938,13 +938,13 @@ namespace Unity.Physics.Tests.Authoring
         {
             TestNonUniformScaleOnCollider(new[] {typeof(PhysicsBodyAuthoring), typeof(PhysicsShapeAuthoring)}, gameObjectToConvert =>
             {
-                // create a primitive cube which we will assign to the game object used in the test
+                // 创建一个原始立方体，我们将其分配给测试中使用的游戏对象
                 var cubeGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 var cubeMeshFilter = cubeGameObject.GetComponent<MeshFilter>();
                 var cubeMeshRenderer = cubeGameObject.GetComponent<MeshRenderer>();
                 Assert.That(cubeMeshFilter != null && cubeMeshFilter.sharedMesh != null && cubeMeshRenderer != null);
 
-                // set up the test game object with a mesh filter and renderer of a cube
+                // 使用网格过滤器和立方体渲染器设置测试游戏对象
                 var meshFilter = gameObjectToConvert.GetComponent<MeshFilter>();
                 meshFilter.mesh = cubeMeshFilter.sharedMesh;
                 var meshRenderer = gameObjectToConvert.GetComponent<MeshRenderer>();
@@ -969,27 +969,27 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when a game object contains non-uniform scale in world space, a convex collider
-        /// has the non-uniform scale baked in.
+        /// 测试当游戏对象在 world 空间中包含非均匀尺度时，凸 collider
+        /// 烘焙了不均匀的比例。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsNonUniformlyScaled_ConvexColliderHasBakedScale()
         {
             TestNonUniformScaleOnCollider(new[] {typeof(PhysicsBodyAuthoring), typeof(PhysicsShapeAuthoring)}, gameObjectToConvert =>
             {
-                // create a primitive cube which we will assign to the game object used in the test
+                // 创建一个原始立方体，我们将其分配给测试中使用的游戏对象
                 var cubeGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 var cubeMeshFilter = cubeGameObject.GetComponent<MeshFilter>();
                 var cubeMeshRenderer = cubeGameObject.GetComponent<MeshRenderer>();
                 Assert.That(cubeMeshFilter != null && cubeMeshFilter.sharedMesh != null && cubeMeshRenderer != null);
 
-                // set up the test game object with a mesh filter and renderer of a cube
+                // 使用网格过滤器和立方体渲染器设置测试游戏对象
                 var meshFilter = gameObjectToConvert.GetComponent<MeshFilter>();
                 meshFilter.mesh = cubeMeshFilter.sharedMesh;
                 var meshRenderer = gameObjectToConvert.GetComponent<MeshRenderer>();
                 meshRenderer.sharedMaterial = cubeMeshRenderer.sharedMaterial;
 
-                // assign mesh to shape and make it a convex shape
+                // 将网格分配给形状并使其成为凸形状
                 var shape = Child.GetComponent<PhysicsShapeAuthoring>();
                 Assert.That(shape != null);
                 shape.SetConvexHull(ConvexHullGenerationParameters.Default, cubeMeshFilter.sharedMesh);
@@ -999,8 +999,8 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when a game object contains non-uniform scale in world space, a sphere collider has the non-uniform
-        /// scale baked in.
+        /// 测试当游戏对象在 world 空间中包含非均匀尺度时，球体 collider 具有非均匀尺度
+        /// 规模烘烤。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsNonUniformlyScaled_SphereColliderHasBakedScale()
@@ -1011,7 +1011,7 @@ namespace Unity.Physics.Tests.Authoring
                 new[] {typeof(PhysicsBodyAuthoring), typeof(PhysicsShapeAuthoring)}
             );
 
-            // induce non-uniform scale in the child collider
+            // 导致儿童 collider 的尺度不均匀
             var nonUniformScale = new Vector3(1, 2, 3);
             Child.transform.localScale = nonUniformScale;
 
@@ -1023,21 +1023,21 @@ namespace Unity.Physics.Tests.Authoring
 
             TestConvertedData<PhysicsCollider>((world, entities, colliders) =>
             {
-                // expect there to be a LocalTransform component with identity scale
+                // 期望有一个具有身份比例的 LocalTransform component
                 var entity = entities[0];
                 Assert.That(world.EntityManager.HasComponent<LocalTransform>(entity), Is.True);
                 var localTransform = world.EntityManager.GetComponentData<LocalTransform>(entity);
                 Assert.That(localTransform.Scale, Is.PrettyCloseTo(1));
 
-                // expect there to be a PostTransformMatrix component
+                // 期望有一个 PostTransformMatrix component
                 Assert.That(world.EntityManager.HasComponent<PostTransformMatrix>(entity), Is.True);
 
                 var postTransformMatrix = world.EntityManager.GetComponentData<PostTransformMatrix>(entity);
-                // expect the post transform matrix to have non-uniform scale but no shear
+                // 期望后变换矩阵具有非均匀尺度但没有剪切
                 Assert.That(postTransformMatrix.Value.HasNonUniformScale());
                 Assert.That(postTransformMatrix.Value.HasShear(), Is.False);
 
-                // check if the sphere collider geometry is as expected
+                // 检查球体 collider 几何形状是否符合预期
                 unsafe
                 {
                     var sphereColliderPtr = (SphereCollider*)colliders[0].ColliderPtr;
@@ -1049,8 +1049,8 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Test that when a game object contains non-uniform scale in world space, a capsule collider has the non-uniform
-        /// scale baked in.
+        /// 测试当游戏对象在 world 空间中包含非均匀尺度时，胶囊 collider 具有非均匀尺度
+        /// 规模烘烤。
         /// </summary>
         [Test]
         public void PhysicsShapeConversionSystem_WhenGOIsNonUniformlyScaled_CapsuleColliderHasBakedScale()
@@ -1061,7 +1061,7 @@ namespace Unity.Physics.Tests.Authoring
                 new[] {typeof(PhysicsBodyAuthoring), typeof(PhysicsShapeAuthoring)}
             );
 
-            // induce non-uniform scale in the child collider
+            // 导致儿童 collider 的尺度不均匀
             var nonUniformScale = new Vector3(2, 3, 4);
             Child.transform.localScale = nonUniformScale;
 
@@ -1069,30 +1069,30 @@ namespace Unity.Physics.Tests.Authoring
             var unscaledRadius = 1.23f;
             var unscaledHeight = 4.2f;
 
-            // capsule with z-axis as central axis
+            // 以 z 轴为中心轴的胶囊
             capsuleShape.SetCapsule(new CapsuleGeometryAuthoring() { Height = unscaledHeight, Radius = unscaledRadius, Orientation = quaternion.identity});
-            int directionIndex = 2; // z-axis
+            int directionIndex = 2; // z 轴
 
             var expectedRadius = unscaledRadius * math.cmax(new float3(nonUniformScale) { [directionIndex] = 0f });
             var expectedHeight = unscaledHeight * nonUniformScale[directionIndex];
 
             TestConvertedData<PhysicsCollider>((world, entities, colliders) =>
             {
-                // expect there to be a LocalTransform component with identity scale
+                // 期望有一个具有身份比例的 LocalTransform component
                 var entity = entities[0];
                 Assert.That(world.EntityManager.HasComponent<LocalTransform>(entity), Is.True);
                 var localTransform = world.EntityManager.GetComponentData<LocalTransform>(entity);
                 Assert.That(localTransform.Scale, Is.PrettyCloseTo(1));
 
-                // expect there to be a PostTransformMatrix component
+                // 期望有一个 PostTransformMatrix component
                 Assert.That(world.EntityManager.HasComponent<PostTransformMatrix>(entity), Is.True);
 
                 var postTransformMatrix = world.EntityManager.GetComponentData<PostTransformMatrix>(entity);
-                // expect the post transform matrix to have non-uniform scale but no shear
+                // 期望后变换矩阵具有非均匀尺度但没有剪切
                 Assert.That(postTransformMatrix.Value.HasNonUniformScale());
                 Assert.That(postTransformMatrix.Value.HasShear(), Is.False);
 
-                // check if the sphere collider geometry is as expected
+                // 检查球体 collider 几何形状是否符合预期
                 unsafe
                 {
                     var capsuleColliderPtr = (CapsuleCollider*)colliders[0].ColliderPtr;
@@ -1116,12 +1116,12 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Tests that colliders in provided entities have expected bounds, assuming they are all baked from the provided shape type.
+        /// 测试提供的 entities 中的 colliders 是否具有预期边界，假设它们都是从提供的形状类型烘焙的。
         /// </summary>
         void TestCollidersHaveExpectedBounds(ShapeType shapeType, World world, NativeArray<Entity> entities, NativeArray<PhysicsCollider> colliders,
             List<Tuple<Bounds, Transform>> expectedBounds)
         {
-            // expect the colliders to have the same size as the mesh bounds
+            // 期望 colliders 与网格边界具有相同的大小
             var foundIndices = new NativeHashSet<int>(entities.Length, Allocator.Temp);
             var manager = world.EntityManager;
             for (int i = 0; i < colliders.Length; i++)
@@ -1131,8 +1131,8 @@ namespace Unity.Physics.Tests.Authoring
                     out var colliderScale, out var colliderLocalToWorld);
 
                 var matrixPrettyCloseTo = new MatrixPrettyCloseConstraint(colliderLocalToWorld.Value);
-                // find the mesh bounds that correspond to the collider by comparing the entity's transform
-                // with the mesh bounds' transform
+                // 通过比较 entity 的变换，找到与 collider 相对应的网格边界
+                // 随着网格边界的变换
                 var expectedBoundsIndex = expectedBounds.FindIndex(element =>
                     matrixPrettyCloseTo.ApplyTo((float4x4)element.Item2.localToWorldMatrix).IsSuccess);
                 Assert.That(expectedBoundsIndex, Is.Not.EqualTo(-1));
@@ -1149,7 +1149,7 @@ namespace Unity.Physics.Tests.Authoring
                 var expectedBoundsCenter = expectedBoundsElement.Item1.center;
                 if (shapeType == ShapeType.Plane)
                 {
-                    // ignore default plane axis
+                    // 忽略默认平面轴
                     actualBoundsSize[0] = expectedBoundsSize[0] = actualBoundsCenter[0] = expectedBoundsCenter[0] = 0;
                 }
 
@@ -1159,25 +1159,25 @@ namespace Unity.Physics.Tests.Authoring
         }
 
         /// <summary>
-        /// Tests that there is only one compound collider and that its bounds correspond to the union of the provided bounds, assuming they are all baked from the provided shape type.
+        /// 测试是否只有一种复合 collider 并且其边界对应于提供的边界的并集，假设它们都是从提供的形状类型烘焙的。
         /// </summary>
         protected void TestCompoundColliderHasExpectedUnionBounds(ShapeType shapeType, World world, NativeArray<Entity> entities, NativeArray<PhysicsCollider> colliders,
             List<Tuple<Bounds, Transform>> expectedBounds)
         {
-            // expect only one compound collider in this case
+            // 在这种情况下，预计只有一种化合物 collider
             Assert.That(colliders.Length, Is.EqualTo(1));
 
             ref var compoundCollider = ref colliders[0].Value.Value;
             Assert.That(compoundCollider.Type, Is.EqualTo(ColliderType.Compound));
 
-            // calculate union of the expected bounds for comparison
+            // 计算预期边界的并集以进行比较
             var expectedUnionBounds = new Bounds();
             foreach (var expectedBound in expectedBounds)
             {
                 expectedUnionBounds.Encapsulate(expectedBound.Item1);
             }
 
-            // expect the compound collider to have the same size as the union of the mesh bounds
+            // 期望复合 collider 与网格边界的并集具有相同的大小
             var entity = entities[0];
             var manager = world.EntityManager;
             GetRigidBodyTransformationData(ref manager, entity, out var colliderWorldTransform,
@@ -1190,7 +1190,7 @@ namespace Unity.Physics.Tests.Authoring
             var expectedBoundsCenter = expectedUnionBounds.center;
             if (shapeType == ShapeType.Plane)
             {
-                // ignore default plane axis
+                // 忽略默认平面轴
                 actualBoundsSize[0] = expectedBoundsSize[0] = actualBoundsCenter[0] = expectedBoundsCenter[0] = 0;
             }
 

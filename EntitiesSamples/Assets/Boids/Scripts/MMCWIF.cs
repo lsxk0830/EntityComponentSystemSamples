@@ -5,15 +5,15 @@ using Unity.Entities;
 namespace Boids
 {
     /*
-     * This file ensures that we preserve the current typemanager hashing behavior, 
-     * which is that if you #if UNITY_EDITOR a field in a class IComponentData itself,
-     * it will have a different hash in the player and then there will be errors 
-     * when the player runs if you put it in a subscene. 
-     * 
-     * But, if you do the same thing on a class type that the class IComponentData 
-     * includes as a field, it will be fine, because we don't look inside class types
-     * of fields. 
-     */ 
+     * 该文件确保我们保留当前的 ​​typemanager 哈希行为，
+     * 也就是说，如果您 #if UNITY_EDITOR 类 IComponentData 本身中的一个字段，
+     * 播放器中会有不同的哈希值，然后就会出现错误
+     * 当播放器运行时，如果将其放入 subscene 中。
+     *
+     * 但是，如果您对类 IComponentData 类执行相同的操作
+     * 包含作为字段，那会很好，因为我们不查看类类型内部
+     * 字段。
+     */
     public class MMCWIFAuthoring : MonoBehaviour
     {
         class Baker : Baker<MMCWIFAuthoring>

@@ -71,10 +71,10 @@ namespace Unity.Physics.Tests
     }
 
     /// <summary>
-    /// Validation of all PhysicsJoint objects in the simulation.
+    /// 验证模拟中的所有 PhysicsJoint 对象。
     ///
-    /// The expected behavior corresponds to joints created with the
-    /// joint creation functions in PhysicsJoint, e.g., CreatePrismatic, CreateHinge, etc.
+    /// 预期的行为对应于使用创建的关节
+    /// PhysicsJoint、e.g.、CreatePrismatic、CreateHinge 等中的 joint 创建函数
     /// </summary>
     [BurstCompile]
     public partial struct ValidateJointBehaviorJob : IJobEntity
@@ -133,7 +133,7 @@ namespace Unity.Physics.Tests
             var anchorAWorld = math.mul(rigidAWorld, anchorALocal.AsRigidTransform());
             var anchorBWorld = math.mul(rigidBWorld, anchorBLocal.AsRigidTransform());
 
-            // pose validation for PhysicsJoints
+            // PhysicsJoints 的姿势验证
             switch (joint.JointType)
             {
                 case JointType.BallAndSocket:
@@ -152,19 +152,19 @@ namespace Unity.Physics.Tests
                 case JointType.AngularVelocityMotor:
                 case JointType.RotationalMotor:
                 {
-                    // obtain hinge axis (attached to body A)
+                    // 获取铰链轴（连接到主体 A）
                     byte hingeConstraintBlockIndex = (byte)(joint.JointType == JointType.Hinge ? 0 : 1);
                     var hingeConstraint = joint[hingeConstraintBlockIndex];
                     ValidateConstraintType(hingeConstraint, ConstraintType.Angular);
                     var hingeAxisIndex = hingeConstraint.FreeAxis2D;
                     var hingeAxis = new float3x3(anchorAWorld.rot)[hingeAxisIndex];
 
-                    // make sure rotation happens about the hinge axis
+                    // 确保绕铰链轴旋转
                     var rotBToA = math.mul(math.inverse(anchorAWorld.rot), anchorBWorld.rot);
                     rotBToA = math.normalize(rotBToA);
                     ((Quaternion)rotBToA).ToAngleAxis(out var angle, out var actualRotationAxis);
-                    // We can only get a meaningful rotation axis between the two anchors if there is some reasonable amount of delta rotation.
-                    // Note: angle is in degrees here
+                    // 只有存在一定量的增量旋转，我们才能在两个锚点之间获得有意义的旋转轴。
+                    // Note: 这里角度以度为单位
                     var absAngle = math.abs(angle);
                     var epsValidationAngle = 10.0f;
                     if (absAngle > epsValidationAngle && absAngle < 360f - epsValidationAngle)
@@ -172,7 +172,7 @@ namespace Unity.Physics.Tests
                         actualRotationAxis = math.mul(anchorAWorld.rot, actualRotationAxis);
                         actualRotationAxis = math.normalize(actualRotationAxis);
 
-                        // make sure hinge axis is aligned in both anchor frames
+                        // 确保铰链轴在两个锚架中对齐
                         var cosAngle = math.dot(actualRotationAxis, hingeAxis);
                         var absCosAngle = math.abs(cosAngle);
                         var epsCos = OrientationErrorTolCos;
@@ -182,7 +182,7 @@ namespace Unity.Physics.Tests
                         }
                     }
 
-                    // Make sure anchor positions are sufficiently close, as the bodies rotate around them.
+                    // 确保锚点位置足够近，因为主体围绕它们旋转。
                     var deltaPos = anchorAWorld.pos - anchorBWorld.pos;
                     var posErrorSq = math.lengthsq(deltaPos);
                     if (posErrorSq > PositionErrorTolSq)
@@ -194,9 +194,9 @@ namespace Unity.Physics.Tests
                 }
                 case JointType.Fixed:
                 {
-                    // make sure anchor frames are aligned
+                    // 确保锚框对齐
 
-                    // orientation
+                    // 方向
                     var relQ = math.mul(math.inverse(anchorAWorld.rot), anchorBWorld.rot);
                     relQ = math.normalize(relQ);
                     var angle = 2.0 * math.acos(relQ.value.w);
@@ -206,7 +206,7 @@ namespace Unity.Physics.Tests
                         Errors.Add($"Validation (Fixed): relative orientation violated by {angle} radians, which exceeds orientation error tolerance of {OrientationErrorTol} radians");
                     }
 
-                    // position
+                    // 位置
                     var deltaPos = anchorAWorld.pos - anchorBWorld.pos;
                     var posErrorSq = math.lengthsq(deltaPos);
                     if (posErrorSq > PositionErrorTolSq)
@@ -235,7 +235,7 @@ namespace Unity.Physics.Tests
 
                     Assert.IsTrue(constrainedAxisIndex > -1);
 
-                    // We expect the prismatic axis in both anchor frames to be parallel and in the same direction.
+                    // 我们期望两个锚框架中的棱柱轴平行且方向相同。
                     var axisA = new float3x3(anchorAWorld.rot)[constrainedAxisIndex];
                     var axisB = new float3x3(anchorBWorld.rot)[constrainedAxisIndex];
                     var absCosAngle = math.dot(axisA, axisB);
@@ -244,12 +244,12 @@ namespace Unity.Physics.Tests
                         Errors.Add($"Validation (Prismatic or equivalent): prismatic axis orientation violated by {math.acos(absCosAngle)} radians, which exceeds orientation error tolerance of {OrientationErrorTol} radians");
                     }
 
-                    // Make sure anchors lie on the prismatic axis:
-                    // The anchor position in A lies on the prismatic axis (i.e., axisA) by design since both are attached to the same rigid body A.
-                    // So we only need to check that the distance of the anchor position in B to the prismatic axis in A lies below the
-                    // provided position error tolerance.
+                    // 确保锚点位于棱柱轴上：
+                    // A 中的锚点位置按设计位于棱柱轴 (i.e.、axisA) 上，因为两者都连接到同一刚体 A。
+                    // 所以我们只需要检查 B 中的锚点位置到 A 中的棱柱轴的距离是否低于
+                    // 提供位置误差容限。
                     var ab = anchorBWorld.pos - anchorAWorld.pos;
-                    // calculate rejection of ab with respect to plane formed by axisA and anchorAWorld.pos
+                    // 计算 ab 相对于由 axisA 和 anchorAWorld.pos 形成的平面的拒绝
                     ab -= math.dot(ab, axisA) * axisA;
                     var distToPrismaticAxisSq = math.lengthsq(ab);
                     if (distToPrismaticAxisSq > PositionErrorTolSq)
@@ -265,7 +265,7 @@ namespace Unity.Physics.Tests
                     ValidateConstraintType(motorConstraint, ConstraintType.LinearVelocityMotor);
                     var constrainedAxisIndex = motorConstraint.ConstrainedAxis1D;
 
-                    // We expect the linear velocity motor axis (prismatic axis) in both anchor frames to be parallel and in the same direction
+                    // 我们期望两个锚架中的线速度电机轴（棱柱轴）平行且方向相同
                     var axisA = new float3x3(anchorAWorld.rot)[constrainedAxisIndex];
                     var axisB = new float3x3(anchorBWorld.rot)[constrainedAxisIndex];
                     var absCosAngle = math.dot(axisA, axisB);
@@ -274,9 +274,9 @@ namespace Unity.Physics.Tests
                         Errors.Add($"Validation (LinearVelocityMotor): prismatic axis orientation violated by {math.acos(absCosAngle)} radians, which exceeds orientation error tolerance of {OrientationErrorTol} radians");
                     }
 
-                    // We also expect the anchor position in A to lie on the prismatic axis attached to B.
+                    // 我们还期望 A 中的锚点位置位于附加到 B 的棱柱轴上。
                     var ba = anchorAWorld.pos - anchorBWorld.pos;
-                    // calculate rejection of ba with respect to plane formed by axisB and anchorBWorld.pos
+                    // 计算 ba 对于 axisB 和 anchorBWorld.pos 形成的平面的拒绝
                     ba -= math.dot(ba, axisB) * axisB;
                     var distToPrismaticAxisSq = math.lengthsq(ba);
                     if (distToPrismaticAxisSq > PositionErrorTolSq)
@@ -308,27 +308,27 @@ namespace Unity.Physics.Tests
                     break;
             }
 
-            // target validation for PhysicsJoints
+            // PhysicsJoints 的目标验证
             switch (joint.JointType)
             {
                 case JointType.AngularVelocityMotor:
                 {
-                    // get expected angular velocity
+                    // 得到期望的角速度
                     var motorConstraint = joint[2];
                     ValidateConstraintType(motorConstraint, ConstraintType.AngularVelocityMotor);
                     int constrainedAxisIndex = motorConstraint.ConstrainedAxis1D;
 
-                    // expected angular velocity in world space
+                    // world 空间中的预期角速度
                     var speed = motorConstraint.Target[constrainedAxisIndex];
                     var expectedAngVelRel = new float3x3(anchorAWorld.rot)[constrainedAxisIndex] * speed;
 
-                    // get actual angular velocity
+                    // 获取实际角速度
                     var wA = bodyAIsStatic ? float3.zero
                         : PhysicsVelocityLookup[bodyPair.EntityA].GetAngularVelocityWorldSpace(PhysicsMassLookup[bodyPair.EntityA], new quaternion(bodyAWorld));
                     var wB = bodyBIsStatic ? float3.zero
                         : PhysicsVelocityLookup[bodyPair.EntityB].GetAngularVelocityWorldSpace(PhysicsMassLookup[bodyPair.EntityB], new quaternion(bodyBWorld));
 
-                    // actual angular velocity in world space (relative to B)
+                    // world 空间中的实际角速度（相对于 B）
                     var angVelRel = wA - wB;
                     var check = math.abs(math.lengthsq(expectedAngVelRel - angVelRel));
                     if (check > AngVelErrorTolSq)
@@ -344,15 +344,15 @@ namespace Unity.Physics.Tests
                     ValidateConstraintType(motorConstraint, ConstraintType.LinearVelocityMotor);
                     int constrainedAxisIndex = motorConstraint.ConstrainedAxis1D;
 
-                    // expected angular velocity in world space
+                    // world 空间中的预期角速度
                     var speed = motorConstraint.Target[constrainedAxisIndex];
                     var expectedLinVelRel = new float3x3(anchorBWorld.rot)[constrainedAxisIndex] * speed;
 
-                    // get actual linear velocity
+                    // 获取实际线速度
                     var vA = bodyAIsStatic ? float3.zero : PhysicsVelocityLookup[bodyPair.EntityA].Linear;
                     var vB = bodyBIsStatic ? float3.zero : PhysicsVelocityLookup[bodyPair.EntityB].Linear;
 
-                    // actual linear velocity in world space (relative to B)
+                    // world 空间中的实际线速度（相对于 B）
                     var linVelRel = vA - vB;
 
                     if (math.abs(math.lengthsq(expectedLinVelRel - linVelRel)) > LinVelErrorTolSq)
@@ -369,23 +369,23 @@ namespace Unity.Physics.Tests
                     int constrainedAxisIndex = motorConstraint.ConstrainedAxis1D;
                     var targetAngle = motorConstraint.Target[constrainedAxisIndex];
 
-                    // Calculate angle between the joint attachment frames.
-                    // Note: we already confirmed that the joint axis is aligned in both anchor frames in the pose validation above.
+                    // 计算 joint 附件框架之间的角度。
+                    // Note: 我们已经确认 joint 轴在上面的姿势验证中的两个锚帧中对齐。
                     var qDelta = math.normalize(math.mul(math.inverse(anchorBWorld.rot), anchorAWorld.rot));
                     ((Quaternion)qDelta).ToAngleAxis(out var currentAngle, out var axis);
-                    // account for flip of axis in ToAngleAxis calculation
+                    // 在 ToAngleAxis 计算中考虑轴翻转
                     currentAngle *= axis[constrainedAxisIndex];
                     currentAngle = math.radians(currentAngle);
                     var deltaAngle = currentAngle - targetAngle;
                     var deltaAngleCos = math.cos(deltaAngle);
-                    // Note: below we exclude compliant joints, since these won't be able to reach their targets with reasonable accuracy in the general case.
+                    // Note: 下面我们排除了顺从接头，因为在一般情况下这些接头无法以合理的精度达到目标。
                     var compliantJoint = motorConstraint.SpringFrequency < 1e3;
                     if (deltaAngleCos < OrientationErrorTolCos && !compliantJoint)
                     {
                         Errors.Add($"Validation (RotationalMotor): angle between anchor frames differs from target angle {targetAngle} radians by {deltaAngle} radians, which exceeds the orientation error tolerance of {OrientationErrorTol} radians.");
                     }
 
-                    // check if we are within the limits
+                    // 检查我们是否在限制范围内
                     if (currentAngle + OrientationErrorTol <= motorConstraint.Min || currentAngle - OrientationErrorTol >= motorConstraint.Max)
                     {
                         Errors.Add($"Validation (RotationalMotor): angle between anchor frames {currentAngle} is out of admissible (min, max) range ({motorConstraint.Min}, {motorConstraint.Max}) by more than orientation error tolerance of {OrientationErrorTol} radians.");
@@ -501,8 +501,8 @@ namespace Unity.Physics.Tests
 
         public void OnUpdate(ref SystemState state)
         {
-            // since we require SimulationValidationSettings to exist for this system to be updated,
-            // we can be sure that we can retrieve it.
+            // 因为我们需要 SimulationValidationSettings 存在才能更新此 system，
+            // 我们可以确定我们可以找回它。
             var settings = SystemAPI.GetSingleton<SimulationValidationSettings>();
 
             if (!settings.EnableValidation)
@@ -511,13 +511,13 @@ namespace Unity.Physics.Tests
             }
             // else:
 
-            // check if any error has been detected in the validation jobs scheduled last frame (see below)
+            // 检查在验证 jobs 安排的最后一帧中是否检测到任何错误（见下文）
             var numErrorsDetectedLastFrame = Errors.GetCount();
-            // reset the error counter for the upcoming validation jobs
+            // 为即将进行的验证重置错误计数器 jobs
             Errors.Reset();
 
-            // Note: we need to calculate our own elapsed time since the first update of this system has occurred. This is because during SubScene streaming with closed SubScenes
-            // the systems in the SubScenes are not immediately created and stepped. They might get stepped only after a few frames delay. Therefore, some time might already have
+            // Note: 我们需要计算自第一次更新 system 以来经过的时间。这是因为在 SubScene 流式传输过程中，SubScenes 已关闭
+            // SubScenes 中的 systems 不会立即创建和步进。他们可能只会在几帧延迟后才被踩踏。因此，一段时间可能已经
             // passed (i.e., SystemAPI.Time.ElapsedTime > 0) the first time this system is updated.
             var elapsedTime = ElapsedTime;
             ElapsedTime += SystemAPI.Time.DeltaTime;
@@ -571,7 +571,7 @@ namespace Unity.Physics.Tests
                 state.Dependency = combinedHandle;
             }
 
-            // Assert if last frame any errors have been detected
+            // 断言最后一帧是否检测到任何错误
             Assert.AreEqual(0, numErrorsDetectedLastFrame, $"SimulationValidationSystem: {numErrorsDetectedLastFrame} errors detected in simulation.");
         }
     }

@@ -141,7 +141,7 @@ namespace Samples.HelloNetcode.Hybrid
         {
             var behaviourPlayable = ScriptPlayable<StateSelectorGhostPlayableBehaviour>.Create(graph);
             var behaviour = behaviourPlayable.GetBehaviour();
-            // This registers the behaviour for receiving PreparePredictedData, skip this if predicted data is updated by a system (PrepareFrame is still called)
+            // 这注册了接收 PreparePredictedData 的行为，如果 predicted 数据由 system 更新（PrepareFrame 仍然被调用），则跳过此操作
             behaviours.Add(behaviour);
 
             behaviour.Initialize(controller, graph, behaviours, behaviourPlayable, controllers);

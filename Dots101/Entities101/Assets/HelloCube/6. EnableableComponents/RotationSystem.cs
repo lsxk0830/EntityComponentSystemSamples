@@ -22,7 +22,7 @@ namespace HelloCube.EnableableComponents
             float deltaTime = SystemAPI.Time.DeltaTime;
             m_Timer -= deltaTime;
 
-            // Toggle the enabled state of every RotationSpeed
+            // 切换每个 RotationSpeed 的启用状态
             if (m_Timer < 0)
             {
                 foreach (var rotationSpeedEnabled in
@@ -35,7 +35,7 @@ namespace HelloCube.EnableableComponents
                 m_Timer = k_Interval;
             }
 
-            // The query only matches entities whose RotationSpeed is enabled.
+            // query 仅匹配启用了 RotationSpeed 的 entities。
             foreach (var (transform, speed) in
                      SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotationSpeed>>())
             {

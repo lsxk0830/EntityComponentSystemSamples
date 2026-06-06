@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Unity.DotsUISample
 {
-    // Base class for the UI elements
-    // Inherits from ScriptableObject so that the instances can be stored in a UnityObjectRef
+    // UI 元素的基类
+    // 继承自 ScriptableObject，以便实例可以存储在 UnityObjectRef 中
     public abstract class UIScreen : ScriptableObject
     {
         public const string k_VisibleClass = "screen-visible";

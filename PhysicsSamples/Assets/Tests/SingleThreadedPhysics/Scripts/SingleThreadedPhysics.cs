@@ -63,13 +63,13 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
     private Havok.Physics.SimulationContext HavokSimulationContext;
 #endif
 
-    // Static and dynamic rigid bodies
+    // 静态和动态刚体
     public unsafe void CreateRigidBodies()
     {
         NativeArray<RigidBody> dynamicBodies = PhysicsWorld.DynamicBodies;
         NativeArray<RigidBody> staticBodies = PhysicsWorld.StaticBodies;
 
-        // Creating dynamic bodies
+        // 创建动态主体
         {
             NativeArray<CustomCollider> colliders = CustomDynamicEntityGroup.ToComponentDataArray<CustomCollider>(Allocator.TempJob);
 
@@ -99,7 +99,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
             entities.Dispose();
         }
 
-        // Creating static bodies
+        // 创建静态物体
         {
             NativeArray<CustomCollider> colliders = CustomStaticEntityGroup.ToComponentDataArray<CustomCollider>(Allocator.TempJob);
 
@@ -121,7 +121,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
                 };
             }
 
-            // default static body
+            // 默认静态主体
             staticBodies[entities.Length] = new RigidBody
             {
                 WorldFromBody = new RigidTransform(quaternion.identity, float3.zero),
@@ -224,8 +224,8 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
                 EnableCollision = (byte)constrainedBodyPairs[i].EnableCollision,
                 Version = jointData.Version,
             };
-            // We have to memcopy the data over to convert it to the internal container
-            // as we do not have access to this internal container in the samples
+            // 我们必须将数据 memcopy 过来以将其转换到内部容器
+            // 因为我们无法访问示例中的这个内部容器
             unsafe
             {
                 ref var constraintsRef = ref joint.Constraints;
@@ -263,10 +263,10 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
         }
     }
 
-    // Custom data initialization
+    // 自定义数据初始化
     public void Initialize(Material referenceMaterial)
     {
-        // Key is new entity that gets copied from old entity
+        // 密钥是从旧 entity 复制的新 entity
         EntityQuery query = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[]
@@ -309,7 +309,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
                 Angular = 0.0f,
             };
 
-            // default gravity factor
+            // 默认重力系数
             var defaultGravityFactor = new PhysicsGravityFactor
             {
                 Value = 1.0f
@@ -370,7 +370,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
 
             var transform = EntityManager.GetComponentData<LocalTransform>(entities[i]);
             float3 position = transform.Position;
-            // The idea is that static bodies overlap, and dynamic ones are separated from original ones
+            // 这个想法是静态物体重叠，动态物体与原始物体分离
             transform.Position = new float3(position.x, position.y, position.z);
 
             EntityManager.SetComponentData(ghost, transform);
@@ -441,16 +441,16 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        // Make sure regular physics world is stepped
+        // 确保常规物理 world 是阶梯式的
         Dependency.Complete();
 
         int numDynamicBodies = CustomDynamicEntityGroup.CalculateEntityCount();
         int numStaticBodies = CustomStaticEntityGroup.CalculateEntityCount();
         int numJoints = JointEntityGroup.CalculateEntityCount();
 
-        numStaticBodies++; // + 1 for default static body
+        numStaticBodies++; // + 1 表示默认静态主体
 
-        // Build the world
+        // 构建 world
         {
             PhysicsWorld.Reset(numStaticBodies, numDynamicBodies, numJoints);
 
@@ -460,7 +460,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
             CreateJoints();
         }
 
-        // Step the world
+        // 步 world
         if (PhysicsWorld.NumDynamicBodies != 0)
         {
             PhysicsStep stepComponent = PhysicsStep.Default;
@@ -504,7 +504,7 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
 #endif
         }
 
-        // Export the data
+        // 导出数据
         ExportMotions(PhysicsWorld.DynamicBodies, PhysicsWorld.MotionDatas, PhysicsWorld.MotionVelocities);
     }
 
@@ -516,10 +516,10 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
 
         public void Execute()
         {
-            // Build broad phase
+            // 构建广阔阶段
             Input.World.CollisionWorld.BuildBroadphase(ref Input.World, Input.TimeStep, Input.Gravity);
 
-            // Step the simulation
+            // 步骤模拟
             Simulation.StepImmediate(Input, ref SimulationContext);
         }
     }
@@ -533,10 +533,10 @@ public partial class SingleThreadedPhysicsSystem : SystemBase
 
         public void Execute()
         {
-            // Build broad phase
+            // 构建广阔阶段
             Input.World.CollisionWorld.BuildBroadphase(ref Input.World, Input.TimeStep, Input.Gravity);
 
-            // Step the simulation
+            // 步骤模拟
             Havok.Physics.HavokSimulation.StepImmediate(Input, ref SimulationContext);
         }
     }

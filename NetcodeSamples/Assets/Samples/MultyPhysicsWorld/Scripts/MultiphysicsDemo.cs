@@ -11,7 +11,7 @@ using Unity.Physics.Systems;
 
 namespace Samples.MultyPhysicsWorld
 {
-    // RPC request from client to server for game to go "in game" and send snapshots / inputs
+    // RPC 从 client 向 server 请求游戏进入“游戏中”并发送 snapshots / 输入
     public struct GoInGameRequest : IRpcCommand
     {
     }
@@ -30,7 +30,7 @@ namespace Samples.MultyPhysicsWorld
         }
     }
 
-    // When client has a connection with network id, go in game and tell server to also go in game
+    // 当 client 与网络 id 连接时，进入游戏并告诉 server 也进入游戏
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation|WorldSystemFilterFlags.ThinClientSimulation)]
     public partial class GoInGameClientSystem : SystemBase
     {
@@ -54,7 +54,7 @@ namespace Samples.MultyPhysicsWorld
         }
     }
 
-    // When server receives go in game request, go in game and delete request
+    // 当 server 收到进入游戏请求时，进入游戏并删除请求
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial class GoInGameServerSystem : SystemBase
     {
@@ -76,7 +76,7 @@ namespace Samples.MultyPhysicsWorld
                 commandBuffer.DestroyEntity(reqEnt);
 
                 var entity = commandBuffer.Instantiate(spawner.prefab);
-                //Add the entity to the connection linked entity group so when connection is destroyed, ghost are too
+                //将 entity 添加到连接链接的 entity 组中，这样当连接被破坏时，ghost 也会被删除
                 var linkedEntityGroups = commandBuffer.AddBuffer<LinkedEntityGroup>(reqSrc.ValueRO.SourceConnection);
                 linkedEntityGroups.Add(entity);
 
@@ -101,7 +101,7 @@ namespace Samples.MultyPhysicsWorld
         public FixedString512Bytes ToFixedString() => $"h:{horizontal},v:{vertical},rot:{rotation}";
     }
 
-    // When server receives go in game request, go in game and delete request
+    // 当 server 收到进入游戏请求时，进入游戏并删除请求
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
     public partial class ImputSampling : SystemBase
     {
@@ -149,7 +149,7 @@ namespace Samples.MultyPhysicsWorld
         }
     }
 
-    // When server receives go in game request, go in game and delete request
+    // 当 server 收到进入游戏请求时，进入游戏并删除请求
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateBefore(typeof(PhysicsInitializeGroup))]
     public partial class CubeFlySystem : SystemBase
@@ -179,7 +179,7 @@ namespace Samples.MultyPhysicsWorld
                 var angularInpulse = new float3(0f, input.rotation, 0f) * deltaTime;
                 physicsVelocity.ApplyLinearImpulse(physicsMass, impulse);
                 physicsVelocity.ApplyAngularImpulse(physicsMass, angularInpulse);
-                //force the cube to be at 1 mt from the ground
+                //迫使立方体距离地面 1 米
                 //translation.Value.y = 0.7f + 0.1f*math.sin((float)(math.PI * predictTick * 1.0f/60f));
             }
         }
@@ -262,7 +262,7 @@ namespace Samples.MultyPhysicsWorld
                     emitter.random.InitState(1023932191);
                 while (--particles >= 0)
                 {
-                    // Create the first particle, then instantiate the rest based on its value
+                    // 创建第一个粒子，然后根据其值实例化其余粒子
                     var particle = commandBuffer.Instantiate(nativeThreadIndex, emitter.prefab);
                     float3 randomSpread = emitter.random.NextFloat3();
                     var originalScale = transformLookup[emitter.prefab];

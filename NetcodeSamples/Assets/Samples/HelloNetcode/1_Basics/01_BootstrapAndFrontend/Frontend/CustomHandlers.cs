@@ -10,13 +10,13 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// This driver constructor and network handler are the same as the default ones
-    /// from the Multiplayer SDK except the network handler contains two fixes. One where
-    /// the default driver constructor is overwritten but not replaced back after use, so
-    /// if you use sessions once then it will the be session driver constructor used next time
-    /// unless the default driver constructor is again set. And another where a query
-    /// checking for network disconnects doesn't verify the world still exists after waiting
-    /// for a delay and re-checking (will result in crash if world was destroyed while waiting).
+    /// 该驱动程序构造函数和网络处理程序与默认的相同
+    /// 来自多人游戏 SDK，但网络处理程序包含两个修复。一处
+    /// 默认驱动程序构造函数被覆盖，但在使用后不会替换回来，所以
+    /// 如果您使用一次会话，那么下次将使用会话驱动程序构造函数
+    /// 除非再次设置默认驱动程序构造函数。还有一个 query
+    /// 检查网络断开连接并不能验证等待后 world 是否仍然存在
+    /// 延迟并重新检查（如果 world 在等待时被破坏，将导致崩溃）。
     /// </summary>
     class CustomDriverConstructor : INetworkStreamDriverConstructor
     {
@@ -308,7 +308,7 @@ namespace Samples.HelloNetcode
                     await Task.Delay(100);
                     if (m_ClientWorld == null || !m_ClientWorld.IsCreated)
                     {
-                        return; // if world is gone after the yield immediately return, the query will already be disposed
+                        return; // 如果在收益立即返回后 world 消失，则 query 将已被处置
                     }
                 }
                 connectionQuery.Dispose();

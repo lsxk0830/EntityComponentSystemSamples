@@ -34,15 +34,15 @@ namespace Unity.DotsUISample
         public int EnergyCount;
     }
 
-    // buffer length should equal count of item types
-    // The count of items for each type
-    // collectableCountBuf[CollectableType.FireFlower] is count for the fire flowers, etc. 
+    // 缓冲区长度应等于项目类型的数量
+    // 每种类型的项目数量
+    // collectableCountBuf[CollectableType.FireFlower] 是火花等的计数。
     public struct CollectableCount : IBufferElementData
     {
         public int Count;
     }
 
-    // the player's items in the order they should appear in the inventory window
+    // 玩家的物品按照它们应该出现在库存窗口中的顺序排列
     public struct InventoryItem : IBufferElementData
     {
         public CollectableType Type;

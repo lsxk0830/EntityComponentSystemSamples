@@ -143,20 +143,20 @@ SubShader {
 			UNITY_VERTEX_OUTPUT_STEREO
 			float4	position		: SV_POSITION;
 			fixed4	color			: COLOR;
-			float2	atlas			: TEXCOORD0;		// Atlas
-			float4	param			: TEXCOORD1;		// alphaClip, scale, bias, weight
-			float4	mask			: TEXCOORD2;		// Position in object space(xy), pixel Size(zw)
+			float2	atlas			: TEXCOORD0;		// 阿特拉斯
+			float4	param			: TEXCOORD1;		// alphaClip，尺度，偏差，重量
+			float4	mask			: TEXCOORD2;		// 物体空间位置(xy)，像素大小(zw)
 			float3	viewDir			: TEXCOORD3;
 
 		    #if (UNDERLAY_ON || UNDERLAY_INNER)
-			float4	texcoord2		: TEXCOORD4;		// u,v, scale, bias
+			float4	texcoord2		: TEXCOORD4;		// u,v，尺度，偏差
 			fixed4	underlayColor	: COLOR1;
 		    #endif
 
 		    float4 textures			: TEXCOORD5;
 		};
 
-		// Used by Unity internally to handle Texture Tiling and Offset.
+		// 由 Unity 在内部使用来处理纹理平铺和偏移。
 		float4 _FaceTex_ST;
 		float4 _OutlineTex_ST;
 		float _UIMaskSoftnessX;
@@ -212,11 +212,11 @@ SubShader {
 			float2 bOffset = float2(x, y);
 		    #endif
 
-			// Generate UV for the Masking Texture
+			// 为遮罩纹理生成 UV
 			float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
 			float2 maskUV = (vert.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
 
-			// Support for texture tiling and offset
+			// 支持纹理平铺和偏移
 			float2 textureUV = input.texcoord1;
 			float2 faceUV = TRANSFORM_TEX(textureUV, _FaceTex);
 			float2 outlineUV = TRANSFORM_TEX(textureUV, _OutlineTex);
@@ -305,7 +305,7 @@ SubShader {
 			faceColor.rgb += glowColor.rgb * glowColor.a;
 		    #endif
 
-		// Alternative implementation to UnityGet2DClipping with support for softness.
+		// UnityGet2DClipping 的替代实现，支持软性。
 		    #if UNITY_UI_CLIP_RECT
 			half2 m = saturate((_ClipRect.zw - _ClipRect.xy - abs(input.mask.xy)) * input.mask.zw);
 			faceColor *= m.x * m.y;

@@ -34,12 +34,12 @@ namespace Unity.Physics.Authoring
             if (rb != null)
                 return rb.gameObject;
 
-            // for implicit static shape, first see if it is part of static optimized hierarchy
+            // 对于隐式静态形状，首先查看它是否是静态优化层次结构的一部分
             isStaticBody = FindTopmostStaticEnabledAncestor(shape, out var topStatic);
             if (topStatic != null)
                 return topStatic;
 
-            // otherwise, find topmost enabled Collider or PhysicsShapeAuthoring
+            // 否则，查找最顶层启用的 Collider 或 PhysicsShapeAuthoring
             var topCollider = FindTopmostEnabledAncestor(shape, PhysicsShapeExtensions_NonBursted.s_CollidersBuffer);
             var topShape = FindTopmostEnabledAncestor(shape, PhysicsShapeExtensions_NonBursted.s_ShapesBuffer);
 
@@ -61,14 +61,14 @@ namespace Unity.Physics.Authoring
 
             var bodyEntity = GetEntity(body, TransformUsageFlags.Dynamic);
 
-            // prepare the static root
+            // 准备静态根
             if (isStaticBody)
             {
                 var staticRootMarker = CreateAdditionalEntity(TransformUsageFlags.Dynamic, true, "StaticRootBakeMarker");
                 AddComponent(staticRootMarker, new BakeStaticRoot() { Body = bodyEntity, ConvertedBodyInstanceID = body.transform.GetInstanceID() });
             }
 
-            // Track dependencies to the transforms
+            // 跟踪转换的依赖关系
             Transform shapeTransform = GetComponent<Transform>(shape);
             Transform bodyTransform = GetComponent<Transform>(body);
             var instance = new ColliderInstanceBaking
@@ -90,19 +90,19 @@ namespace Unity.Physics.Authoring
 
             var rb = FindFirstEnabledAncestor(shapeGameObject, PhysicsShapeExtensions_NonBursted.s_RigidbodiesBuffer);
             var pb = FindFirstEnabledAncestor(shapeGameObject, PhysicsShapeExtensions_NonBursted.s_PhysicsBodiesBuffer);
-            // The Rigidbody cannot know about the Physics Shape Component. We need to take responsibility of baking the collider.
+            // 刚体无法了解 Physics 形状 Component。我们需要承担 baking 和 collider 的责任。
             if (rb || (!rb && !pb) && body == shapeGameObject)
             {
                 GetComponents(physicsShapeComponents);
                 GetComponents(colliderComponents);
-                // We need to check that there are no other colliders in the same object, if so, only the first one should do this, otherwise there will be 2 bakers adding this to the entity
-                // This will be needed to trigger BuildCompoundColliderBakingSystem
-                // If they are legacy Colliders and PhysicsShapeAuthoring in the same object, the PhysicsShapeAuthoring will add this
+                // 我们需要检查同一对象中是否有其他 colliders，如果有，则只有第一个应该这样做，否则会有 2 个 bakers 将其添加到 entity
+                // trigger BuildCompoundColliderBakingSystem 需要此信息
+                // 如果它们是同一对象中的旧版 Colliders 和 PhysicsShapeAuthoring，则 PhysicsShapeAuthoring 将添加此
                 if (colliderComponents.Count == 0 && physicsShapeComponents.Count > 0 && physicsShapeComponents[0].GetInstanceID() == shapeInstanceID)
                 {
                     var entity = GetEntity(TransformUsageFlags.Dynamic);
 
-                    // // Rigid Body bakes always add the PhysicsWorldIndex component and process transform
+                    // // 刚体烘焙始终添加 PhysicsWorldIndex component 并处理变换
                     if (!hasBodyComponent)
                     {
                         AddSharedComponent(entity, new PhysicsWorldIndex());
@@ -143,7 +143,7 @@ namespace Unity.Physics.Authoring
 
             if (mesh == null)
             {
-                // Try to get a mesh in the children
+                // 尝试在孩子们中建立网格
                 var filter = GetComponentInChildren<MeshFilter>();
                 if (filter != null && filter.sharedMesh != null)
                 {
@@ -175,7 +175,7 @@ namespace Unity.Physics.Authoring
             }
             else
             {
-                // Try to get all the meshes in the children
+                // 尝试获取子级中的所有网格
                 var meshFilters = GetComponentsInChildren<MeshFilter>();
 
                 foreach (var meshFilter in meshFilters)
@@ -185,13 +185,13 @@ namespace Unity.Physics.Authoring
                         var shapeAuthoring = GetComponent<PhysicsShapeAuthoring>(meshFilter);
                         if (shapeAuthoring != null && shapeAuthoring != shape)
                         {
-                            // Skip this case, since it will be treated independently
+                            // 跳过此案例，因为它将被单独处理
                             continue;
                         }
 
                         meshes.Add(meshFilter.sharedMesh);
 
-                        // Don't calculate the children to shape if not needed, to avoid approximation that could prevent collider to be shared
+                        // 如果不需要，请勿计算子项形状，以避免可能阻止共享 collider 的近似值
                         if (shape.transform.localToWorldMatrix.Equals(meshFilter.transform.localToWorldMatrix))
                             childrenToShape.Add(float4x4.identity);
                         else
@@ -224,7 +224,7 @@ namespace Unity.Physics.Authoring
                     );
                 }
 
-                // Combine submeshes manually
+                // 手动组合子网格
                 numVertices += meshes[i].vertexCount;
                 var combinedSubmeshes = new UnityEngine.Mesh();
                 combinedSubmeshes.vertices = currentMesh.vertices;
@@ -268,39 +268,39 @@ namespace Unity.Physics.Authoring
             var localToWorld = (float4x4)shapeTransform.localToWorldMatrix;
             var bodyLocalToWorld = (float4x4)bodyTransform.transform.localToWorldMatrix;
 
-            // We don't bake pure uniform scales into colliders since edit-time uniform scales
-            // are baked into the entity's LocalTransform.Scale property, unless the shape has non-identity scale
-            // relative to its contained body. In this case we need to bake all scales into the collider geometry.
+            // 我们不会将纯均匀尺度烘焙到 colliders 中，因为编辑时均匀尺度
+            // 被烘焙到 entity 的 LocalTransform.Scale 属性中，除非形状具有非同一比例
+            // 相对于它所包含的身体。在这种情况下，我们需要将所有比例烘焙到 collider 几何体中。
             var relativeTransform = math.mul(math.inverse(bodyLocalToWorld), localToWorld);
 
             var hasNonIdentityScaleRelativeToBody = relativeTransform.HasNonIdentityScale();
             var hasShearRelativeToBody = relativeTransform.HasShear();
             var bakeUniformScale = hasNonIdentityScaleRelativeToBody || hasShearRelativeToBody;
 
-            // If the body transform has purely uniform scale, and there is any scale or shear between the body and the shape,
-            // then we need to extract the uniform body scale from the shape transform before baking
-            // to prevent the shape from being scaled by the body's uniform scale twice. This is because pure top level body uniform scales
-            // are not baked into collider geometry but represented by the body entity's LocalTransform.Scale property.
+            // 如果身体变换具有纯粹均匀的比例，并且身体和形状之间存在任何比例或剪切，
+            // 那么我们需要在 baking 之前从形状变换中提取统一的身体比例
+            // 防止形状被身体的统一尺度缩放两次。这是因为纯粹的顶级体质均匀的鳞片
+            // 不会烘焙到 collider 几何体中，而是由主体 entity 的 LocalTransform.Scale 属性表示。
             if (bakeUniformScale)
             {
                 var bodyHasShear = bodyLocalToWorld.HasShear();
                 var bodyHasNonUniformScale = bodyLocalToWorld.HasNonUniformScale();
                 if (!bodyHasShear && !bodyHasNonUniformScale)
                 {
-                    // extract uniform scale of body and remove it from the shape transform
+                    // 提取身体的均匀尺度并将其从形状变换中删除
                     var bodyScale = bodyLocalToWorld.DecomposeScale();
                     var bodyScaleInverse = 1 / bodyScale;
                     localToWorld = math.mul(localToWorld, float4x4.Scale(bodyScaleInverse));
                 }
             }
 
-            // bake uniform scale only if required (see above), and always bake shear and non-uniform scales into the collider geometry
+            // 仅在需要时烘焙均匀比例（参见上文），并始终将剪切和非均匀比例烘焙到 collider 几何体中
             var colliderBakeMatrix = float4x4.identity;
             if (bakeUniformScale || localToWorld.HasShear() || localToWorld.HasNonUniformScale())
             {
                 var rigidBodyTransform = Math.DecomposeRigidBodyTransform(localToWorld);
                 colliderBakeMatrix = math.mul(math.inverse(new float4x4(rigidBodyTransform)), localToWorld);
-                // make sure we have a valid transformation matrix
+                // 确保我们有一个有效的变换矩阵
                 colliderBakeMatrix.c0[3] = 0;
                 colliderBakeMatrix.c1[3] = 0;
                 colliderBakeMatrix.c2[3] = 0;
@@ -373,7 +373,7 @@ namespace Unity.Physics.Authoring
         {
             if (GetMeshes(shape, out var meshes, out var childrenToShape))
             {
-                // Combine all detected meshes into a single one
+                // 将所有检测到的网格合并为一个网格
                 var mesh = CombineMeshes(shape, meshes, childrenToShape);
                 if (!mesh.IsValidForConversion(shape.gameObject))
                 {
@@ -404,24 +404,24 @@ namespace Unity.Physics.Authoring
         {
             var shapeBakingData = new PhysicsColliderAuthoringData();
 
-            // First pass
+            // 第一关
             Profiler.BeginSample("Collect Inputs from Authoring Components");
 
             if (ShouldConvertShape(authoring))
             {
-                // We can have multiple Colliders of the same type on the same game object, so instead of adding the components to the baking entity
-                // we add the components to an additional entity. These new entities will be processed by the baking system
+                // 我们可以在同一个游戏对象上拥有多个相同类型的 Colliders，因此不要将 components 添加到 baking entity
+                // 我们将 components 添加到附加 entity。这些新的 entities 将由 baking system 进行处理
                 var colliderEntity = CreateAdditionalEntity(TransformUsageFlags.None, true);
                 shapeBakingData.ShapeComputationalData = GetInputDataFromAuthoringComponent(authoring, colliderEntity);
                 AddComponent(colliderEntity, shapeBakingData);
 
-                // The data will be filled in by the BaseShapeBakingSystem, but we add it here so it gets reverted from the entity if the collider component is deleted
+                // 数据将由 BaseShapeBakingSystem 填充，但我们将其添加到此处，以便在删除 collider component 时从 entity 恢复数据
                 AddComponent(colliderEntity, new PhysicsColliderBakedData()
                 {
                     BodyEntity = shapeBakingData.ShapeComputationalData.Instance.BodyEntity,
                     BodyFromShape = shapeBakingData.ShapeComputationalData.Instance.BodyFromShape,
                     ChildEntity = shapeBakingData.ShapeComputationalData.Instance.ChildEntity,
-                    // It is a leaf if the Shape Entity equals Body Entity
+                    // 如果 Shape Entity 等于 Body Entity 则为叶子
                     IsLeafEntityBody = (shapeBakingData.ShapeComputationalData.Instance.ShapeEntity.Equals(shapeBakingData.ShapeComputationalData.Instance.BodyEntity))
                 });
             }

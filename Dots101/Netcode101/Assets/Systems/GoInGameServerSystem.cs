@@ -7,7 +7,7 @@ using Unity.Transforms;
 
 namespace KickBall
 {
-    // When server receives GoInGameRequest, ready the client to receive ghosts, spawn the player character, and delete the RPC request
+    // 当 server 接收到 GoInGameRequest 时，准备好 client 来接收 ghosts，生成玩家角色，并删除 RPC 请求
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial struct GoInGameServerSystem : ISystem
     {
@@ -32,19 +32,19 @@ namespace KickBall
             {
                 ecb.AddComponent<NetworkStreamInGame>(requestSource.ValueRO.SourceConnection);
 
-                // spawn player
+                // 生成玩家
                 {
                     var networkId = SystemAPI.GetComponent<NetworkId>(requestSource.ValueRO.SourceConnection);
 
                     var player = ecb.Instantiate(playerPrefab);
                     ecb.SetComponent(player, new GhostOwner { NetworkId = networkId.Value });
 
-                    // Set color for player based on their network ID.
+                    // 根据玩家的网络 ID 设置颜色。
                     var rand = Random.CreateFromIndex((uint)networkId.Value);
                     ecb.SetComponent(player, new Color { Value = new float4(rand.NextFloat3(), 0) });
 
-                    // Add the player to the linked entity group so it is destroyed automatically on disconnect
-                    ecb.AppendToBuffer(requestSource.ValueRO.SourceConnection, new LinkedEntityGroup { Value = player });    
+                    // 将播放器添加到链接的 entity 组中，以便在断开连接时自动销毁
+                    ecb.AppendToBuffer(requestSource.ValueRO.SourceConnection, new LinkedEntityGroup { Value = player });
                 }
 
                 ecb.DestroyEntity(requestEntity);

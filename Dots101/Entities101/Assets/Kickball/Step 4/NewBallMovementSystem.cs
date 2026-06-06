@@ -25,7 +25,7 @@ namespace Tutorials.Kickball.Step4
         {
             var config = SystemAPI.GetSingleton<Config>();
             var obstacleQuery = SystemAPI.QueryBuilder().WithAll<LocalTransform, Obstacle>().Build();
-            var minDist = config.ObstacleRadius + 0.5f; // the ball radius is 0.5f
+            var minDist = config.ObstacleRadius + 0.5f; // 球半径为 0.5f
 
             var job = new BallMovementJob
             {
@@ -38,9 +38,9 @@ namespace Tutorials.Kickball.Step4
         }
     }
 
-    // The implicit query of this IJobEntity matches all entities having LocalTransform, Velocity, and Ball components.
+    // 此 IJobEntity 的隐式 query 与具有 LocalTransform、Velocity 和 Ball components 的所有 entities 匹配。
     [WithAll(typeof(Ball))]
-    [WithDisabled(typeof(Carry))]  // Relevant in Step 5
+    [WithDisabled(typeof(Carry))]  // 与第 5 步相关
     [BurstCompile]
     public partial struct BallMovementJob : IJobEntity
     {

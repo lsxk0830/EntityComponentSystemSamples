@@ -1,5 +1,5 @@
-// The purpose of this demo is to show how to create mesh colliders at runtime. The demo uses trigger events as a way to
-// interact during runtime for a collider creation event to take place.
+// 此演示的目的是展示如何在运行时创建网格 colliders。该演示使用 trigger 事件作为一种方式
+// 在运行时进行交互以发生 collider 创建事件。
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;

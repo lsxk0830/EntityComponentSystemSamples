@@ -49,7 +49,7 @@ namespace Streaming.SceneManagement.StreamingVolume
 
         public static void DrawAABB(in float3 pos, in float3 min, in float3 max, in Color color)
         {
-            // Draw a bounding box
+            // 绘制边界框
             Debug.DrawLine(pos + new float3(min.x, min.y, min.z), pos + new float3(max.x, min.y, min.z), color);
             Debug.DrawLine(pos + new float3(min.x, max.y, min.z), pos + new float3(max.x, max.y, min.z), color);
             Debug.DrawLine(pos + new float3(min.x, min.y, min.z), pos + new float3(min.x, max.y, min.z), color);

@@ -77,7 +77,7 @@ public partial struct ChangeColliderTypeSystem : ISystem
                     }
                     else
                     {
-                        // keep updateCollider as-is
+                        // 保持 updateCollider 原样
                         updateMeshInfo =
                             state.EntityManager.GetComponentData<MaterialMeshInfo>(modifier.ValueRW.EntityA);
                     }

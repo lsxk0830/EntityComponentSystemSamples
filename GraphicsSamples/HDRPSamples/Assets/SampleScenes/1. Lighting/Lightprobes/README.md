@@ -1,18 +1,18 @@
-# Lightprobes
+# 光探针
 
-This sample demonstrates lightprobe support for Entities.
+此示例演示了 lightprobe 对 Entities 的支持。
 
 <img src="../../../../READMEimages/Lightprobes.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains spheres that uses different lit shaders. This sample uses light probes to light the scene.
+scene 包含使用不同光照着色器的球体。此示例使用光探针照亮 scene。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select the Subscene
-2. In the Inspector, click **Open**
-3. Note that in the subscene, the lights are Static and the spheres are not Static
-4. Go to: **Window > Rendering > Lighting**
-5. In the Scene tab, make sure to enable **Baked Global Illumination**. Configure the lightmap settings, click **Generate Lighting**
-6. Save the scene and the Subscene, and then Close the Subscene
+1. 在 Hierarchy 中，选择子场景
+2. 在 Inspector 中，单击“**打开**”
+3. 请注意，在 subscene 中，灯光是静态的，而球体不是静态的
+4. 转到：**窗口 > 渲染 > 照明**
+5. 在 Scene 选项卡中，确保启用 **烘焙全局照明**。配置光照贴图设置，单击**生成光照**
+6. 保存 scene 和子场景，然后关闭子场景

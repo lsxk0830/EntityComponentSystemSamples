@@ -24,7 +24,7 @@ namespace Streaming.SceneManagement.CompleteSample
         }
     }
 
-    // Runtime information with the distance range to load and unload the section
+    // 运行时信息以及加​​载和卸载该部分的距离范围
     public struct TileLODRange : IComponentData
     {
         public float LowerRadiusSq;
@@ -47,7 +47,7 @@ namespace Streaming.SceneManagement.CompleteSample
         public Entity Value;
     }
 
-    // Used to indicate that Section 0 needs to be loaded.
+    // 用来表示需要加载 Section 0。
     public struct LoadSection0 : IComponentData
     {
     }

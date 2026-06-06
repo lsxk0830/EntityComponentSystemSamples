@@ -110,7 +110,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
         var entities = new NativeList<Entity>(Allocator.Temp);
         var rangeModifier = new float2(math.max(0, math.min(rangeGain, 1)));
 
-        // Head
+        // 头
         float headRadius = 0.1f;
         float3 headPosition = new float3(0, 1.8f, headRadius);
         Entity head;
@@ -127,7 +127,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
         }
         entities.Add(head);
 
-        // Torso
+        // 躯干
         float3 torsoSize;
         float3 torsoPosition;
         Entity torso;
@@ -153,7 +153,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
         }
         entities.Add(torso);
 
-        // Neck
+        // 脖子
         {
             float3 pivotHead = new float3(0, -headRadius, 0);
             float3 pivotTorso = math.transform(math.inverse(GetBodyTransform(torso)), math.transform(GetBodyTransform(head), pivotHead));
@@ -174,7 +174,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
             CreateJoint(ragdoll1, head, torso);
         }
 
-        // Arms
+        // 武器
         {
             float armLength = 0.25f;
             float armRadius = 0.05f;
@@ -224,7 +224,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                 entities.Add(foreArm);
                 entities.Add(hand);
 
-                // shoulder
+                // 肩膀
                 {
                     float3 pivotArm = new float3(-s * armLength / 2.0f, 0, 0);
                     float3 pivotTorso = math.transform(math.inverse(GetBodyTransform(torso)), math.transform(GetBodyTransform(upperArm), pivotArm));
@@ -245,7 +245,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                     CreateJoint(ragdoll1, upperArm, torso);
                 }
 
-                // elbow
+                // 弯头
                 {
                     float3 pivotUpper = new float3(s * armLength / 2.0f, 0, 0);
                     float3 pivotFore = -pivotUpper;
@@ -260,7 +260,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                     CreateJoint(hinge, foreArm, upperArm);
                 }
 
-                // wrist
+                // 手腕
                 {
                     float3 pivotFore = new float3(s * armLength / 2.0f, 0, 0);
                     float3 pivotHand = new float3(-s * handLength / 2.0f, 0, 0);
@@ -276,7 +276,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
             }
         }
 
-        // Pelvis
+        // 骨盆
         float pelvisRadius = 0.08f;
         float pelvisLength = 0.22f;
         float3 pelvisPosition = torsoPosition - new float3(0, pelvisRadius * 0.75f, 0.0f);
@@ -294,7 +294,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
         }
         entities.Add(pelvis);
 
-        // Waist
+        // 腰部
         {
             float3 pivotTorso = float3.zero;
             float3 pivotPelvis = math.transform(math.inverse(GetBodyTransform(pelvis)), math.transform(GetBodyTransform(torso), pivotTorso));
@@ -311,7 +311,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
             CreateJoint(ragdoll1, pelvis, torso);
         }
 
-        // Legs
+        // 腿
         {
             float thighLength = 0.32f;
             float thighRadius = 0.08f;
@@ -362,7 +362,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                 entities.Add(calf);
                 entities.Add(foot);
 
-                // hip
+                // 时髦的
                 {
                     float3 pivotThigh = new float3(0, thighLength / 2.0f, 0);
                     float3 pivotPelvis = math.transform(math.inverse(GetBodyTransform(pelvis)), math.transform(GetBodyTransform(thigh), pivotThigh));
@@ -383,7 +383,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                     CreateJoint(ragdoll1, thigh, pelvis);
                 }
 
-                // knee
+                // 膝盖
                 {
                     float3 pivotThigh = new float3(0, -thighLength / 2.0f, 0);
                     float3 pivotCalf = math.transform(math.inverse(GetBodyTransform(calf)), math.transform(GetBodyTransform(thigh), pivotThigh));
@@ -398,7 +398,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
                     CreateJoint(hinge, calf, thigh);
                 }
 
-                // ankle
+                // 踝
                 {
                     float3 pivotCalf = new float3(0, -calfLength / 2.0f, 0);
                     float3 pivotFoot = float3.zero;
@@ -414,7 +414,7 @@ public partial class RagdollDemoSystem : SceneCreationSystem<RagdollDemoScene>
             }
         }
 
-        // reposition with offset information
+        // 使用偏移信息重新定位
         if (entities.Length > 0)
         {
             for (int i = 0; i < entities.Length; i++)

@@ -1,9 +1,9 @@
-// Is checking if the number of collision events is correct. There should be 4 collision events:
-// 1) DynamicCube & Floor
+// 正在检查碰撞事件的数量是否正确。应该有 4 个碰撞事件：
+// 1) DynamicCube & 地板
 // 2) KinematicCube & DynamicCubeOnKinematic
-// 3) PenetratingKinematicCube & Floor
+// 3) PenetratingKinematicCube & 地板
 // 4) PenetratingKinematicCubeInTheAir1 & PenetratingKinematicCubeInTheAir2
-// Note that there is a 0.01 gap between KinematicCubeInTheAir1 and KinematicCubeInTheAir2: no collision event here.
+// Note KinematicCubeInTheAir1 和 KinematicCubeInTheAir2 之间有 0.01 的差距：这里没有碰撞事件。
 using System;
 using Unity.Collections;
 using Unity.Entities;

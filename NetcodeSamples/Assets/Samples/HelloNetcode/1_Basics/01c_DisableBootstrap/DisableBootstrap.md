@@ -1,28 +1,28 @@
-# HelloNetcode Disabling the Bootstrap
+# HelloNetcode 禁用 Bootstrap
 
-When the Entities package is installed, it automatically creates a 'Default World' via its custom bootstrapping (see `Unity.Entities.AutomaticWorldBootstrap` class),
-so that authoring components in the loaded scenes can be injected (upon entering Play Mode) via a fast-path.
+安装 Entities package 时，它会通过其自定义引导自动创建“默认 World”（请参阅​​ `Unity.Entities.AutomaticWorldBootstrap` 类），
+这样加载的 scenes 中的 authoring components 就可以通过快速路径注入（进入 Play Mode 后）。
 
-Similarly, Netcode for Entities overrides this (via `ClientServerBootstrap` implementing `ICustomBoostrap`) to create two worlds by default;
-[a client world, and a server world](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/client-server-worlds.html).
-Each are automatically injected with the appropriate authoring data,
-and [this is how they automatically connect at startup](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html#connection-flow).
+类似地，Netcode for Entities 会覆盖它（通过 `ClientServerBootstrap` 实现 `ICustomBoostrap`）以默认创建两个 worlds；
+[client world 和 server world](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/client-server-worlds.html)。
+每个都会自动注入适当的 authoring 数据，
+[这就是它们在启动时自动连接的方式](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html#connection-flow)。
 
-## Requirements
+## 要求
 
-In some situations, it's undesirable to have worlds automatically created at start-up (e.g. when booting to a UI frontend, rather than a game scene).
-Therefore, netcode provides a few ways to disable the automatic Entities bootstrapping:
-1. Project-wide: Implement an `ICustomBoostrap` by inheriting from `ClientServerBootstrap`. See the [Bootstrap/FrontendBootstrap.cs](../01_BootstrapAndFrontend/Bootstrap/FrontendBootstrap.cs) file for an example.
-2. Project-wide: Create a `NetcodeConfig`, set its `EnableClientServerBootstrap` enum to `EnableBootstrapSetting.DisableAutomaticBootstrap`, and then set this `ScriptableObject` as the default via the 'Netcode for Entities' Project Settings. 
-3. Per-Scene Override: Add the `OverrideAutomaticNetcodeBootstrap` to a root `GameObject` in your active scene, and set its field to `EnableBootstrapSetting.DisableAutomaticBootstrap`.
+在某些情况下，不希望在启动时自动创建 worlds（e.g。当启动到 UI 前端，而不是游戏 scene 时）。
+因此，netcode 提供了几种禁用自动 Entities 引导的方法：
+1. 项目范围：通过继承 `ClientServerBootstrap` 来实现 `ICustomBoostrap`。有关示例，请参阅 [Bootstrap/FrontendBootstrap.cs](../01_BootstrapAndFrontend/Bootstrap/FrontendBootstrap.cs) 文件。
+2. 项目范围：创建一个 `NetcodeConfig`，将其 `EnableClientServerBootstrap` 枚举设置为 `EnableBootstrapSetting.DisableAutomaticBootstrap`，然后通过“Netcode for Entities”项目设置将此 `ScriptableObject` 设置为默认值。
+3. Per-Scene 覆盖：将 `OverrideAutomaticNetcodeBootstrap` 添加到活动 scene 中的根 ZXQOZUDYKTF​​WVESZXQ，并将其字段设置为 `EnableBootstrapSetting.DisableAutomaticBootstrap`。
 
 >[!NOTE]
-> The per-scene override `OverrideAutomaticNetcodeBootstrap` can also be used to re-enable bootstrapping selectively, if disabled project-wide via `NetcodeConfig` Project Setting.
+> 如果通过 `NetcodeConfig` 项目设置在项目范围内禁用，则每个 scene 覆盖 `OverrideAutomaticNetcodeBootstrap` 也可用于有选择地重新启用引导。
 
-## Adhering to `EnableBootstrapSetting.DisableAutomaticBootstrap` overrides in user-code `ICustomBootstrap`/`ClientServerBootstrap` implementations 
+## 遵守用户代码 `ICustomBootstrap`/`ClientServerBootstrap` 实现中的 `EnableBootstrapSetting.DisableAutomaticBootstrap` 覆盖
 
-If you write your own `ICustomBoostrap` implementation, it will **not** automatically respect `OverrideAutomaticNetcodeBootstrap`, nor any `NetcodeConfig.Global` setting.
-To query these two settings via your own bootstrapper, call `DetermineIfBootstrappingEnabled` as follows:
+如果您编写自己的 `ICustomBoostrap` 实现，它将**不会**自动尊重 `OverrideAutomaticNetcodeBootstrap` 或任何 `NetcodeConfig.Global` 设置。
+通过您自己的引导程序对 query 这两个设置进行调用，如下所示：
 
 ```csharp
     // The preserve attribute is required to make sure the bootstrap is not stripped in il2cpp builds with stripping enabled.
@@ -37,16 +37,16 @@ To query these two settings via your own bootstrapper, call `DetermineIfBootstra
             // or disabled Bootstrapping project-wide via a `NetcodeConfig.Global`, we should respect that here.
             if (!DetermineIfBootstrappingEnabled())
                 return false;
-            
+
             ...
         }
     }
 ```
 
-Alternatively, you can query only for the `OverrideAutomaticNetcodeBootstrap` by calling `DiscoverAutomaticNetcodeBootstrap`, which returns the `MonoBehaviour` if found (and `null` if not).
+或者，您可以通过调用 `DiscoverAutomaticNetcodeBootstrap` 仅为 `OverrideAutomaticNetcodeBootstrap` 提供 query，如果找到，则返回 `MonoBehaviour`（如果没有，则返回 `null`）。
 
-## Sample description
+## 示例描述
 
-This DisableBootstrap sample makes use of the `OverrideAutomaticNetcodeBootstrap` approach to disable bootstrapping exclusively for this scene.
-I.e. You can observe - upon entering Play Mode from the [DisableBootstrap scene](DisableBootstrap.unity) - that no netcode worlds are created.
-We recommend viewing and debugging netcode worlds (and their connections) via the [Netcode for Entities PlayMode Tools Window](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/playmode-tool.html), which also contains many other netcode configuration options, including further bootstrap customization.
+此 DisableBootstrap 示例利用 `OverrideAutomaticNetcodeBootstrap` 方法专门为此 scene 禁用引导。
+I.e。您可以观察到 - 从 [DisableBootstrap scene](DisableBootstrap.unity) 输入 Play Mode - 没有创建Netcode worlds。
+我们建议通过 [Netcode for Entities PlayMode 工具窗口](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/playmode-tool.html) 查看和调试Netcode worlds（及其连接），该窗口还包含许多其他Netcode配置选项，包括进一步的引导自定义。

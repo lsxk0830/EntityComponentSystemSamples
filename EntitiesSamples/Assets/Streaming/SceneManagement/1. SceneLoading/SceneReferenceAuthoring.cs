@@ -14,8 +14,8 @@ namespace Streaming.SceneManagement.SceneLoading
         {
             public override void Bake(SceneReferenceAuthoring authoring)
             {
-                // We want to create a dependency to the scene in case the scene gets deleted.
-                // This needs to be outside the null check below in case the asset file gets deleted and then restored.
+                // 我们希望创建对 scene 的依赖关系，以防 scene 被删除。
+                // 这需要在下面的空检查之外，以防资产文件被删除然后恢复。
                 DependsOn(authoring.scene);
 
                 if (authoring.scene != null)
@@ -23,7 +23,7 @@ namespace Streaming.SceneManagement.SceneLoading
                     var entity = GetEntity(TransformUsageFlags.None);
                     AddComponent(entity, new SceneReference
                     {
-                        // Bake a reference to the scene, to be used at runtime to load the scene
+                        // 烘焙对 scene 的引用，以在运行时加载 scene
                         Value = new EntitySceneReference(authoring.scene)
                     });
                 }
@@ -32,10 +32,10 @@ namespace Streaming.SceneManagement.SceneLoading
 #endif
     }
 
-    // Triggers the load of the referenced scene
+    // 触发引用的 scene 的负载
     public struct SceneReference : IComponentData
     {
-        // Reference to the scene to load
+        // 参考 scene 来加载
         public EntitySceneReference Value;
     }
 }

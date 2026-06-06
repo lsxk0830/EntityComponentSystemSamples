@@ -6,8 +6,8 @@ using UnityEngine;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Stores the raw last hit data from the <see cref="ShootingSystem"/>, to be processed into either
-    /// <see cref="ClientHitMarker"/> or <see cref="ServerHitMarker"/> by <see cref="ApplyHitMarkSystem"/>.
+    /// 存储来自 <see cref="ShootingSystem"/> 的原始最后命中数据，以处理为
+    /// <see cref="ClientHitMarker"/> 或 <see cref="ServerHitMarker"/> 由 <see cref="ApplyHitMarkSystem"/>。
     /// </summary>
     public struct Hit : IComponentData
     {

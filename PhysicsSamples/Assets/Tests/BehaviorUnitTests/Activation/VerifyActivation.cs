@@ -57,7 +57,7 @@ namespace Unity.Physics.Tests
     {
         public override void CreateScene(VerifyActivationScene sceneSettings)
         {
-            // Common params
+            // 常用参数
             float3 groundSize = new float3(5.0f, 1.0f, 5.0f);
             float3 boxSize = new float3(1.0f, 1.0f, 1.0f);
             float mass = 1.0f;
@@ -65,7 +65,7 @@ namespace Unity.Physics.Tests
             Entity e = SystemAPI.ManagedAPI.GetSingletonEntity<VerifyActivationScene>();
             VerifyActivationData data = SystemAPI.GetComponent<VerifyActivationData>(e);
 
-            // Ground to do nothing on (other than filter change) and dynamic box over it
+            // 地面不做任何事情（除了更换过滤器）和动态盒在其上
             if (data.PureFilter == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -77,7 +77,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Ground to remove and dynamic box over it
+            // 接地以移除其上的动态框
             if (data.Remove == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -89,7 +89,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Ground to convert to dynamic and dynamic box over it
+            // 地面转换为动态并在其上方动态框
             if (data.MotionChange == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -101,7 +101,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Ground to teleport and dynamic box over it
+            // 地面传送和其上的动态框
             if (data.Teleport == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -113,7 +113,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Ground to change collider of and dynamic box over it
+            // 接地改 collider 及其上的动力盒
             if (data.ColliderChange == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -125,7 +125,7 @@ namespace Unity.Physics.Tests
                 CreatedColliders.Add(boxCollider);
             }
 
-            // Ground to set new collider on and dynamic box over it
+            // 地面设置新的 collider 和动态盒在其上
             if (data.NewCollider == 1)
             {
                 var groundCollider = BoxCollider.Create(new BoxGeometry { Orientation = quaternion.identity, Size = groundSize });
@@ -172,7 +172,7 @@ namespace Unity.Physics.Tests
             {
                 VerifyActivationSystem system = state.World.GetExistingSystemManaged<VerifyActivationSystem>();
 
-                // First change filter of all ground colliders to collide with nothing
+                // 先换滤镜 colliders 全地无碰撞
                 var bpwData = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(state.World.GetExistingSystem<BuildPhysicsWorld>());
                 var staticEntities = bpwData.StaticEntityGroup.ToEntityArray(Allocator.TempJob);
                 for (int i = 0; i < staticEntities.Length; i++)
@@ -190,21 +190,21 @@ namespace Unity.Physics.Tests
                 var verificationData = m_VerificationGroup.ToEntityArray(Allocator.TempJob);
                 var verificationComponentData = m_ActivationData[verificationData[0]];
 
-                // Do nothing for ground 0 (other than filter change)
+                // 对接地 0 不执行任何操作（除了更换滤波器）
                 int counter = 0;
                 if (verificationComponentData.PureFilter > 0)
                 {
                     counter++;
                 }
 
-                // Completely remove one ground (1)
+                // 完全移除一处地面 (1)
                 if (verificationComponentData.Remove > 0)
                 {
                     state.EntityManager.DestroyEntity(staticEntities[counter]);
                     counter++;
                 }
 
-                // Convert one ground to dynamic object (2)
+                // 将地面转换为动态物体 (2)
                 if (verificationComponentData.MotionChange > 0)
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[counter]);
@@ -217,7 +217,7 @@ namespace Unity.Physics.Tests
                     counter++;
                 }
 
-                // Teleport one ground (3)
+                // 传送一地 (3)
                 if (verificationComponentData.Teleport > 0)
                 {
 
@@ -228,7 +228,7 @@ namespace Unity.Physics.Tests
                     counter++;
                 }
 
-                // Change collider of one ground (4)
+                // 改一地 collider (4)
                 if (verificationComponentData.ColliderChange > 0)
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[counter]);
@@ -240,7 +240,7 @@ namespace Unity.Physics.Tests
                     counter++;
                 }
 
-                // Set new collider of one ground (5)
+                // 一地新 collider (5)
                 if (verificationComponentData.NewCollider > 0)
                 {
                     var colliderComponent = state.EntityManager.GetComponentData<PhysicsCollider>(staticEntities[counter]);
@@ -256,7 +256,7 @@ namespace Unity.Physics.Tests
             }
             else if (m_Counter == 40)
             {
-                // Verify that all boxes started falling after the ground was changed
+                // 验证地面改变后所有盒子都开始掉落
                 var bpwData = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(state.World.GetExistingSystem<BuildPhysicsWorld>());
                 var dynamicEntities = bpwData.DynamicEntityGroup.ToEntityArray(Allocator.TempJob);
                 for (int i = 0; i < dynamicEntities.Length; i++)

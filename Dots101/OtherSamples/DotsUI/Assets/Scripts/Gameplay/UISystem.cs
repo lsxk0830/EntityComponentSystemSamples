@@ -7,7 +7,7 @@ namespace Unity.DotsUISample
     public partial struct UISystem : ISystem
     {
         private InterfaceState lastInterfaceState;
-        
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameData>();
@@ -24,18 +24,18 @@ namespace Unity.DotsUISample
             }
 
             var screens = SystemAPI.GetSingleton<UIScreens>();
-            
+
             screens.HintScreen.Value.Hide();
-            
+
             foreach (var evt in
                      SystemAPI.Query<RefRO<CollectableProximityEvent>>())
             {
                 screens.HintScreen.Value.SetMessage("COLLECT");
                 screens.HintScreen.Value.Show();
                 screens.HintScreen.Value.SetPosition(evt.ValueRO.Position, screens.Camera.Value);
-                
+
             }
-            
+
             foreach (var evt in
                      SystemAPI.Query<RefRO<CauldronProximityEvent>>())
             {
@@ -72,13 +72,13 @@ namespace Unity.DotsUISample
                      SystemAPI.Query<RefRO<PickupEvent>>())
             {
                 var player = SystemAPI.GetSingleton<Player>();
-                screens.InventoryScreen.Value.UpdateInventory(SystemAPI.GetSingletonBuffer<InventoryItem>(), 
+                screens.InventoryScreen.Value.UpdateInventory(SystemAPI.GetSingletonBuffer<InventoryItem>(),
                     player.EnergyCount, game.ValueRO.Collectables.Value);
                 screens.QuestScreen.Value.UpdateMessage(SystemAPI.GetSingletonBuffer<CollectableCount>(),
                     game.ValueRO.Collectables.Value, game.ValueRO.Quest.Value.HasAllItems);
             }
 
-            if (GameInput.ShowInventory.WasPerformedThisFrame()) 
+            if (GameInput.ShowInventory.WasPerformedThisFrame())
             {
                 if (game.ValueRW.InterfaceState == InterfaceState.Inventory)
                 {
@@ -94,10 +94,10 @@ namespace Unity.DotsUISample
             {
                 game.ValueRW.InterfaceState = InterfaceState.Questing;
             }
-            
+
             if (lastInterfaceState != game.ValueRW.InterfaceState)
             {
-                // set render state
+                // 设置渲染状态
                 switch (game.ValueRW.InterfaceState)
                 {
                     case InterfaceState.Questing:

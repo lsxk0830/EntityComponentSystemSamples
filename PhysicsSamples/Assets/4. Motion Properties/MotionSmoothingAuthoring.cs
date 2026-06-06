@@ -2,10 +2,10 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-// this script forces a lower fixed time step for both GO and DOTS physics to demonstrate motion smoothing
+// 该脚本强制 GO 和 DOTS 物理采用较低的固定时间步长，以演示运动平滑
 class MotionSmoothingAuthoring : MonoBehaviour
 {
-    // default to a low tick rate for demonstration purposes
+    // 出于演示目的，默认为低刻度率
     [Min(0)]
     public int StepsPerSecond = 15;
 

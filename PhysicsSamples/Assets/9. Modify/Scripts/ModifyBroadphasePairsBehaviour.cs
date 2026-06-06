@@ -6,7 +6,7 @@ using Unity.Jobs;
 using UnityEngine;
 using Unity.Burst;
 
-//<todo.eoin.usermod Rename to ModifyOverlappingBodyPairsComponentData?
+//<todo.eoin.usermod 重命名为 ModifyOverlappingBodyPairsComponentData？
 public struct ModifyBroadphasePairs : IComponentData {}
 
 public class ModifyBroadphasePairsBehaviour : MonoBehaviour
@@ -22,7 +22,7 @@ class ModifyBroadphasePairsBehaviourBaker : Baker<ModifyBroadphasePairsBehaviour
     }
 }
 
-// A system which configures the simulation step to disable certain broad phase pairs
+// system，配置模拟步骤以禁用某些宽相对
 
 [UpdateInGroup(typeof(PhysicsSimulationGroup))]
 [UpdateAfter(typeof(PhysicsCreateBodyPairsGroup))]
@@ -65,7 +65,7 @@ public partial struct ModifyBroadphasePairsSystem : ISystem
 
         public unsafe void Execute(ref ModifiableBodyPair pair)
         {
-            // Disable the pair if a box collides with a static object
+            // 如果盒子与静态物体碰撞，则禁用该对
             int indexA = pair.BodyIndexA;
             int indexB = pair.BodyIndexB;
             if ((Bodies[indexA].Collider != null && Bodies[indexA].Collider.Value.Type == ColliderType.Box && indexB >= Motions.Length)

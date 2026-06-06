@@ -18,7 +18,7 @@ namespace Baking.BlobAssetBaker
         {
             var dt = SystemAPI.Time.DeltaTime;
 
-            // Apply the animation from the blob asset.
+            // 应用 blob 资源中的动画。
             foreach (var (anim, transform) in
                      SystemAPI.Query<RefRW<Animation>, RefRW<LocalTransform>>())
             {
@@ -33,7 +33,7 @@ namespace Baking.BlobAssetBaker
             time *= anim.Value.InvLength;
             time -= math.floor(time);
 
-            // Find index and interpolation value in the array
+            // 查找数组中的索引和 interpolation 值
             float sampleT = time * anim.Value.KeyCount;
             var sampleTFloor = math.floor(sampleT);
 

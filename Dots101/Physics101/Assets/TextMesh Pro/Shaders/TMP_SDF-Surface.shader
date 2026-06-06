@@ -42,7 +42,7 @@ Properties {
 	_WeightNormal		("Weight Normal", float) = 0
 	_WeightBold			("Weight Bold", float) = 0.5
 
-	// Should not be directly exposed to the user
+	// 不应直接暴露给用户
 	_ShaderFlags		("Flags", float) = 0
 	_ScaleRatioA		("Scale RatioA", float) = 1
 	_ScaleRatioB		("Scale RatioB", float) = 1
@@ -90,7 +90,7 @@ SubShader {
 		float2	uv_MainTex;
 		float2	uv2_FaceTex;
 		float2  uv2_OutlineTex;
-		float2	param;						// Weight, Scale
+		float2	param;						// 重量、规模
 		float3	viewDirEnv;
 	};
 
@@ -100,7 +100,7 @@ SubShader {
 
 	ENDCG
 
-	// Pass to render object as a shadow caster
+	// 作为阴影投射器传递给渲染对象
 	Pass
 	{
 		Name "Caster"

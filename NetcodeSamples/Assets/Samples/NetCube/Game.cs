@@ -6,12 +6,12 @@ using Unity.Mathematics;
 using Unity.NetCode;
 using Unity.Transforms;
 
-// RPC request from client to server for game to go "in game" and send snapshots / inputs
+// RPC 从 client 向 server 请求游戏进入“游戏中”并发送 snapshots / 输入
 public struct GoInGameRequest : IRpcCommand
 {
 }
 
-// When client has a connection with network id, go in game and tell server to also go in game
+// 当 client 与网络 id 连接时，进入游戏并告诉 server 也进入游戏
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
 public partial struct GoInGameClientSystem : ISystem
@@ -19,7 +19,7 @@ public partial struct GoInGameClientSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        // Run only on entities with a CubeSpawner component data
+        // 仅在带有 CubeSpawner component 数据的 entities 上运行
         state.RequireForUpdate<CubeSpawner>();
 
         var builder = new EntityQueryBuilder(Allocator.Temp)
@@ -43,7 +43,7 @@ public partial struct GoInGameClientSystem : ISystem
     }
 }
 
-// When server receives go in game request, go in game and delete request
+// 当 server 收到进入游戏请求时，进入游戏并删除请求
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
 public partial struct GoInGameServerSystem : ISystem
@@ -67,10 +67,10 @@ public partial struct GoInGameServerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        // Get the prefab to instantiate
+        // 获取 prefab 进行实例化
         var prefab = SystemAPI.GetSingleton<CubeSpawner>().Cube;
 
-        // Ge the name of the prefab being instantiated
+        // 正在实例化的 prefab 的名称
         state.EntityManager.GetName(prefab, out var prefabName);
         var worldName = state.WorldUnmanaged.Name;
 
@@ -80,11 +80,11 @@ public partial struct GoInGameServerSystem : ISystem
 
         foreach (var (reqSrc, reqEntity) in SystemAPI.Query<RefRO<ReceiveRpcCommandRequest>>().WithAll<GoInGameRequest>().WithEntityAccess())
         {
-            // Get the NetworkId for the requesting client
+            // 获取请求 client 的 NetworkId
             var networkId = networkIdLookup[reqSrc.ValueRO.SourceConnection];
 
-            // If this request is coming from a reconnecting connection we don't need to spawn and configure a player entity
-            // as it has been migrated to the new host and will be reconnected to this client
+            // 如果此请求来自重新连接的连接，我们不需要生成和配置播放器 entity
+            // 因为它已迁移到新主机并将重新连接到此 client
             if (reconnectedLookup.HasComponent(reqSrc.ValueRO.SourceConnection))
             {
                 Debug.Log($"'{worldName}' connection '{networkId.Value}' has reconnected!");
@@ -94,18 +94,18 @@ public partial struct GoInGameServerSystem : ISystem
 
             commandBuffer.AddComponent<NetworkStreamInGame>(reqSrc.ValueRO.SourceConnection);
 
-            // Log information about the connection request that includes the client's assigned NetworkId and the name of the prefab spawned.
+            // 有关连接请求的日志信息，包括 NetworkId 分配的 NetworkId 以及生成的 prefab 的名称。
             Debug.Log($"'{worldName}' setting connection '{networkId.Value}' to in game, spawning a Ghost '{prefabName}' for them!");
 
-            // Instantiate the prefab
+            // 实例化 prefab
             var player = commandBuffer.Instantiate(prefab);
-            // Associate the instantiated prefab with the connected client's assigned NetworkId
+            // 将实例化的 prefab 与连接的 client 的分配的 NetworkId 关联
             commandBuffer.SetComponent(player, new GhostOwner { NetworkId = networkId.Value});
 
-            // Add the player to the linked entity group so it is destroyed automatically on disconnect
+            // 将播放器添加到链接的 entity 组中，以便在断开连接时自动销毁
             commandBuffer.AppendToBuffer(reqSrc.ValueRO.SourceConnection, new LinkedEntityGroup{Value = player});
 
-            // Give each NetworkId their own spawn pos:
+            // 给每个 NetworkId 自己的生成位置：
             {
                 var isEven = (networkId.Value & 1) == 0;
                 const float halfCharacterWidthPlusHalfPadding = .55f;

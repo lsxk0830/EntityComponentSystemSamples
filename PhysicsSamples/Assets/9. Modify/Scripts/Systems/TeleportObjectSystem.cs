@@ -23,8 +23,8 @@ public partial struct TeleportObjectSystem : ISystem
 
     public void OnDestroy(ref SystemState state) {}
 
-    // A job that teleports the falling spheres back to the StartingPosition when they reach the EndingPosition.
-    // The linear velocity is reset to zero so that the spheres don't fall too fast
+    // 当掉落的球体到达 EndingPosition 时，job 将其传送回 StartingPosition。
+    // 线速度重置为零，以便球体不会下落得太快
     [BurstCompile]
     private partial struct TeleportObjectJob : IJobEntity
     {

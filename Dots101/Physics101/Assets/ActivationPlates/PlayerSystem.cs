@@ -21,7 +21,7 @@ namespace ActivationPlates
             float3 input = new float3(Input.GetAxis($"Horizontal"), 0, Input.GetAxis($"Vertical"));
 
             var speed = config.PlayerMoveSpeed * SystemAPI.Time.DeltaTime;
-            
+
             foreach (var playerTransform in
                      SystemAPI.Query<RefRW<LocalTransform>>()
                          .WithAll<Player>())

@@ -49,7 +49,7 @@ namespace Graphical.Splines
 
             public override void OnInspectorGUI()
             {
-                // This custom editor disables editing of these properties in play mode.
+                // 此自定义编辑器禁止在播放模式下编辑这些属性。
                 serializedObject.Update();
                 EditorGUI.BeginDisabledGroup(Application.isPlaying);
                 EditorGUILayout.PropertyField(Prefab);

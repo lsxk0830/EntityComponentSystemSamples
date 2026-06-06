@@ -26,7 +26,7 @@ namespace Samples.HelloNetcode
             var localToWorldFromEntity = SystemAPI.GetComponentLookup<LocalToWorld>();
             var lagCompensationEnabledFromEntity = SystemAPI.GetComponentLookup<LagCompensationEnabled>();
             var predictingTick = networkTime.ServerTick;
-            // Do not perform hit-scan when rolling back, only when simulating the latest tick
+            // 回滚时不执行 hit-scan，仅在模拟最新 tick 时执行
             if (!networkTime.IsFirstTimeFullyPredictingTick)
                 return;
 
@@ -44,26 +44,26 @@ namespace Samples.HelloNetcode
                     continue;
                 }
 
-                // When we fetch the CollisionWorld for ServerTick T, we need to account for the fact that the user
-                // raised this input sometime on the previous tick (render-frame, technically).
+                // 当我们获取 ServerTick T 的 CollisionWorld 时，我们需要考虑到用户
+                // 在上一个刻度的某个时间（技术上，渲染帧）引发了此输入。
                 const int additionalRenderDelay = 1;
 
-                // Breakdown of timings:
-                // - On the client, predicting ServerTick: 100 (for example)
-                // - InterpolationDelay: 2 ticks
-                // - Rendering Latency (assumption): 1 tick (likely more than 1 due to: double/triple buffering, pipelining, monitor refresh & draw latency)
-                // - Client visually sees 97 (-1 for render latency, -2 for lag compensation)
-                // - CommandDataInterpolationTick.Delay is a delta between CurrentCommand.Tick vs InterpolationTick, thus -2.
-                //   I.e. InterpolationDelay is already accounted for.
-                // - On the server, we process this input on ServerTick:100.
+                // 时间细分：
+                // - 在 client 上，预测 ServerTick：100（例如）
+                // - InterpolationDelay：2 个刻度
+                // - 渲染延迟（假设）：1 个刻度（可能超过 1，因为：双/三缓冲、管道、监视器刷新和绘制延迟）
+                // - Client 视觉上看到 97（-1 表示渲染延迟，-2 表示延迟补偿）
+                // - CommandDataInterpolationTick.Delay 是 CurrentCommand.Tick 与 InterpolationTick 之间的增量，因此为 -2。
+                //   I.e。InterpolationDelay 已计入。
+                // - 在 server 上，我们在 ServerTick:100 上处理此输入。
                 // - CommandDataInterpolationTick.Delay:-2 = 98 (-2)
-                // - So the server also needs to subtract the rendering delay to be consistent with what the client sees and queries against (97).
+                // - 因此，server 还需要减去渲染延迟，以与 client 看到的内容和查询的内容保持一致 (97)。
                 var delay = lagCompensationEnabledFromEntity.HasComponent(character.Self)
                     ? interpolationDelay.ValueRO.Delay + additionalRenderDelay
                     : additionalRenderDelay;
 
                 collisionHistory.GetCollisionWorldFromTick(predictingTick, delay, ref physicsWorld, out var collWorld, out var expectedTick, out var returnedTick);
-                var didClamp = expectedTick != returnedTick; // ClientWorld shouldn't be clamping when calling GetCollisionWorldFromTick!
+                var didClamp = expectedTick != returnedTick; // 调用 GetCollisionWorldFromTick 时，ClientWorld 不应被钳位！
                 if(state.WorldUnmanaged.IsClient()) UnityEngine.Debug.Assert(!didClamp);
 
 

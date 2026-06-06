@@ -18,7 +18,7 @@ namespace Unity.Physics.Tests
         public IEnumerator LoadScenes([ValueSource(nameof(UnityPhysicsSamplesTest.GetScenes))] string scenePath)
         {
 #if UNITY_GAMECORE
-            // Tests we're skipping with HavokPhysics
+            // 我们使用 HavokPhysics 跳过测试
             if (scenePath.Contains("/Modify - Surface Velocity.unity") ||
                 scenePath.Contains("/Modify - Contact Jacobians.unity") ||
                 scenePath.Contains("/JacobianModifiersUT.unity") ||
@@ -31,7 +31,7 @@ namespace Unity.Physics.Tests
 #endif
 
 #if UNITY_IOS
-            // Tests we're skipping with HavokPhysics
+            // 我们使用 HavokPhysics 跳过测试
             if (scenePath.Contains("/Joints - Ragdolls.unity") ||
                 scenePath.Contains("/ChangeGroundFilter.unity") ||
                 scenePath.Contains("/ChangeGroundFilterChangeCollider.unity") ||
@@ -57,7 +57,7 @@ namespace Unity.Physics.Tests
 #endif
 
 #if UNITY_STANDALONE_LINUX
-             // Tests we're skipping with HavokPhysics
+             // 我们使用 HavokPhysics 跳过测试
              if (scenePath.Contains("/VehicleOverTerrain.unity"))
              {
                  Debug.Log("Skipping " + scenePath);
@@ -66,14 +66,14 @@ namespace Unity.Physics.Tests
              }
 #endif
 
-            // Don't create log messages about the number of trial days remaining
+            // 不要创建有关剩余试用天数的日志消息
             PlayerPrefs.SetInt("Havok.Auth.SuppressDialogs", 1);
 
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Enable multi threaded Havok simulation
+            // 启用多线程 Havok 模拟
             ConfigureSimulation(World.DefaultGameObjectInjectionWorld, SimulationType.HavokPhysics, true);
 
             yield return LoadSceneAndSimulate(scenePath);
@@ -90,7 +90,7 @@ namespace Unity.Physics.Tests
         public IEnumerator LoadScenes([ValueSource(nameof(UnityPhysicsSamplesTest.GetScenes))] string scenePath)
         {
 #if UNITY_GAMECORE
-            // Tests we're skipping with HavokPhysics
+            // 我们使用 HavokPhysics 跳过测试
             if (scenePath.Contains("/Modify - Surface Velocity.unity") ||
                 scenePath.Contains("/Modify - Contact Jacobians.unity") ||
                 scenePath.Contains("/JacobianModifiersUT.unity") ||
@@ -103,7 +103,7 @@ namespace Unity.Physics.Tests
 #endif
 
 #if UNITY_IOS
-            // Tests we're skipping with HavokPhysics
+            // 我们使用 HavokPhysics 跳过测试
             if (scenePath.Contains("/Joints - Ragdolls.unity") ||
                 scenePath.Contains("/ChangeGroundFilter.unity") ||
                 scenePath.Contains("/ChangeGroundFilterChangeCollider.unity") ||
@@ -129,7 +129,7 @@ namespace Unity.Physics.Tests
 #endif
 
 #if UNITY_STANDALONE_LINUX
-             // Tests we're skipping with HavokPhysics
+             // 我们使用 HavokPhysics 跳过测试
              if (scenePath.Contains("/VehicleOverTerrain.unity"))
              {
                  Debug.Log("Skipping " + scenePath);
@@ -138,14 +138,14 @@ namespace Unity.Physics.Tests
              }
 #endif
 
-            // Don't create log messages about the number of trial days remaining
+            // 不要创建有关剩余试用天数的日志消息
             PlayerPrefs.SetInt("Havok.Auth.SuppressDialogs", 1);
 
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Enable single threaded Havok simulation
+            // 启用单线程 Havok 模拟
             ConfigureSimulation(World.DefaultGameObjectInjectionWorld, SimulationType.HavokPhysics, false);
 
             yield return LoadSceneAndSimulate(scenePath);

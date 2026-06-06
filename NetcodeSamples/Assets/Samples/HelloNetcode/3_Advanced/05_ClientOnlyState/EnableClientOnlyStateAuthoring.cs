@@ -11,9 +11,9 @@ namespace Samples.HelloNetcode
             public override void Bake(EnableClientOnlyStateAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                //Enabled the the sample systems
+                //启用示例 systems
                 AddComponent<EnableClientOnlyState>(entity);
-                //Enabled the client only backup systems
+                //启用了 client 仅备份 systems
                 AddComponent<EnableClientOnlyBackup>(entity);
             }
         }

@@ -5,21 +5,21 @@ using Unity.Mathematics;
 
 namespace Baking.AutoAuthoring.BakingTypeAutoAuthoring
 {
-    // In this example, the component Complex is bundling together many values that make sense to be edited together.
-    // By defining an AutoAuthoring<Complex> MonoBehaviour, the component is automatically visible and editable in the inspector.
+    // 在此示例中，component 复合体将许多值得一起编辑的值捆绑在一起。
+    // 通过定义 AutoAuthoring<Complex> MonoBehaviour，component 在检查器中自动可见和可编辑。
 
-    // The authoring component BakingTypeAutoAuthoring implements a custom Baker, allowing us to create a different representation for the runtime data.
-    // For example, the baker adds a Speed component on the primary entity, ensuring an optimal data access for this property at runtime.
-    // Furthermore, other properties are extracted from the authoring component in a baking system.
+    // authoring component BakingTypeAutoAuthoring 实现了自定义 Baker，允许我们为运行时数据创建不同的表示形式。
+    // 例如，baker 在主 entity 上添加 Speed component，确保运行时此属性的最佳数据访问。
+    // 此外，其他属性是从 baking system 中的 authoring component 中提取的。
 
-    // Because the Complex component has the attribute [BakingType], it will not be serialized in the final runtime data.
+    // 由于 Complex component 具有属性[BakingType]，因此在最终的运行时数据中不会被序列化。
 
-    // The same pattern can also be used to refactor the runtime data to ensure optimal runtime access while at the same time
-    // giving the necessary flexibility to define the authoring components in a convenient way.
-    // This facilitates easy prototyping while leaving open a path to optimize the data later.
+    // 相同的模式还可以用于重构运行时数据，以确保最佳的运行时访问，同时
+    // 提供必要的灵活性，以方便的方式定义 authoring components。
+    // 这有助于轻松进行原型设计，同时为以后优化数据留下了余地。
 
 
-    // Authoring component, optimized for convenient editing of the data.
+    // Authoring component，为方便编辑数据而优化。
     public class BakingTypeAutoAuthoring : AutoAuthoring<Complex>
     {
         class Baker : Baker<BakingTypeAutoAuthoring>
@@ -30,7 +30,7 @@ namespace Baking.AutoAuthoring.BakingTypeAutoAuthoring
 
                 AddComponent(entity, new Speed { Value = authoring.Data.Properties.Speed });
 
-                // We do not call GetEntity here because the Reference field is assigned in the ComponentAuthoring baker.
+                // 我们这里不调用 GetEntity，因为 Reference 字段是在 ComponentAuthoring baker 中分配的。
                 AddComponent(entity, new SpawnPrefab() { Prefab = authoring.Data.Reference });
             }
         }

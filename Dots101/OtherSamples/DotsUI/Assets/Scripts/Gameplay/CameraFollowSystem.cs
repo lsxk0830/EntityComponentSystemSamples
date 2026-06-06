@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Unity.DotsUISample
 {
-    // Update after physics so we can get the accurate player position.
+    // 在物理之后更新，以便我们可以获得准确的玩家位置。
     [UpdateAfter(typeof(FixedStepSimulationSystemGroup))]
     public partial struct CameraFollowSystem : ISystem
     {

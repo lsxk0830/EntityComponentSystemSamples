@@ -15,8 +15,8 @@ namespace BreakingBricks
         public Color FullHitpointsColor = Color.green;
         public Color EmptyHitpointsColor = Color.red;
         public Bounds SpawnBounds;
-        public float BallSpawnHeight; // how high the ball spawning bounds should be above the brick spawning bounds 
-        public float BallDespawnHeight; // balls falling below this threshold are despawned
+        public float BallSpawnHeight; // 球生成边界应高于砖块生成边界多高
+        public float BallDespawnHeight; // 低于此阈值的球将消失
 
         public class Baker : Baker<ConfigAuthoring>
         {

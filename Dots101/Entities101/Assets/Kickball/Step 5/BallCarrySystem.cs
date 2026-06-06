@@ -26,7 +26,7 @@ namespace Tutorials.Kickball.Step5
         {
             var config = SystemAPI.GetSingleton<Config>();
 
-            // move carried balls
+            // 移动携带的球
             foreach (var (ballTransform, carrier) in
                      SystemAPI.Query<RefRW<LocalTransform>, RefRO<Carry>>()
                          .WithAll<Ball>())
@@ -47,7 +47,7 @@ namespace Tutorials.Kickball.Step5
             {
                 if (state.EntityManager.IsComponentEnabled<Carry>(playerEntity))
                 {
-                    // put down ball
+                    // 放下球
                     var carried = state.EntityManager.GetComponentData<Carry>(playerEntity);
 
                     var ballTransform = state.EntityManager.GetComponentData<LocalTransform>(carried.Target);
@@ -62,7 +62,7 @@ namespace Tutorials.Kickball.Step5
                 }
                 else
                 {
-                    // pick up first ball in range
+                    // 捡起范围内的第一个球
                     foreach (var (ballTransform, ballEntity) in
                              SystemAPI.Query<RefRO<LocalTransform>>()
                                  .WithAll<Ball>()

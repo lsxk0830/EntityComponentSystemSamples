@@ -16,8 +16,8 @@ using Random = Unity.Mathematics.Random;
 namespace Unity.Physics.Extensions
 {
 #if UNITY_EDITOR
-    // The system uses the PhysicsDebugDisplaySystem to draw the results of the queries, therefore the
-    // system must be run as part of the PhysicsDebugDisplayGroup for correct handling of the debug draw lines.
+    // system 使用 PhysicsDebugDisplaySystem 来绘制查询结果，因此
+    // system 必须是 run 作为 PhysicsDebugDisplayGroup 的一部分，以便正确处理调试绘制线。
     [UpdateInGroup(typeof(PhysicsDebugDisplayGroup))]
     public partial class QueryTesterSystem : SystemBase
     {
@@ -60,7 +60,7 @@ namespace Unity.Physics.Extensions
 
         protected override void OnUpdate()
         {
-            // Properly chain up dependencies
+            // 正确链接依赖关系
             {
                 if (!SystemAPI.TryGetSingleton<PhysicsDebugDisplayData>(out _))
                 {
@@ -77,7 +77,7 @@ namespace Unity.Physics.Extensions
             NativeList<ColliderCastHit> colliderCastHits = new NativeList<ColliderCastHit>(Allocator.TempJob);
             NativeList<DistanceHit> distanceHits = new NativeList<DistanceHit>(Allocator.TempJob);
 
-            // The generated code doesn't automatically complete the dependency on PhysicsWorldSingleton
+            // 生成的代码不会自动完成对 PhysicsWorldSingleton 的依赖
             EntityManager.CompleteDependencyBeforeRO<PhysicsWorldSingleton>();
 
             foreach (var(qd, localToWorld) in SystemAPI.Query<QueryData, RefRO<LocalToWorld>>())
@@ -141,7 +141,7 @@ namespace Unity.Physics.Extensions
                 {
                     MeshTrs meshTrs = m_MeshTrsList[i];
 
-                    // Using this as DrawMeshInstanced is the only thing that works
+                    // 将此用作 DrawMeshInstanced 是唯一有效的方法
                     Matrix4x4[] trs = new[] { meshTrs.m_Trs };
                     UnityEngine.Graphics.DrawMeshInstanced(meshTrs.m_Mesh, 0, k_MeshDisplayMaterial, trs);
                 }
@@ -255,7 +255,7 @@ namespace Unity.Physics.Extensions
             in NativeList<RaycastHit> raycastHits, in NativeList<ColliderCastHit> colliderCastHits, in NativeList<DistanceHit> distanceHits,
             ref MeshTrsList meshTrsList)
         {
-            // Draw the query
+            // 绘制 query
             bool colliderCast = math.any(new float3(queryData.Direction) != float3.zero);
             if (queryData.ColliderQuery)
             {
@@ -299,7 +299,7 @@ namespace Unity.Physics.Extensions
                 }
             }
 
-            // Draw ray hits
+            // 绘制射线命中
             if (raycastHits.IsCreated)
             {
                 foreach (RaycastHit hit in raycastHits)
@@ -319,7 +319,7 @@ namespace Unity.Physics.Extensions
                     {
                         DrawLeafCollider(world.Bodies[hit.RigidBodyIndex], hit.ColliderKey);
 
-                        // Need to fix this once Unity.DebugDisplay.Label starts working and is exposed in PhysicsDebugDisplaySystem API [Havok-275]
+                        // 一旦 Unity.DebugDisplay.Label 开始工作并在 PhysicsDebugDisplaySystem API 中暴露，需要修复此问题 [Havok-275]
                         //GUIStyle style = new GUIStyle();
                         //style.normal.textColor = Color.yellow;
                         //Handles.Label(hit.Position, hit.ColliderKey.Value.ToString("X8"), style);
@@ -327,7 +327,7 @@ namespace Unity.Physics.Extensions
                 }
             }
 
-            // Draw collider hits
+            // 抽奖 collider 命中
             if (colliderCastHits.IsCreated)
             {
                 foreach (ColliderCastHit hit in colliderCastHits)
@@ -383,7 +383,7 @@ namespace Unity.Physics.Extensions
                 }
             }
 
-            // Draw distance hits
+            // 绘制距离命中
             if (distanceHits.IsCreated)
             {
                 foreach (DistanceHit hit in distanceHits)
@@ -588,10 +588,10 @@ namespace Unity.Physics.Extensions
                     });
                     break;
                 case ColliderType.Cylinder:
-                    // TODO: need someone to add
+                    // TODO: 需要有人添加
                     throw new NotImplementedException();
                 case ColliderType.Convex:
-                    // Tetrahedron
+                    // 四面体
                     NativeArray<float3> points = new NativeArray<float3>(k_TetraherdonVertices, Allocator.TempJob);
                     collider = ConvexCollider.Create(points, ConvexHullGenerationParameters.Default, CollisionFilter.Default);
                     points.Dispose();
@@ -642,7 +642,7 @@ namespace Unity.Physics.Extensions
                     childrenBlobs.Dispose();
                     break;
                 case ColliderType.Mesh:
-                    // Tetrahedron mesh
+                    // 四面体网格
                     NativeArray<float3> meshVertices = new NativeArray<float3>(k_TetraherdonVertices, Allocator.TempJob);
                     NativeArray<int3> meshTriangles = new NativeArray<int3>(k_TetrahedronMeshTriangles, Allocator.TempJob);
 

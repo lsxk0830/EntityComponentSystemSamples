@@ -7,35 +7,35 @@ using System;
 namespace Unity.NetCode
 {
     /// <summary>
-    /// Component used to configure how physics rebuild the and step the predicted physic world.
+    /// Component 用于配置物理如何重建和步进 predicted 物理 world。
     /// </summary>
     [Serializable]
     public struct PhysicsLoopConfig : IComponentData
     {
         /// <summary>
-        /// Use immediate mode (no jobs, only mainthread) to step the physics world. This can be faster than
+        /// 使用立即模式（无 jobs，仅主线程）来单步执行物理 world。这可能比
         /// using jobs in case the number of entities is relatively small.
         /// </summary>
         public byte StepImmediateMode;
         /// <summary>
-        /// Use immediate mode (no jobs, only mainthread) to build or update the physics world. This can be faster than
+        /// 使用立即模式（无 jobs，仅主线程）来构建或更新物理 world。这可能比
         /// using jobs in case the number of entities is relatively small.
         /// </summary>
         public byte UseImmediateMode;
         /// <summary>
-        /// When enable, the physics world (and in particular the broadphase tree) is build from scratch only for the first predicted tick
-        /// (when the prediction start). For all the sub-sequent predicted ticks, the broadphase AABB tree is only
-        /// updated using the calculated physics velocity from the previous physics step and the gravity. This lead to better performance
-        /// than rebuilding from scratch, at the cost of slighlty worse broadphase culling.
-        /// The following conditions must be respected to avoid a full physics world build:
-        /// - No dynamic physics object has been created or destroyed inside the prediction loop
+        /// 启用后，物理 world （特别是宽相树）仅针对第一个 predicted 从头开始​​构建
+        /// （当 prediction 启动时）。对于所有后续的 predicted 蜱，宽相 AABB 树仅
+        /// 使用上一个物理步骤计算出的物理速度和重力进行更新。这会带来更好的性能
+        /// 比从头开始重建，代价是稍差的宽相剔除。
+        /// 必须遵守以下条件以避免完整的物理 world 构建：
+        /// - prediction 循环内没有创建或销毁动态物理对象
         /// </summary>
         public byte BuildPhysicsWorldOnceThenUpdate;
     }
 
     /// <summary>
-    /// Auhoring behaviour that can be used to configure the predicted physics loop update. It will bake
-    /// bake a <see cref="PhysicsLoopConfig"/> component.
+    /// 可用于配置 predicted 物理循环更新的授权行为。会烤的
+    /// 烘烤 <see cref="PhysicsLoopConfig"/> component。
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class PredictedPhysicsStepConfig : MonoBehaviour

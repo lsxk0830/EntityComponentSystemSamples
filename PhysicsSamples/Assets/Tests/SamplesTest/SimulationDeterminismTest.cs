@@ -1,4 +1,4 @@
-//#define DEBUG_TEST_IN_PLAYER_BUILD
+//#定义 DEBUG_TEST_IN_PLAYER_BUILD
 
 #if UNITY_ANDROID && !UNITY_64
 #define UNITY_ANDROID_ARM7V
@@ -18,9 +18,9 @@ using Unity.Jobs;
 
 namespace Unity.Physics.Tests
 {
-    // Runs all simulation types on the same cloned physics world for a
-    // predefined number of steps and compares results.
-    // Only works in standalone build, since it needs synchronous Burst compilation.
+    // 在同一克隆物理 world 上运行所有模拟类型
+    // 预定义的步骤数并比较结果。
+    // 仅适用于独立构建，因为它需要同步 Burst 编译。
 #if !UNITY_EDITOR || UNITY_PHYSICS_INCLUDE_END2END_TESTS
     [TestFixture]
 #endif
@@ -31,38 +31,38 @@ namespace Unity.Physics.Tests
 #endif
         static World DefaultWorld => World.DefaultGameObjectInjectionWorld;
 
-        // Put the names of demos that shouldn't
-        // be run in this test in this array
+        // 放置不应该放置的演示的名称
+        // 在此数组中的本次测试中为 run
         private static string[] s_FilteredOutDemos =
         {
             "SingleThreadedRagdoll", "LoaderScene",
             "InitTestScene",
 
-            // Following demos are removed from SimulationDeterminism because they take
-            // too long to complete, and bring no special value
+            // 以下演示已从 SimulationDeterminism 中删除，因为它们占用了
+            // 完成时间太长，并且没有带来特殊价值
             "Planet Gravity", "LargeMesh", "Force Field", "ComplexStacking",
 
-            // Removed as long as Havok plugins are not build with -strict floating point mode
+            // 只要 Havok 插件不是使用 -strict 浮点模式构建的，就会被删除
             "Raycast Car", "Joints - Parade",
 
-            // These demos do some verifications that would currently fail with UP
+            // 这些演示进行了一些目前会因 UP 失败的验证
             "AllMotors.unity",
 
 #if UNITY_ANDROID_ARM7V
-            // disabled due to sigbuss crashes, something is defo corrupting memory in the allocators
+            // 由于 sigbuss 崩溃而被禁用，某些东西肯定会损坏分配器中的内存
             "Character Controller",
             "Animation",
             "ClientServer",
             "DeactivatedBodiesTriggerTest",
 #endif
 #if !(UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX)
-            "SimpleStacking", //disabled due to being unstable on some console devices
+            "SimpleStacking", //由于在某些控制台设备上不稳定而被禁用
 #endif
 #if UNITY_GAMECORE
-            "SoftJoint" // disabled on Xbox Series X as it fails.  Jira ticket: DOTS-6520
+            "SoftJoint" // 在 Xbox Series X 上禁用，因为它失败了。Jira 票证：DOTS-6520
 #endif
 #if UNITY_IOS
-            // Scences disabled on iOS. Bug report: DOTS-9614
+            // iOS 上禁用场景。错误报告：DOTS-9614
             "Joints - Ragdolls",
             "ChangeGroundFilter",
             "ChangeGroundFilterChangeCollider",
@@ -120,32 +120,32 @@ namespace Unity.Physics.Tests
 #endif
         public virtual IEnumerator LoadScenes([ValueSource(nameof(GetScenes))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Wait for next frame
+            // 等待下一帧
             yield return null;
 
-            // Number of steps to simulate
+            // 模拟步骤数
             const int k_StopAfterStep = 100;
 
-            // Number of worlds to simulate
+            // 要模拟的 worlds 数量
             const int k_NumWorlds = 3;
 
-            // Number of threads in each of the runs (2nd run is immediate mode simulation)
+            // 每次运行中的线程数（第二个 run 是立即模式模拟）
             NativeArray<int> numThreadsPerRun = new NativeArray<int>(k_NumWorlds, Allocator.Persistent);
             numThreadsPerRun[0] = 4;
             numThreadsPerRun[1] = 0;
             numThreadsPerRun[2] = -1;
 
-            // Load the scene and wait 2 frames
+            // 加载 scene 并等待 2 帧
             SceneManager.LoadScene(scenePath);
 
 #if DEBUG_TEST_IN_PLAYER_BUILD
-            // For testing in player builds, build with "Development Build" and "Script Debugging" enabled.
-            // Attach with your IDE and put a breakpoint on the line below. Then, set the kContinue variable to true
-            // to continue the test and begin debugging.
+            // 要在播放器构建中进行测试，请在启用“开发构建”和“脚本调试”的情况下进行构建。
+            // 附加您的 IDE 并在下面的行上放置一个断点。然后，将 kContinue 变量设置为 true
+            // 继续测试并开始调试。
             while (!kContinue)
             {
                 yield return null;
@@ -172,7 +172,7 @@ namespace Unity.Physics.Tests
                 }
             }
 
-            // Extract original world and make copies
+            // 提取原件 world 并复印
             List<PhysicsWorld> physicsWorlds = new List<PhysicsWorld>(k_NumWorlds);
             for (int i = 0; i < k_NumWorlds; i++)
             {
@@ -188,7 +188,7 @@ namespace Unity.Physics.Tests
 
             var buildStaticTree = new NativeReference<int>(1, Allocator.Persistent);
 
-            // Simulation step input
+            // 模拟步骤输入
             var stepInput = new SimulationStepInput()
             {
                 Gravity = stepComponent.Gravity,
@@ -200,7 +200,7 @@ namespace Unity.Physics.Tests
                 HaveStaticBodiesChanged = buildStaticTree,
             };
 
-            // Step the simulation on all worlds
+            // 对所有 worlds 进行步进仿真
             for (int i = 0; i < physicsWorlds.Count; i++)
             {
                 int threadCountHint = numThreadsPerRun[i];
@@ -282,7 +282,7 @@ namespace Unity.Physics.Tests
                 }
             }
 
-            // Verify simulation results
+            // 验证模拟结果
             for (int i = 0; i < physicsWorlds.Count - 1; i++)
             {
                 for (int j = i + 1; j < physicsWorlds.Count; j++)
@@ -305,7 +305,7 @@ namespace Unity.Physics.Tests
                 }
             }
 
-            // Clean up
+            // 清理
             {
                 SwitchWorlds();
                 numThreadsPerRun.Dispose();

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Receives <see cref="PlayerListEntry" /> RPC's, notifying this client of the PRESENCE of other clients.
+    ///     收到<see cref="PlayerListEntry" /> RPC 的，通知本 client 其他 clients 的 PRESENCE。
     /// </summary>
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
@@ -47,7 +47,7 @@ namespace Unity.NetCode.Samples.PlayerList
         [BurstCompile]
         public void OnStopRunning(ref SystemState state)
         {
-            // The implication is that we disconnected.
+            // 言下之意就是我们断绝了联系。
             SystemAPI.GetSingletonBuffer<PlayerListBufferEntry>().Clear();
         }
 
@@ -79,7 +79,7 @@ namespace Unity.NetCode.Samples.PlayerList
             var players = SystemAPI.GetSingletonBuffer<PlayerListBufferEntry>();
             var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
-            // Handle username RPC:
+            // 处理用户名 RPC：
             if(!m_DesiredUsernameChangedQuery.IsEmpty)
             {
                 var desiredUsername = SystemAPI.GetSingletonRW<DesiredUsername>().ValueRW;
@@ -99,7 +99,7 @@ namespace Unity.NetCode.Samples.PlayerList
                 localPlayerNetworkId = localPlayerNetworkId
             }.Schedule();
 
-            // Handle invalid username responses:
+            // 处理无效的用户名响应：
             if(!m_InvalidUsernameResponseRpc.IsEmptyIgnoreFilter)
             {
                 using var rpcs = m_InvalidUsernameResponseRpc.ToComponentDataArray<PlayerListEntry.InvalidUsernameResponseRpc>(Allocator.Temp);
@@ -108,7 +108,7 @@ namespace Unity.NetCode.Samples.PlayerList
                     ref var entry = ref GetOrCreateEntry(players, localPlayerNetworkId);
                     var desiredUsernameStore = SystemAPI.GetSingletonRW<DesiredUsername>().ValueRW;
 
-                    // Note that if the user has already changed their username AGAIN, this invalid response should be ignored (as we've already sent another Username Change Request RPC).
+                    // Note 如果用户已经更改了用户名 AGAIN，则应忽略此无效响应（因为我们已经发送了另一个用户名更改请求 RPC）。
                     if (desiredUsernameStore.Value == rpc.RequestedUsername)
                     {
                         desiredUsernameStore.Value = entry.State.Username.Value;
@@ -152,10 +152,10 @@ namespace Unity.NetCode.Samples.PlayerList
         }
 
         /// <summary>
-        ///     Because we store entries in a list, fetching an entry involves:
-        ///     1. Ensuring array capacity.
-        ///     2. Returning a ref of the entry.
-        ///     Note that a default entry is valid.
+        ///     因为我们将条目存储在列表中，所以获取条目涉及：
+        ///     1、保证阵列容量。
+        ///     2. 返回条目的引用。
+        ///     Note 默认条目有效。
         /// </summary>
         static unsafe ref PlayerListEntry GetOrCreateEntry(DynamicBuffer<PlayerListBufferEntry> players, int networkId)
         {

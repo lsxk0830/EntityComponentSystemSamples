@@ -1,29 +1,29 @@
-# HelloNetcode connection monitor sample
+# HelloNetcode 连接监视器示例
 
-A connection entity will be created as soon as a server starts listening or client starts to connect. It will initially get a `NetworkStreamConnection` component and then others depending on how it's configured. This can be queried to get the status of the connection (see `ConnectionState`).
+一旦 server 开始监听或 client 开始连接，就会创建连接 entity。它最初会获得 `NetworkStreamConnection` component，然后根据其配置方式获得其他信息。可以查询它以获取连接的状态（请参阅 `ConnectionState`）。
 
-The connection is set up with a shorter custom disconnect timeout so timeouts can be quickly tested.
+连接设置为较短的自定义断开连接超时，因此可以快速测试超时。
 
-See
+看
 
-* _Connection_ section in the [Entities list](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/entities-list.html) shows all the components the network connection entity can have.
-* [Network Connection](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
+* [Entities 列表](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/entities-list.html) 中的 _Connection_ 部分显示了 entity 可以拥有的所有 components 网络连接。
+* [网络连接](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/network-connection.html)
 
-## Sample description
+## 示例描述
 
-This sample shows how you can detect various events by querying for connection components. A connection entity is created with the `ConnectionState` component which reflects the connection flow
+此示例演示如何通过查询连接 components 来检测各种事件。使用反映连接流的 `ConnectionState` component 创建连接 entity
 
-* Disconnected
-* Connecting
-* Handshake
-* Connected
+* 已断开连接
+* 正在连接
+* 握手
+* 已连接
 
-To set up a disconnect timeout on the driver a custom/manual driver needs to be set up so different network parameters can be passed to it. The custom driver constructor needs to be set up in the bootstrap to be there early enough to replace the default driver. This is done in _NetCodeBootstrapExtension.cs_ but it's disabled with the _ENABLE_NETCODE_SAMPLE_TIMEOUT_ define at the top of the file, since enabling it means it's enforced globally through the whole project. To enable it just uncomment the define.
+要在驱动程序上设置断开连接超时，需要设置自定义/手动驱动程序，以便可以将不同的网络参数传递给它。需要在引导程序中设置自定义驱动程序构造函数，以便尽早替换默认驱动程序。这是在 _NetCodeBootstrapExtension.cs_ 中完成的，但它被文件顶部的 _ENABLE_NETCODE_SAMPLE_TIMEOUT_ 定义禁用，因为启用它意味着它在整个项目中全局强制执行。要启用它，只需取消注释定义即可。
 
-## Notes
+## 笔记
 
-Try it with one thin client added in the playermode tools to see what messages are passed around when it is disconnected. Try making a standalone build with this sample (can be picked from frontend sample list) and then terminate the standalone process when testing to see the timeout event.
+尝试使用玩家模式工具中添加的一根薄 client 来查看断开连接时会传递哪些消息。尝试使用此示例进行独立构建（可以从前端示例列表中选取），然后在测试以查看超时事件时终止独立进程。
 
-The UI is not set up to do anything fancy but just demonstrate connection events on disconnections.
+UI 的设置并不是为了执行任何花哨的操作，而只是演示断开连接时的连接事件。
 
-Please take note of the descriptions beneath the buttons labeled `ServerWorld`, `ClientWorld`, and `ThinClientWorld`. These descriptions indicate the specific world in which the given connection is stored (the name of the connection is the number which we can disconnect). For instance, if we are testing this sample in the editor with a single ThinClient, you will observe this connection appearing twice: once in the `ThinClientWorld` and once in the `ServerWorld`. This duplication occurs because both of these worlds store the same connection. In another scenario, if the server is operational in the editor and we connect to it from a different build, you will notice that there is a connection in the editor for the `ServerWorld` and in the build for the `ClientWorld`.
+请注意标有 `ServerWorld`、`ClientWorld` 和 `ThinClientWorld` 的按钮下方的说明。这些描述指示了存储给定连接的特定 world（连接的名称是我们可以断开连接的号码）。例如，如果我们使用单个 ThinClient 在编辑器中测试此示例，您将观察到此连接出现两次：一次在 `ThinClientWorld` 中，一次在 `ServerWorld` 中。发生这种重复是因为这两个 worlds 存储相同的连接。在另一种情况下，如果 server 在编辑器中可操作，并且我们从不同的构建连接到它，您会注意到编辑器中存在 `ServerWorld` 的连接，而构建中存在 `ClientWorld` 的连接。

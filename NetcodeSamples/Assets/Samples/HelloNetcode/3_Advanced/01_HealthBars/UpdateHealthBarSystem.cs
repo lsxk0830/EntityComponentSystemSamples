@@ -9,8 +9,8 @@ namespace Samples.HelloNetcode
 {
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
     /// <summary>
-    /// Update position and rotation of the health bar above players. This will make sure the health bar follow the character
-    /// character and is always facing the main camera.
+    /// 更新玩家上方生命条的位置和旋转。这将确保健康栏跟随角色
+    /// 角色并且始终面向主摄像机。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
@@ -32,7 +32,7 @@ namespace Samples.HelloNetcode
 
                 if (state.EntityManager.IsComponentEnabled<GhostOwnerIsLocal>(entity))
                 {
-                    // Move the UI on top of the local player, so that you can see.
+                    // 将 UI 移动到本地播放器的顶部，以便您可以看到。
                     var targetHealthBarPos = ltw.ValueRO.Position;
                     targetHealthBarPos.y += ui.PlayerHeightOffset;
                     var n = mainCamera.transform.position - ui.HealthBar.position;
@@ -41,7 +41,7 @@ namespace Samples.HelloNetcode
                 }
                 else
                 {
-                    // Move the UI above the players head.
+                    // 将 UI 移至玩家头顶上方。
                     var targetHealthBarPos = ltw.ValueRO.Position;
                     targetHealthBarPos.y += ui.OpponentHeightOffset;
                     var n = mainCamera.transform.position - ui.HealthBar.position;
@@ -51,16 +51,16 @@ namespace Samples.HelloNetcode
                 var hpNormalized = math.saturate((float)health.ValueRO.CurrentHitPoints / health.ValueRO.MaximumHitPoints);
                 var playerColor = NetworkIdDebugColorUtility.GetColor(owner.ValueRO.NetworkId);
 
-                // Killed by server:
+                // 被 server 杀死：
                 if (act.ValueRO.Enabled)
                 {
-                    // Set to players color:
+                    // 设置为玩家颜色：
                     ui.HealthSlider.color = playerColor;
                 }
                 else
                 {
-                    // Set to 0 regardless of prediction, and change the background to an authoritative dead.
-                    // Note that we only do this once AutoCommandTarget is set. Why? We're waiting for server confirmation.
+                    // 无论 prediction 都设置为 0，并将背景更改为权威死者。
+                    // Note 我们只有在 AutoCommandTarget 设置后才执行此操作。为什么？我们正在等待 server 确认。
                     hpNormalized = 0;
                     playerColor.a = 0.3f;
                     ui.HealthSlider.transform.parent.GetComponent<Image>().color = playerColor;

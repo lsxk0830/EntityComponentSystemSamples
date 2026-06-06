@@ -6,14 +6,14 @@ using UnityEngine;
 namespace Unity.NetCode.Samples
 {
     /// <summary>
-    /// Authoring class used in the tests or in game scene. Add all the client-only components to the ghost prefab.
+    /// 测试或游戏中使用的 Authoring 类 scene。将所有仅 client 的 components 添加到 ghost prefab。
     /// </summary>
     internal class ClientOnlyAuthoring : MonoBehaviour
     {
     }
 
     /// <summary>
-    /// Singleton component used to enable the client-only backup systems.
+    /// Singleton component 用于启用仅 client 的备份 systems。
     /// </summary>
     public struct EnableClientOnlyBackup : IComponentData
     {

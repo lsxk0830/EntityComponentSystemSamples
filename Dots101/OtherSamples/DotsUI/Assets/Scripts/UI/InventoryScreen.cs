@@ -20,8 +20,8 @@ namespace Unity.DotsUISample
         public static InventoryScreen Instantiate(VisualElement parentElement)
         {
             var screen = CreateInstance<InventoryScreen>();
-            screen.RootElement = parentElement;    
-            
+            screen.RootElement = parentElement;
+
             screen.m_EnergyLabel = screen.RootElement.Q<Label>("inventory__energy-label");
             screen.m_BackButton = screen.RootElement.Q<Button>("inventory__back-button");
             screen.m_SlotsContainer = screen.RootElement.Q<VisualElement>("inventory__slots-container");
@@ -29,7 +29,7 @@ namespace Unity.DotsUISample
             screen.InitializeSlots();
 
             screen.m_BackButton.clicked += screen.OnBackClicked;
-                
+
             screen.RootElement.style.display = DisplayStyle.None;
             return screen;
         }

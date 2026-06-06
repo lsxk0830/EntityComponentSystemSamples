@@ -24,7 +24,7 @@ namespace Unity.DotsUISample
             foreach (var (transform, energy) in
                      SystemAPI.Query<RefRW<LocalTransform>, RefRW<Energy>>())
             {
-                // If the energy ball is already collected, have it fly in a circle around the player
+                // 如果能量球已经收集完毕，让它绕玩家一圈飞行
                 if (energy.ValueRO.Collected)
                 {
                     var indexSeparation = energy.ValueRO.Index * math.PI / 2;
@@ -38,19 +38,19 @@ namespace Unity.DotsUISample
 
                 float distance = math.distance(transform.ValueRO.Position.xz, playerPosition.xz);
 
-                // If the player is far from the energy ball, move it up and down
+                // 如果玩家距离能量球较远，请将其上下移动
                 if (distance > 4f)
                 {
                     transform.ValueRW.Position.y = (float)(math.sin(SystemAPI.Time.ElapsedTime) * 0.5f + 2f);
                 }
                 else if (distance < 5f)
                 {
-                    // If the player is close to the energy ball, move it towards the player
+                    // 如果玩家靠近能量球，将其移向玩家
                     var t = SystemAPI.Time.DeltaTime * 5f;
                     transform.ValueRW.Position.xz = math.lerp(transform.ValueRO.Position.xz, playerPosition.xz, t);
                     transform.ValueRW.Scale = math.lerp(transform.ValueRO.Scale, 0.5f, t);
 
-                    // If the player is close enough, collect the energy ball
+                    // 如果玩家足够近，收集能量球
                     if (distance < 1f)
                     {
                         energy.ValueRW.Collected = true;

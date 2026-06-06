@@ -33,7 +33,7 @@ namespace Unity.Physics.Stateful
             {
                 var statefulCollisionEvent = new StatefulCollisionEvent(collisionEvent);
 
-                // Check if we should calculate the collision details
+                // 检查我们是否应该计算碰撞细节
                 bool calculateDetails = ForceCalculateDetails;
                 if (!calculateDetails && EventDetails.HasComponent(collisionEvent.EntityA))
                 {

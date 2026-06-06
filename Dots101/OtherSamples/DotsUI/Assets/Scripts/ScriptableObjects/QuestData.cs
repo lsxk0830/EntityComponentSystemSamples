@@ -12,7 +12,7 @@ namespace Unity.DotsUISample
         public bool HasAllItems;
         public bool Done;
     }
-    
+
     [Serializable]
     public class QuestGoals
     {

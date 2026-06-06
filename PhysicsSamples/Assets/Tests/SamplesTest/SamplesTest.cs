@@ -62,9 +62,9 @@ namespace Unity.Physics.Tests
                 var scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
                 if (scenePath.Contains("InitTestScene")
                     || scenePath.Contains("Built-in Prefab Joint Conversion")
-                    || scenePath.Contains("ChainTestWithMass") // Test runs for 26s. Only want for performance testing
-                                                               // in order to circumvent API breakages that do not affect physics, some packages are removed from the project on CI
-                                                               // any scenes referencing asset types in com.unity.inputsystem must be guarded behind UNITY_INPUT_SYSTEM_EXISTS
+                    || scenePath.Contains("ChainTestWithMass") // 测试运行 26s。只想进行性能测试
+                                                               // 为了避免 API 不影响物理的破损，一些 packages 从 CI 上的项目中删除
+                                                               // 任何 scenes 引用 com.unity.inputsystem 中的资产类型都必须在 UNITY_INPUT_SYSTEM_EXISTS 后面进行保护
 #if !UNITY_INPUT_SYSTEM_EXISTS
                     || scenePath.Contains("LoaderScene")
 #endif
@@ -72,36 +72,36 @@ namespace Unity.Physics.Tests
                     continue;
 
 #if UNITY_ANDROID_ARM7V || UNITY_IOS
-                // Terrain scene needs a lot of memory, skip it on Android armv7 and IOS
+                // 地形 scene 需要大量内存，在 Android armv7 和 IOS 上跳过它
                 if (scenePath.Contains("/Terrain.unity"))
                     continue;
 
-                // Performance scenes need a lot of memory, skip it on Android armv7 and IOS
+                // 性能 scenes 需要大量内存，在 Android armv7 和 IOS 上跳过它
                 if (scenePath.Contains("/ConvexCollisionPerformanceTest.unity") ||
                     scenePath.Contains("/CubeCollisionPerformanceTest.unity") ||
                     scenePath.Contains("/RagdollPerformanceTest.unity") ||
                     scenePath.Contains("/SphereCollisionPerformanceTest.unity"))
                     continue;
 
-                // Seems to run out of memory on armv7 and IOS
+                // 似乎 run 在 armv7 和 IOS 上内存不足
                 if (scenePath.Contains("/Character Controller.unity") ||
                     scenePath.Contains("/Raycast Car.unity"))
                     continue;
 
-                //SIGSEGV/SIGBUSS error looks like there's some alignment/out of bounds access somewhere
-                //Sample tests seem to randomly trigger it on CI, at the moment of this comment it is not reproducible locally
+                //SIGSEGV/SIGBUSS 错误看起来好像某处存在一些对齐/越界访问
+                //示例测试似乎是在 CI 上随机 trigger 进行的，在发表此评论时，它无法在本地重现
                 if (scenePath.Contains("/Animation.unity")
                     || scenePath.Contains("/ClientServer.unity")
-                    || scenePath.Contains("/DeactivatedBodiesTriggerTest")) //all trigger test scenes
+                    || scenePath.Contains("/DeactivatedBodiesTriggerTest")) //所有 trigger 测试 scenes
                     continue;
 #endif
 
 #if UNITY_IOS
-                // Disabled due to iOS device specific crash on 2023.3.0a17: DOTS-9820
+                // 由于 2023.3.0a17 上 iOS 设备特定崩溃而被禁用：DOTS-9820
                 if (scenePath.Contains("/Pyramids.unity"))
                     continue;
 
-                // Tests we're skipping with HavokPhysics
+                // 我们使用 HavokPhysics 跳过测试
                 if (scenePath.Contains("/Joints - Ragdolls.unity") ||
                     scenePath.Contains("/ChangeGroundFilter.unity") ||
                     scenePath.Contains("/ChangeGroundFilterChangeCollider.unity") ||
@@ -123,18 +123,18 @@ namespace Unity.Physics.Tests
 #endif
 
 #if UNITY_STANDALONE_WIN
-                // DOTS-10318 RagdollPerformanceTest is failing on Windows Standalone
+                // DOTS-10318 RagdollPerformanceTest 在 Windows Standalone 上失败
                 if (scenePath.Contains("/RagdollPerformanceTest.unity"))
                     continue;
 #endif
 
-#if UNITY_STANDALONE_LINUX 
-             // Tests we're skipping due to failure in Ubuntu for 1.4 release
+#if UNITY_STANDALONE_LINUX
+             // 由于 Ubuntu 1.4 版本失败，我们正在跳过测试
              if (scenePath.Contains("/VehicleOverTerrain.unity"))
              {
                  continue;
              }
-#endif                   
+#endif
 
                 scenes.Add(scenePath);
             }
@@ -142,7 +142,7 @@ namespace Unity.Physics.Tests
             return scenes;
         }
 
-        // Adds the specified scenes to the list of scenes to be tested rather than skipping the named scenes.
+        // 将指定的 scenes 添加到要测试的 scenes 列表中，而不是跳过指定的 scenes。
         protected static IEnumerable GetScenesForSubstepTesting()
         {
             var sceneCount = SceneManager.sceneCountInBuildSettings;
@@ -152,13 +152,13 @@ namespace Unity.Physics.Tests
                 var scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
 
 #if UNITY_IOS
-                // Disabled due to iOS device specific crash on 2023.3.0a17: DOTS-9820
+                // 由于 2023.3.0a17 上 iOS 设备特定崩溃而被禁用：DOTS-9820
                 if (scenePath.Contains("/Pyramids.unity"))
                     continue;
 #endif
-                // A selection of Demos & Tests where substepping should be tested. Did not select tests that are
-                // conditionally skipped on some platforms (except for Pyramids on iOS)
-                // Note: simulation validation fails for: Motion Properties - Mass.unity, BasicStacks.unity
+                // 应测试子步的一系列演示和测试。没有选择以下测试
+                // 在某些平台上有条件地跳过（iOS 上的金字塔除外）
+                // Note: 模拟验证失败：运动属性 - Mass.unity、BasicStacks.unity
                 if (scenePath.Contains("/HelloWorld.unity") ||
                     scenePath.Contains("/GravityWell.unity") ||
                     scenePath.Contains("/Collider Parade - Basic.unity") ||
@@ -178,7 +178,7 @@ namespace Unity.Physics.Tests
                     scenePath.Contains("/Modify - Surface Velocity.unity") ||
                     scenePath.Contains("/Pool.unity") ||
 
-                    // A selection of Test scenes where substepping should be tested
+                    // 应测试子步的测试 scenes 的选择
                     scenePath.Contains("/CollisionUT.unity") ||
                     scenePath.Contains("/CollisionEventDataUT.unity") ||
                     scenePath.Contains("/CollisionEventsUT.unity") ||
@@ -225,11 +225,11 @@ namespace Unity.Physics.Tests
         protected IEnumerator LoadScene(string scenePath)
         {
             SceneManager.LoadScene(scenePath);
-            // Skip a frame in order to trigger loading so that the Sub Scene loading process is started and we can find
-            // the corresponding scene entities below.
+            // 跳过一帧以便 trigger 加载，从而启动 Sub Scene 加载过程，我们可以发现
+            // 对应下面的 scene entities。
             yield return new WaitForFixedUpdate();
 
-            // Find all Sub Scenes and make sure they are loaded before proceeding
+            // 找到所有 Sub Scenes 并确保它们已加载，然后再继续
             using (var subSceneQuery = DefaultWorld.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<SceneReference>()))
             {
                 using (var sceneEntities = subSceneQuery.ToEntityArray(Allocator.Persistent))
@@ -247,7 +247,7 @@ namespace Unity.Physics.Tests
                             }
                         }
 
-                        // keep waiting by skipping a frame while Sub Scenes are still being loaded
+                        // 当 Sub Scenes 仍在加载时，通过跳过一帧继续等待
                         if (loading)
                         {
                             yield return new WaitForFixedUpdate();
@@ -260,9 +260,9 @@ namespace Unity.Physics.Tests
 
         protected IEnumerator Simulate()
         {
-            // Find Simulation Validation in the loaded scene and enable validation if present.
-            // Then run the simulation until the end period specified in the Simulation Validation Settings, unless
-            // it's set to "infinity" (value < 0, see SimulationValidationAuthoring).
+            // 在加载的 scene 中查找模拟验证并启用验证（如果存在）。
+            // 然后 run 进行模拟，直到模拟验证设置中指定的结束时间段，除非
+            // 它设置为“无穷大”（值 < 0，请参阅 SimulationValidationAuthoring）。
             var simulationTime = 1.0f;
             using (var query = DefaultWorld.EntityManager.CreateEntityQuery(ComponentType.ReadWrite<SimulationValidationSettings>()))
             {
@@ -270,15 +270,15 @@ namespace Unity.Physics.Tests
                 {
                     validationSettings.ValueRW.EnableValidation = true;
                     var timeRange = validationSettings.ValueRO.ValidationTimeRange;
-                    // obtain simulation end time unless it's set to "infinity"
+                    // 获取模拟结束时间，除非它设置为“无穷大”
                     if (timeRange[1] >= 0)
                     {
                         simulationTime = timeRange[1];
                     }
                     else
                     {
-                        // if infinite simulation validation is requested (timeRange[1] < 0),
-                        // simulate at least as long as required to start the validation plus one extra second.
+                        // 如果请求无限模拟验证（timeRange[1] < 0），
+                        // 模拟时间至少与开始验证所需的时间一样长，再加上一秒。
                         simulationTime = timeRange[0] + 1;
                     }
 
@@ -338,11 +338,11 @@ namespace Unity.Physics.Tests
         [Timeout(240000)]
         public IEnumerator LoadScenes([ValueSource(nameof(GetScenes))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Enable multi threaded Unity Physics simulation
+            // 启用多线程 Unity Physics 模拟
             ConfigureSimulation(DefaultWorld, SimulationType.UnityPhysics);
 
             yield return LoadSceneAndSimulate(scenePath);
@@ -356,11 +356,11 @@ namespace Unity.Physics.Tests
         [Timeout(240000)]
         public IEnumerator LoadScenes([ValueSource(nameof(GetScenes))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
-            // Enable single threaded Unity Physics simulation
+            // 启用单线程 Unity Physics 模拟
             ConfigureSimulation(DefaultWorld, SimulationType.UnityPhysics, false);
 
             yield return LoadSceneAndSimulate(scenePath);
@@ -373,7 +373,7 @@ namespace Unity.Physics.Tests
         [Timeout(240000)]
         public IEnumerator LoadScenes([ValueSource(nameof(GetScenesForSubstepTesting))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
@@ -383,7 +383,7 @@ namespace Unity.Physics.Tests
                 numSolverIterations = 4;
             }
 
-            // Enable single threaded Unity Physics simulation
+            // 启用单线程 Unity Physics 模拟
             ConfigureSimulation(DefaultWorld, SimulationType.UnityPhysics, false,
                 false, false, 4, numSolverIterations, true, true);
 
@@ -397,7 +397,7 @@ namespace Unity.Physics.Tests
         [Timeout(240000)]
         public IEnumerator LoadScenes([ValueSource(nameof(GetScenesForSubstepTesting))] string scenePath)
         {
-            // Log scene name in case Unity crashes and test results aren't written out.
+            // 记录 scene 名称，以防 Unity 崩溃并且测试结果未写出。
             Debug.Log("Loading " + scenePath);
             LogAssert.Expect(LogType.Log, "Loading " + scenePath);
 
@@ -407,7 +407,7 @@ namespace Unity.Physics.Tests
                 numSolverIterations = 4;
             }
 
-            // Enable single threaded Unity Physics simulation
+            // 启用单线程 Unity Physics 模拟
             ConfigureSimulation(DefaultWorld, SimulationType.UnityPhysics, true,
                 false, false, 4, numSolverIterations, true, true);
 

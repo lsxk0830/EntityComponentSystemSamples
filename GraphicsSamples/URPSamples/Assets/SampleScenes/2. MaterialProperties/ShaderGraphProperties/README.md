@@ -1,20 +1,20 @@
 # ShaderGraphProperties
 
-This sample demonstrates material property overrides for Shader Graph shaders on Entities.
+此示例演示了 Entities 上 Shader Graph 着色器的材质属性覆盖。
 
 <img src="../../../../READMEimages/ShaderGraphProperties.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains cubes which use the Shader Graph PBR output. Some of these cubes have **material override authoring components** attached to their MeshRenderers. These component override the cubes' colors.
+scene 包含使用 Shader Graph PBR 输出的立方体。其中一些立方体的 MeshRenderers 附加了 **材质覆盖 authoring components**。这些 component 覆盖立方体的颜色。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select the **CubeRed** cube
-2. In the Inspector, note the Material Color component. If you want to override other custom Shader Graph material properties, you can reference the MaterialColor script and create one for each of your custom material properties
-3. Click **Edit** to edit the Shader Graph, note that the Node Settings of the Color property has the **Override Property Declaration** enabled and **Shader Declaration** set to **Hybrid Per Instance**
+1. 在 Hierarchy 中，选择 **CubeRed** 立方体
+2. 在 Inspector 中，记下材质颜色 component。如果您想要覆盖其他自定义 Shader Graph 材质属性，您可以引用 MaterialColor 脚本并为每个自定义材质属性创建一个脚本
+3. 单击 **Edit** 编辑 Shader Graph，请注意，Color 属性的 Node Settings 已启用 **Override Property statements**，并且 **ShaderDeclaration** 设置为 **Hybrid Per Instance**
 
 
-## More information
+## 更多信息
 
-For more information about custom Shader Graph material overrides, see the [documentation](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/material-overrides-code.html).
+有关自定义 Shader Graph 材质覆盖的更多信息，请参阅[文档](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/material-overrides-code.html)。

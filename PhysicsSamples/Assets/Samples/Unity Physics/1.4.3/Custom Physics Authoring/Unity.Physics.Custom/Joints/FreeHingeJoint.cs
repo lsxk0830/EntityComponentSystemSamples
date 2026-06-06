@@ -6,7 +6,7 @@ namespace Unity.Physics.Authoring
 {
     public class FreeHingeJoint : BallAndSocketJoint
     {
-        // Editor only settings
+        // 仅 Editor 设置
         [HideInInspector]
         public bool EditAxes;
 

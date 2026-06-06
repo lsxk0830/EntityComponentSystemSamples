@@ -12,7 +12,7 @@ namespace KickBall
         {
             public override void Bake(ConfigAuthoring authoring)
             {
-                DependsOn(authoring.ConfigSO);  // ensures that baking will be re-triggered if the SO is modified
+                DependsOn(authoring.ConfigSO);  // 确保如果 SO 被修改，baking 将被重新触发
 
                 var entity = GetEntity(authoring.gameObject, TransformUsageFlags.None);
                 AddComponent(entity, new EntityPrefabs

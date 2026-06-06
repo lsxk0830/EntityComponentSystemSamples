@@ -7,7 +7,7 @@ namespace Unity.DotsUISample
     {
         Image m_IconImage;
         Sprite m_BaseSprite;
-        
+
         const string k_SlotUssClassName = "inventory-slot";
         const string k_SlotIconUssClassName = "inventory-slot-icon";
 

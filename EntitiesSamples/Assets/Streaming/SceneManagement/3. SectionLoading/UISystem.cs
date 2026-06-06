@@ -31,7 +31,7 @@ namespace Streaming.SceneManagement.SectionLoading
             var sectionEntities = state.EntityManager.GetBuffer<ResolvedSectionEntity>(entities[0]);
             ui.CreateRows(sectionEntities.Length);
 
-            // Update the information for each scene UI
+            // 更新每个 scene UI 的信息
             for (int index = 0; index < sectionEntities.Length; ++index)
             {
                 var entity = sectionEntities[index].SectionEntity;

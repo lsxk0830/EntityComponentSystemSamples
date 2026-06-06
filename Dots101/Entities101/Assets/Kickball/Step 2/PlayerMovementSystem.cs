@@ -22,38 +22,38 @@ namespace Tutorials.Kickball.Step2
         {
             var config = SystemAPI.GetSingleton<Config>();
 
-            // Get directional input. (Most of the UnityEngine.Input are Burst compatible, but not all are.
-            // If the OnUpdate, OnCreate, or OnDestroy methods needs to access managed objects or call methods
-            // that aren't Burst-compatible, the [BurstCompile] attribute can be omitted.
+            // 获取定向输入。（大多数 UnityEngine.Input 与 Burst 兼容，但并非全部都是。
+            // 如果 OnUpdate、OnCreate 或 OnDestroy 方法需要访问托管对象或调用方法
+            // 与 Burst 不兼容的，可以省略 [BurstCompile] 属性。
             var horizontal = Input.GetAxis("Horizontal");
             var vertical = Input.GetAxis("Vertical");
             var input = new float3(horizontal, 0, vertical) * SystemAPI.Time.DeltaTime * config.PlayerSpeed;
 
-            // If there's no directional input this frame, we don't need to move the players.
+            // 如果这一帧没有方向输入，我们就不需要移动玩家。
             if (input.Equals(float3.zero))
             {
                 return;
             }
 
-            var minDist = config.ObstacleRadius + 0.5f; // the player capsule radius is 0.5f
+            var minDist = config.ObstacleRadius + 0.5f; // 玩家胶囊半径为 0.5f
             var minDistSQ = minDist * minDist;
 
-            // For every entity having a LocalTransform and Player component, a read-write reference to
-            // the LocalTransform is assigned to 'playerTransform'.
+            // 对于每个具有 LocalTransform 和播放器 component 的 entity，对
+            // LocalTransform 被分配给“playerTransform”。
             foreach (var playerTransform in
                      SystemAPI.Query<RefRW<LocalTransform>>()
                          .WithAll<Player>())
             {
                 var newPos = playerTransform.ValueRO.Position + input;
 
-                // A foreach query nested inside another foreach query.
-                // For every entity having a LocalTransform and Obstacle component, a read-only reference to
-                // the LocalTransform is assigned to 'obstacleTransform'.
+                // 一个 foreach query 嵌套在另一个 foreach query 中。
+                // 对于每个具有 LocalTransform 和障碍物 component 的 entity，只读引用
+                // LocalTransform 被分配给“obstacleTransform”。
                 foreach (var obstacleTransform in
                          SystemAPI.Query<RefRO<LocalTransform>>()
                              .WithAll<Obstacle>())
                 {
-                    // If the new position intersects the player with a wall, don't move the player.
+                    // 如果新位置与玩家相交，则不要移动玩家。
                     if (math.distancesq(newPos, obstacleTransform.ValueRO.Position) <= minDistSQ)
                     {
                         newPos = playerTransform.ValueRO.Position;

@@ -7,7 +7,7 @@ using Unity.Scenes;
 
 namespace Streaming.SceneManagement.CompleteSample
 {
-    // This system will load/unload the sections based on their distance to Relevant entities
+    // 此 system 将根据其与相关 entities 的距离加载/卸载这些部分
     [UpdateAfter(typeof(RequestPostLoadSystem))]
     partial struct TileLODSystem : ISystem
     {
@@ -16,7 +16,7 @@ namespace Streaming.SceneManagement.CompleteSample
         {
             var loadSection0Query = SystemAPI.QueryBuilder().WithAll<LoadSection0, ResolvedSectionEntity>().Build();
 
-            // Handle the loading of sections 0. They are not part of the LODs and need to be always loaded
+            // 处理第 0 节的加载。它们不是 LODs 的一部分，需要始终加载
             var sceneEntities = loadSection0Query.ToEntityArray(Allocator.Temp);
             foreach (var sceneEntity in sceneEntities)
             {
@@ -25,12 +25,12 @@ namespace Streaming.SceneManagement.CompleteSample
                 {
                     state.EntityManager.AddComponent<RequestSceneLoaded>(buffer[0].SectionEntity);
 
-                    // We can't remove it with the query in case some buffer is empty
+                    // 如果某些缓冲区为空，我们无法使用 query 删除它
                     state.EntityManager.RemoveComponent<LoadSection0>(sceneEntity);
                 }
             }
 
-            // We need the tile center in each section to check the distance. If it is not already in the section, we copy it into it.
+            // 我们需要每个部分的图块中心来检查距离。如果该部分中尚不存在，我们会将其复制到其中。
             var noTileEntityQuery = SystemAPI.QueryBuilder().WithAll<TileLODRange, SceneEntityReference>()
                 .WithNone<TileEntity>().Build();
             var sectionEntities = noTileEntityQuery.ToEntityArray(Allocator.Temp);
@@ -42,7 +42,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 state.EntityManager.AddComponentData(sectionEntities[index], tileEntity);
             }
 
-            // Check sections LOD distances
+            // 检查 LOD 部分距离
             NativeHashSet<Entity> toLoad = new NativeHashSet<Entity>(1, Allocator.Temp);
 
             var sectionQuery = SystemAPI.QueryBuilder().WithAll<TileLODRange, TileEntity, SceneSectionData>()
@@ -51,7 +51,7 @@ namespace Streaming.SceneManagement.CompleteSample
             var tileEntities = sectionQuery.ToComponentDataArray<TileEntity>(Allocator.Temp);
             var lodRanges = sectionQuery.ToComponentDataArray<TileLODRange>(Allocator.Temp);
 
-            // Find all the sections that should be loaded based on the distances to relevant entitie
+            // 根据到相关实体的距离查找应加载的所有部分
             for (int index = 0; index < tileEntities.Length; ++index)
             {
                 var distanceComponent =
@@ -64,7 +64,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 }
             }
 
-            // Cache the streaming state of the section
+            // 缓存该部分的流状态
             NativeHashMap<Entity, SceneSystem.SectionStreamingState> streamingStateLookup =
                 new NativeHashMap<Entity, SceneSystem.SectionStreamingState>(1, Allocator.Temp);
             foreach (Entity sectionEntity in sectionEntities)
@@ -73,7 +73,7 @@ namespace Streaming.SceneManagement.CompleteSample
                 streamingStateLookup.Add(sectionEntity, sectionState);
             }
 
-            // Load or unload the sections based on the previous distance checks
+            // 根据之前的距离检查加载或卸载部分
             foreach (Entity sectionEntity in sectionEntities)
             {
                 var sectionState = streamingStateLookup[sectionEntity];
@@ -81,13 +81,13 @@ namespace Streaming.SceneManagement.CompleteSample
                 {
                     if (sectionState == SceneSystem.SectionStreamingState.Unloaded)
                     {
-                        // We need to load the section
+                        // 我们需要加载该部分
                         state.EntityManager.AddComponent<RequestSceneLoaded>(sectionEntity);
                     }
                 }
                 else if (sectionState != SceneSystem.SectionStreamingState.Unloaded)
                 {
-                    // Check neighbours to avoid the previous LOD to unload before the new one is loaded
+                    // 检查邻居以避免之前的 LOD 在新的 LOD 加载之前卸载
                     var sceneEntityReference =
                         state.EntityManager.GetComponentData<SceneEntityReference>(sectionEntity);
                     var sceneSectionEntities =
@@ -102,7 +102,7 @@ namespace Streaming.SceneManagement.CompleteSample
                             ++sectionsLoaded;
                     }
 
-                    // Unload if there is at least one other section loaded
+                    // 如果至少有一个其他部分已加载，则卸载
                     if (sectionsLoaded > 1)
                     {
                         state.EntityManager.RemoveComponent<RequestSceneLoaded>(sectionEntity);

@@ -62,7 +62,7 @@ public partial class TerrainDemoSystem : SceneCreationSystem<TerrainDemoScene>
 {
     public override void CreateScene(TerrainDemoScene sceneSettings)
     {
-        // Make heightfield data
+        // 制作高度场数据
         NativeArray<float> heights;
         int2 size;
         float3 scale;

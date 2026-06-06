@@ -4,9 +4,9 @@ using Unity.Entities;
 namespace Unity.Physics.Tests
 {
     /// <summary>
-    /// This component is used to store a prefab for testing its conversion into an entity.
-    /// It allows verification that the resulting entity, marked with the [Prefab] tag, was correctly converted.
-    /// For example, it is used in the [Built-in Prefab Joint Conversion.scene] to validate the conversion process.
+    /// 这个 component 用于存储 prefab 以测试其转换为 entity。
+    /// 它允许验证生成的 entity（标有 [Prefab] 标签）是否已正确转换。
+    /// 例如，它用于[内置 Prefab Joint Conversion.scene]来验证转换过程。
     /// </summary>
     public class PrefabAuthoring : MonoBehaviour
     {
@@ -25,7 +25,7 @@ namespace Unity.Physics.Tests
         }
     }
 
-    // This component is used to store a prefab entity reference.
+    // 该 component 用于存储 prefab entity 参考。
     public struct PrefabComponentData : IComponentData
     {
         public Entity Prefab;

@@ -19,7 +19,7 @@ namespace Tutorials.Firefighters
 
     public struct Bucket : IComponentData
     {
-        public float Water;  // 0 = empty, 1 = full
+        public float Water;  // 0 = 空，1 = 满
 
         public Entity CarryingBot;
         public bool IsCarried;

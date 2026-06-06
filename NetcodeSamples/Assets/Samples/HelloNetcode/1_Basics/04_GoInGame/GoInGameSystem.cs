@@ -4,7 +4,7 @@ using Unity.NetCode;
 
 namespace Samples.HelloNetcode
 {
-    // Place any established network connection in-game so ghost snapshot sync can start
+    // 将任何已建立的网络连接放置在游戏中，以便 ghost snapshot 同步可以开始
     [UpdateInGroup(typeof(HelloNetcodeSystemGroup))]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
     public partial class GoInGameSystem : SystemBase
@@ -23,7 +23,7 @@ namespace Samples.HelloNetcode
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             FixedString32Bytes worldName = World.Name;
 
-            // Go in game as soon as we have a connection set up (connection network ID has been set)
+            // 连接建立后立即进入游戏（连接网络 ID 已设置）
             foreach (var (id, ent) in SystemAPI.Query<NetworkId>().WithNone<NetworkStreamInGame>().WithEntityAccess())
             {
                 UnityEngine.Debug.Log($"[{worldName}] Go in game connection {id.Value}");

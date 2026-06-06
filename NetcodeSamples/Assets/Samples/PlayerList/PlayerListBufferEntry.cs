@@ -4,27 +4,27 @@ using Unity.Entities;
 namespace Unity.NetCode.Samples.PlayerList
 {
     /// <summary>
-    ///     Similar to <see cref="PlayerListEntry"/>, except a <see cref="IBufferElementData"/>, allowing the client to store this data in a buffer.
-    ///     Stores all players and their state (username, ping etc).
-    ///     Index mapped to NetworkId - 1.
+    ///     与 <see cref="PlayerListEntry"/> 类似，但 <see cref="IBufferElementData"/> 除外，允许 client 将此数据存储在缓冲区中。
+    ///     存储所有玩家及其状态（用户名、ping 等）。
+    ///     索引映射到 NetworkId - 1。
     /// </summary>
     /// <remarks>
-    ///     This is therefore automatically sorted and deterministic.
-    ///     Will contain disconnected players whose NetworkId has not been re-used.
-    ///     Will also contain default entries as the list is resized with some spare capacity.
-    ///     Depends on the implicit rules of NetworkId's.
-    ///     A list is used to allow implicit resizing without having to dispose.
+    ///     因此，这是自动排序的并且是确定性的。
+    ///     将包含 NetworkId 尚未被重新使用的已断开连接的玩家。
+    ///     当列表大小调整为一些备用容量时，还将包含默认条目。
+    ///     取决于 NetworkId 的隐含规则。
+    ///     列表用于允许隐式调整大小而无需释放。
     /// </remarks>
     public struct PlayerListBufferEntry : IBufferElementData
     {
-        /// <summary>Stores the last received RPC for this player.</summary>
+        /// <summary>Stores 最后收到的此 player.</summary> 的 RPC
         public PlayerListEntry.ChangedRpc State;
 
         public bool IsCreated => State.NetworkId != default;
 
         /// <summary>
-        /// Returns the number of connected players.
-        /// Why? The buffer can also contain disconnected players.
+        /// 返回已连接玩家的数量。
+        /// 为什么？缓冲区还可以包含断开连接的玩家。
         /// </summary>
         /// <param name="playerListBufferEntries"></param>
         /// <returns></returns>

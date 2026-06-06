@@ -25,14 +25,14 @@ public partial class CompoundDemoSystem : SceneCreationSystem<CompoundDemoScene>
 {
     public override void CreateScene(CompoundDemoScene sceneSettings)
     {
-        //         // Floor
+        //         // 地面
         //         {
         //             BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new float3(0, -0.1f, 0), Quaternion.identity, new float3(10.0f, 0.1f, 10.0f), 0.05f);
         //             CreatedColliders.Add(collider);
         //             CreateStaticBody(float3.zero, quaternion.identity, collider);
         //         }
 
-        // Dynamic compound
+        // 动态复合
         {
             var box = new BoxGeometry
             {

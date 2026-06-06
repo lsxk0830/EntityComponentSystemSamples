@@ -17,7 +17,7 @@ namespace Samples.HelloNetcode
         [GhostField] public float Pitch;
         [GhostField] public float Yaw;
 
-        /// <summary>Implemented to get better packet dump info.</summary>
+        /// <summary>Implemented 获得更好的数据包转储 info.</summary>
         public FixedString512Bytes ToFixedString() => $"move({Movement}, j:{Jump.Count}), shoot(p:{PrimaryFire.Count}, s{SecondaryFire.Count}), mouse(pitch:{Pitch}, yaw:{Yaw})";
     }
 
@@ -70,9 +70,9 @@ namespace Samples.HelloNetcode
                 else
                 {
                     lookDelta = new float2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-                    // You'll want to expose userSpecifiedMouseSensitivity in your games UI.
-                    // The server doesn't need to know about it.
-                    // Example valid range: 0.002 - 0.4.
+                    // 您需要在游戏中公开 userSpecifiedMouseSensitivity UI。
+                    // server 不需要知道这一点。
+                    // 有效范围示例：0.002 - 0.4。
                     const float userSpecifiedMouseSensitivity = .04f;
                     lookDelta *= userSpecifiedMouseSensitivity;
                 }

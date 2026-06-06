@@ -7,10 +7,10 @@ namespace Samples.HelloNetcode
     [GhostComponent(PrefabType=GhostPrefabType.AllPredicted)]
     public struct PlayerMovement : IComponentData
     {
-        // This value is connected to the jump logic calculated inside the prediction loop
-        // and thus needs to be a ghost field so it's properly stored in ghost history and
-        // you get the correct value each time the prediction runs regardless of what tick is
-        // being predicted
+        // 该值连接到 prediction 循环内部计算的跳转逻辑
+        // 因此需要是一个 ghost 字段，以便它正确存储在 ghost 历史记录中，并且
+        // 每次 prediction 运行时，无论刻度是什么，您都会获得正确的值
+        // 是 predicted
         [GhostField]
         public int JumpVelocity;
     }

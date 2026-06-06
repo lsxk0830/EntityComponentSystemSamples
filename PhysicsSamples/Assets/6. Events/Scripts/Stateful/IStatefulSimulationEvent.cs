@@ -2,12 +2,12 @@ using Unity.Entities;
 
 namespace Unity.Physics.Stateful
 {
-    // Describes an event state.
-    // Event state is set to:
-    //    0) Undefined, when the state is unknown or not needed
-    //    1) Enter, when 2 bodies are interacting in the current frame, but they did not interact the previous frame
-    //    2) Stay, when 2 bodies are interacting in the current frame, and they also interacted in the previous frame
-    //    3) Exit, when 2 bodies are not interacting in the current frame, but they did interact in the previous frame
+    // 描述事件状态。
+    // 事件状态设置为：
+    //    0) 未定义，当状态未知或不需要时
+    //    1）进入，当 2 个物体在当前帧中有交互，但在上一帧没有交互时
+    //    2）停留，当 2 个物体在当前帧中相互作用，并且它们在前一帧中也相互作用时
+    //    3) 退出，当两个物体在当前帧中没有交互，但它们在前一帧中交互时
     public enum StatefulEventState : byte
     {
         Undefined,
@@ -16,7 +16,7 @@ namespace Unity.Physics.Stateful
         Exit
     }
 
-    // Extends ISimulationEvent with extra StatefulEventState.
+    // 使用额外的 StatefulEventState 扩展 ISimulationEvent。
     public interface IStatefulSimulationEvent<T> : IBufferElementData, ISimulationEvent<T>
     {
         public StatefulEventState State { get; set; }

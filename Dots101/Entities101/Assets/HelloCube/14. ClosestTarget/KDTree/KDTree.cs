@@ -1,8 +1,8 @@
-﻿// This code originates from https://github.cds.internal.unity3d.com/andy-bastable/SpatialTree
-// Check that repo and ask for permission before using it in other projects
+﻿// 此代码源自 https://github.cds.internal.unity3d.com/andy-bastable/SpatialTree
+// 在其他项目中使用该存储库并请求许可之前
 
-// #define ENABLE_KDTREE_VALIDATION_CHECKS
-// #define ENABLE_KDTREE_ANALYTICS
+// #定义 ENABLE_KDTREE_VALIDATION_CHECKS
+// #定义 ENABLE_KDTREE_ANALYTICS
 
 using System;
 using System.Runtime.CompilerServices;
@@ -54,7 +54,7 @@ public unsafe struct KDTree : IDisposable
 
         int padding; // 4
 
-        // 32B (2 per cacheline)
+        // 32B（每个缓存行 2 个）
 
         public uint Count => count & k_CountBitMask;
 
@@ -70,7 +70,7 @@ public unsafe struct KDTree : IDisposable
         internal int index; // 4
         internal float3 position; // 12
 
-        // 16B (4 per cacheline)
+        // 16B（每个缓存行 4 个）
     }
 
     public struct Neighbour : IComparable<Neighbour>
@@ -79,7 +79,7 @@ public unsafe struct KDTree : IDisposable
         public float distSq; // 4
         public float3 position; // 12
 
-        // 20B (3 per cacheline)
+        // 20B（每个缓存行 3 个）
 
         public int CompareTo(Neighbour other)
         {
@@ -153,7 +153,7 @@ public unsafe struct KDTree : IDisposable
     {
         balancedLeafNodes = math.max(1, (numEntries / k_MaxLeafSize));
 
-        // need to ensure we have enough nodes for an eytzinger layout (much more cache performant)
+        // 需要确保我们有足够的节点用于 eytzinger 布局（缓存性能更高）
         maxDepth = KDTree.k_MaxUnbalancedDepth + (int)math.ceil(math.log2(balancedLeafNodes));
         return numEntries > k_MaxLeafSize ? (int)math.pow(2f, 1 + maxDepth) : 1;
     }
@@ -177,7 +177,7 @@ public unsafe struct KDTree : IDisposable
     public KDTree(int capacity, Allocator allocator, int MaxWorkerThreads)
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        // Native allocation is only valid for Temp, Job and Persistent
+        // 本机分配仅对 Temp、Job 和 Persistent 有效
         if (allocator <= Allocator.None)
             throw new ArgumentException("Allocator must be Temp, TempJob or Persistent", "allocator");
         if (capacity < 0)
@@ -261,12 +261,12 @@ public unsafe struct KDTree : IDisposable
 
         if (m_NumEntries > k_MaxLeafSize)
         {
-            // calculate how many workers we need based on entries
+            // 根据条目计算我们需要多少工人
             var entryNumWorkers = CalculateNumWorkers(m_NumEntries, JobsUtility.JobWorkerCount, k_MaxLeafSize, k_MinLeavesPerWorker);
             entryNumWorkers = math.min(m_NumWorkers, entryNumWorkers);
             var maxDepthOnPreProcess = (int)math.log2(entryNumWorkers);
 
-            // preprocess tree for parallel work
+            // 并行工作的预处理树
             for (int depth = 0; depth < maxDepthOnPreProcess; depth++)
             {
                 int numNodesToProcess = (int)math.pow(2, depth);
@@ -279,7 +279,7 @@ public unsafe struct KDTree : IDisposable
                 dep = preProcessJob.Schedule(numNodesToProcess, 1, dep);
             }
 
-            //build tree on workers
+            //在工人身上建树
             var buildSubTreeJob = new BuildSubTreeJob
             {
                 This = this,
@@ -373,8 +373,8 @@ public unsafe struct KDTree : IDisposable
 
         if (count == 0)
         {
-            // preprocessing resulted in an unbalanced tree
-            // so if this is a leaf node, we should drop out now
+            // 预处理导致树不平衡
+            // 所以如果这是一个叶节点，我们现在应该退出
             nodePtr->count |= k_IsLeafNodeBitFlag;
 
             if (preProcess)
@@ -382,7 +382,7 @@ public unsafe struct KDTree : IDisposable
                 uint leftNode = 2 * nodeIndex;
                 uint rightNode = leftNode + 1;
 
-                // fill in left/right node details
+                // 填写左/右节点详细信息
                 SetEmptyLeafNode(leftNode);
                 SetEmptyLeafNode(rightNode);
             }
@@ -397,10 +397,10 @@ public unsafe struct KDTree : IDisposable
             && nodePtr->bounds.radius >= k_ZeroRadiusEpsilon
             && count > k_MaxLeafSize)
         {
-            // as we are preprocessing, we know we are not a leaf node, so we can split
+            // 当我们进行预处理时，我们知道我们不是叶节点，因此我们可以拆分
             depth++;
 
-            // split into left/right
+            // 分为左/右
             float splitValue;
             int splitDimension = CalculateSplitDimension(bounds, mean, out splitValue);
 
@@ -412,24 +412,24 @@ public unsafe struct KDTree : IDisposable
 
             while (leftPtr < rightPtr)
             {
-                // while left positions are on the left, skip to next
+                // 当左边的位置在左边时，跳到下一个
                 while (leftPtr < rightPtr && GetDimensionComponent(splitDimension, ((Entry*)leftPtr)->position) < splitValue)
                 {
                     leftPtr += sizeof(Entry);
                 }
 
-                // while right positions are on the right, skip to next
+                // 当正确的位置在右侧时，跳至下一个
                 while (rightPtr > leftPtr && GetDimensionComponent(splitDimension, ((Entry*)rightPtr)->position) >= splitValue)
                 {
-                    // copy item to dest ptr
-                    // (to ensure the split is cacheline aligned)
+                    // 将项目复制到 dest ptr
+                    // （以确保分割是缓存行对齐的）
                     *(Entry*)rightDestPtr = *(Entry*)rightPtr;
 
                     rightPtr -= sizeof(Entry);
                     rightDestPtr -= sizeof(Entry);
                 }
 
-                // if entries are on the wrong side, swap them over
+                // 如果条目位于错误的一侧，请将它们交换过来
                 if (leftPtr < rightPtr)
                 {
                     Entry temp = *(Entry*)rightPtr;
@@ -445,7 +445,7 @@ public unsafe struct KDTree : IDisposable
 
             *(Entry*)rightDestPtr = *(Entry*)rightPtr;
 
-            // find pivot
+            // 找到支点
             while (leftPtr > beginPtr && GetDimensionComponent(splitDimension, ((Entry*)leftPtr)->position) >= splitValue)
             {
                 leftPtr -= sizeof(Entry);
@@ -471,7 +471,7 @@ public unsafe struct KDTree : IDisposable
         }
         else
         {
-            // this is a leaf node
+            // 这是一个叶节点
             nodePtr->count |= k_IsLeafNodeBitFlag;
 
             if (preProcess)
@@ -479,7 +479,7 @@ public unsafe struct KDTree : IDisposable
                 uint leftNode = 2 * nodeIndex;
                 uint rightNode = leftNode + 1;
 
-                // fill in left/right node details
+                // 填写左/右节点详细信息
                 SetEmptyLeafNode(leftNode);
                 SetEmptyLeafNode(rightNode);
             }
@@ -497,7 +497,7 @@ public unsafe struct KDTree : IDisposable
         };
 
         //if (nodePtr->count == 0 || nodePtr->count > 10000)
-        //    throw new InvalidOperationException($"SetNode on {nodeIndex} ({nodePtr->nodeIndex}) with invalid count {nodePtr->count}");
+        //    在 {nodeIndex} ({nodePtr->nodeIndex}) 上抛出新的 InvalidOperationException($"SetNode，计数无效 {nodePtr->count}")；
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -555,7 +555,7 @@ public unsafe struct KDTree : IDisposable
         TreeNode* nodePtr = m_NodesPtr + nodeIndex;
         if ((nodePtr->count & k_IsLeafNodeBitFlag) > 0)
         {
-            // leaf
+            // 叶子
             uint count = nodePtr->Count;
             int bucketCount = math.min((int)count, k_MaxLeafSize + 1);
             nodeSizeBuckets[bucketCount]++;
@@ -615,8 +615,8 @@ public unsafe struct KDTree : IDisposable
         m_NumNodesVisited++;
 #endif
 
-        // is this a leaf node
-        // do dist check
+        // 这是叶节点吗
+        // 进行远程检查
         if (nodePtr->IsLeaf)
         {
             SearchEntriesInRangeWithHeap(nodePtr, queryingIndex, position, ref range, ref neighboursAsPriorityHeap);
@@ -634,8 +634,8 @@ public unsafe struct KDTree : IDisposable
             float distSqLeft = math.distancesq(leftNodePtr->bounds.centre, position);
             float distSqRight = math.distancesq(rightNodePtr->bounds.centre, position);
 
-            // the min collide distance is the query radius (h) + the node bounding radius (r)
-            // if h + r > distance then we have an entry that could potentially be inside this bound
+            // 最小碰撞距离是 query 半径 (h) + 节点边界半径 (r)
+            // 如果 h + r > 距离，那么我们有一个可能位于此边界内的条目
             float leftCollideDist = leftRadius + range;
             float rightCollideDist = rightRadius + range;
 
@@ -688,7 +688,7 @@ public unsafe struct KDTree : IDisposable
 #if ENABLE_KDTREE_ANALYTICS
                         m_NumEntriesFoundOverNeighbourCapacity++;
 #endif
-                        // pop furthest off heap
+                        // 弹出离堆最远的地方
                         neighbours.Pop();
                         neighbours.Push(new Neighbour { index = ptr->index, distSq = distSq, position = ptr->position });
                     }
@@ -708,7 +708,7 @@ public unsafe struct KDTree : IDisposable
     {
         TreeNode* nodePtr = m_NodesPtr + nodeIndex;
 
-        // check that each entry matches up
+        // 检查每个条目是否匹配
         uint count = nodePtr->Count;
 
         if (count > m_Capacity || count == 0)

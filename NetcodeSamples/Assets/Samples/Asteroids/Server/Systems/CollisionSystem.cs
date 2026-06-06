@@ -105,10 +105,10 @@ namespace Asteroids.Server
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                // This job is not written to support queries with enableable component types.
+                // 此 job 不是为了支持可启用 component 类型的查询而编写的。
                 Assert.IsFalse(useEnabledMask);
 
-                // Rate-limit this, as it gets incredibly expensive on high chunk counts.
+                // 对此进行速率限制，因为在高 chunk 计数上它会变得非常昂贵。
                 if ((chunk.SequenceNumber + tick.TickIndexForValidTick) % level[0].collisionSystemRoundRobinSegments != 0) return;
 
                 var destroyedAsteroidCounter = 0;
@@ -161,8 +161,8 @@ namespace Asteroids.Server
                     }
                 }
 
-                // This sum theoretically causes thread contention, but said contention should be minimal (as bullets
-                // destroying asteroids is relatively rare).
+                // 从理论上讲，这个总和会导致线程争用，但所说的争用应该是最小的（如项目符号
+                // 摧毁小行星的情况相对罕见）。
                 if(destroyedAsteroidCounter > 0)
                     Interlocked.Add(ref asteroidScore.ValueRW.Value, destroyedAsteroidCounter);
             }
@@ -214,7 +214,7 @@ namespace Asteroids.Server
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                // This job is not written to support queries with enableable component types.
+                // 此 job 不是为了支持可启用 component 类型的查询而编写的。
                 Assert.IsFalse(useEnabledMask);
 
                 var shipTile = chunk.Has(distancePartitionSharedType) ? chunk.GetSharedComponent(distancePartitionSharedType).Index : 0;
@@ -418,8 +418,8 @@ namespace Asteroids.Server
             var h1 = asteroidJob.ScheduleParallel(asteroidQuery, asteroidDep);
             var h2 = shipJob.ScheduleParallel(shipQuery, shipDep);
 
-            JobHandle.ScheduleBatchedJobs(); // We call this because waiting for the above jobs to start can
-                                             // often take significantly longer than their execution.
+            JobHandle.ScheduleBatchedJobs(); // 我们之所以这样称呼是因为等待上面的 jobs 启动就可以
+                                             // 往往比他们的执行时间要长得多。
 
             var cleanupShipJob = new ClearShipPointerJob
             {

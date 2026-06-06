@@ -1,180 +1,180 @@
 
-In this page: 
+在此页面中：
 
-- [Enableable components](#enableable-components)
-- [Shared components](#shared-components)
-- [Cleanup components](#cleanup-components)
+- [启用 components](#enableable-components)
+- [共享 components](#shared-components)
+- [清理 components](#cleanup-components)
 - [Chunk components](#chunk-components)
-- [Blob assets](#blob-assets)
-- [Version numbers](#version-numbers)
+- [Blob 资产](#blob-assets)
+- [版本号](#version-numbers)
 
 <br>
 
-# Enableable components
+# 启用 components
 
-A struct implementing `IComponentData` or `IBufferElementData` can also implement [`IEnableableComponent`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.IEnableableComponent.html). A component type implementing this interface can be enabled and disabled per entity.
+实现 `IComponentData` 或 `IBufferElementData` 的结构也可以实现 [`IEnableableComponent`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.IEnableableComponent.html)。可以根据 entity 启用和禁用实现此接口的 component 类型。
 
-**When a component of an entity is disabled, queries consider the entity to not have the component type.** If no entities in a chunk match the query because one or more of their components are disabled, that chunk will not be included in the array returned by the [`ToArchetypeChunkArray()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityQuery.ToArchetypeChunkArray.html) method of `EntityQuery`.
+**当 entity 的 component 被禁用时，查询会认为 entity 没有 component 类型。** 如果 chunk 中没有 entities 与 query 匹配，因为或多个 components 被禁用，chunk 将不会包含在 `EntityQuery` 的 [`ToArchetypeChunkArray()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityQuery.ToArchetypeChunkArray.html) 方法返回的数组中。
 
-Be clear that disabling a component does *not* remove or modify the component: rather, a bit associated with the specific component of the specific entity is cleared. Also be clear that a disabled component only affects queries: a disabled component can otherwise still be read and modified as normal, such as *via* `EntityManager` methods.
+请注意，禁用 component 不会删除或修改 component：相反，与特定 entity 的特定 component 相关的位会被清除。另请注意，禁用的 component 仅影响查询：禁用的 component 仍可以正常读取和修改，例如*通过* `EntityManager` 方法。
 
-All enableable components are enabled by default on a newly created entity. When an entity is copied for serialization, copied to another world, or copied by the `Instantiate` method of `EntityManager`, the enabled states of the components in the new entity match the states in the original.
+所有可启用的 components 在新创建的 entity 上默认启用。当复制 entity 进行序列化、复制到另一个 world 或通过 `EntityManager` 的 `Instantiate` 方法复制时，新 entity 中 components 的使能状态与原始 entity 中的状态匹配。
 
-The enabled state of an entity's components can be checked and set through:
+可以通过以下方式检查和设置 entity 的 components 的启用状态：
 
 - [`EntityManager`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.html)
 - [`ComponentLookup<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ComponentLookup-1.html)
-- [`BufferLookup<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.BufferLookup-1.html) (for a dynamic buffer)
-- [`EnabledRefRW<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EnabledRefRW-1.html) (used in a `SystemAPI.Query` foreach or an `IJobEntity`)
+- [`BufferLookup<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.BufferLookup-1.html)（对于动态缓冲区）
+- [`EnabledRefRW<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EnabledRefRW-1.html)（用于 `SystemAPI.Query` foreach 或 `IJobEntity`）
 - [`ArchetypeChunk`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ArchetypeChunk.html)
 
-For instance, the `EntityManager` has these key methods:
+例如，`EntityManager` 有以下关键方法：
 
-|**Method**|**Description**|
+|**方法**|**描述**|
 |----|---|
-| [`IsComponentEnabled<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.IsComponentEnabled.html) | Returns true if an entity has a currently enabled T component. |
-| [`SetComponentEnabled<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetComponentEnabled.html) | Enables or disables an entity's enableable T component. |
+| [`IsComponentEnabled<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.IsComponentEnabled.html) | 如果 entity 具有当前启用的 T component，则返回 true。 |
+| [`SetComponentEnabled<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetComponentEnabled.html) | 启用或禁用 entity 的可启用 T component。 |
 
 | &#x1F4DD; NOTE |
 | :- |
-| For the sake of the job safety checks, read or write access of a component's enabled state requires read or write access of the component type itself. |
+| 为了进行 job 安全检查，对 component 启用状态的读或写访问需要对 component 类型本身进行读或写访问。 |
 
-In an `IJobChunk`, the `Execute` method parameters signal which entities in the chunk match the query:
+在 `IJobChunk` 中，`Execute` 方法参数表示 chunk 中的 entities 与 query 匹配：
 
-- If the `useEnableMask` parameter is false, all entities in the chunk match the query. 
-- Otherwise, if the `useEnableMask` parameter is true, the bits of the `chunkEnabledMask` parameter signal which entities in the chunk match the query, factoring in all enableable component types of the query. Rather than check these mask bits manually, you can use a [`ChunkEntityEnumerator`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ChunkEntityEnumerator.html) to more conveniently iterate through the matching entities.
+- 如果 `useEnableMask` 参数为 false，则 chunk 中的所有 entities 都与 query 匹配。
+- 否则，如果 `useEnableMask` 参数为 true，则 `chunkEnabledMask` 参数的位表示 chunk 中的 entities 与 query 匹配，考虑到 component 的所有可启用类型 query。您可以使用 [`ChunkEntityEnumerator`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ChunkEntityEnumerator.html) 来更方便地迭代匹配的 entities，而不是手动检查这些掩码位。
 
 | &#x1F4DD; NOTE |
 | :- |
-| The `chunkEnabledMask` is a *composite* of all the enabled states of the enableable components included in the query of the job. To check enabled states of individual components, use the `IsComponentEnabled()` and `SetComponentEnabled()` methods of the `ArchetypeChunk`. |
+| `chunkEnabledMask` 是 job 的 query 中包含的可启用 components 的所有启用状态的“组合”。要检查各个 components 的启用状态，请使用 `ArchetypeChunk` 的 `IsComponentEnabled()` 和 `SetComponentEnabled()` 方法。 |
 
 <br>
 
-# Shared components
+# 共享 components
 
-For a shared component type, all entities in a chunk share the same component value rather than each entity having its own value. Consequently, **setting a shared component value of an entity performs a [structural change](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html)**: the entity is moved to a chunk which has the new value.
+对于共享 component 类型，chunk 中的所有 entities 共享相同的 component 值，而不是每个 entity 都有自己的值。因此，**设置 entity 的共享 component 值会执行[结构更改](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html)**：entity 被移动到具有新值的 chunk。
 
-For example, if an entity has a *Foo* shared component value *X*, then the entity is stored in a chunk that has *Foo* value *X*; if the entity is then set to have *Foo* value *Y*, the entity is moved to a chunk that has value *Y*; if no such chunk already exists, a new chunk is created. 
+例如，如果 entity 具有 *Foo* 共享 component 值 *X*，则 entity 存储在具有 *Foo* 值 *X* 的 chunk 中；如果随后将 entity 设置为具有 *Foo* 值 *Y*，则 entity 会移动到具有值 *Y* 的 chunk；如果不存在这样的 chunk，则创建一个新的 chunk。
 
-The primary utility of shared components comes from the fact that **queries can filter for specific shared component values**.
+共享 components 的主要用途来自这样一个事实：**查询可以过滤特定的共享 component 值**。
 
-Instead of storing shared component values directly in chunks, the world stores them in a set of arrays, and the chunks store just indexes into these arrays. This means that **each unique shared component value is stored only once within a world**.
+world 不是将共享的 component 值直接存储在 chunks 中，而是将它们存储在一组数组中，而 chunks 存储只是对这些数组进行索引。这意味着**每个唯一的共享 component 值在 world 中仅存储一次**。
 
-A shared component type is declared as a struct implementing `ISharedComponentData`. If the struct contains any managed type fields, then the shared component will itself be a managed component type, with the same advantages and restrictions as a managed `IComponentData`.
+共享 component 类型被声明为实现 `ISharedComponentData` 的结构。如果结构体包含任何托管类型字段，则共享 component 本身将是托管 component 类型，具有与托管 `IComponentData` 相同的优点和限制。
 
-The `EntityManager` has these key methods for shared components:
+`EntityManager` 具有共享 components 的以下关键方法：
 
-|**Method**|**Description**|
+|**方法**|**描述**|
 |----|---|
-| [`AddComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddComponent.html) | Adds a T component to an entity, where T can be a shared component type. |
-| [`AddSharedComponent()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddSharedComponent.html) | Adds an unmanaged shared component to an entity and sets its initial value. |
-| [`AddSharedComponentManaged()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddSharedComponentManaged.html) | Adds a managed shared component to an entity and sets its initial value. |
-| [`RemoveComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.RemoveComponent.html) | Removes a T component from an entity, where T can be a shared component type. |
-| [`HasComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.HasComponent.html) | Returns true if an entity currently has a T component, where type T can be a shared component type. |
-| [`GetSharedComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetSharedComponent.html) | Retrieves the value of an entity's unmanaged shared T component. |
-| [`SetSharedComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetSharedComponent.html) | Overwrites the value of an entity's unmanaged shared T component. |
-| [`GetSharedComponentManaged<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetSharedComponentManaged.html) | Retrieves the value of an entity's managed shared T component. |
-| [`SetSharedComponentManaged<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetSharedComponentManaged.html) | Overwrites the value of an entity's managed shared T component. |
+| [`AddComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddComponent.html) | 将 T component 添加到 entity，其中 T 可以是共享 component 类型。 |
+| [`AddSharedComponent()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddSharedComponent.html) | 将非托管共享 component 添加到 entity 并设置其初始值。 |
+| [`AddSharedComponentManaged()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.AddSharedComponentManaged.html) | 将托管共享 component 添加到 entity 并设置其初始值。 |
+| [`RemoveComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.RemoveComponent.html) | 从 entity 中删除 T component，其中 T 可以是共享 component 类型。 |
+| [`HasComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.HasComponent.html) | 如果 entity 当前具有 T component，则返回 true，其中类型 T 可以是共享 component 类型。 |
+| [`GetSharedComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetSharedComponent.html) | 检索 entity 的非托管共享 T component 的值。 |
+| [`SetSharedComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetSharedComponent.html) | 覆盖 entity 的非托管共享 T component 的值。 |
+| [`GetSharedComponentManaged<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetSharedComponentManaged.html) | 检索 entity 的托管共享 T component 的值。 |
+| [`SetSharedComponentManaged<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.SetSharedComponentManaged.html) | 覆盖 entity 的托管共享 T component 的值。 |
 
-How a shared component type is compared for equality by the `EntityManager` can be customized by implementing [`IEquatable<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1.equals).
+可以通过实现 [`IEquatable<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1.equals) 来自定义 `EntityManager` 如何比较共享 component 类型是否相等。
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| Because the `EntityManager` relies upon equality to identify unique and matching shared component values, you should avoid modifying any mutable objects referenced by shared components. For example, if you want to modify an array stored in a shared component of a particular entity, you should not modify the array directly but instead update the component of that entity to have a new, modified copy of the array. |
+| 由于 `EntityManager` 依赖于相等性来识别唯一且匹配的共享 component 值，因此您应该避免修改共享 components 引用的任何可变对象。例如，如果要修改存储在特定 entity 的共享 component 中的数组，则不应直接修改该数组，而应更新该 entity 的 component 以获得该数组的新的、修改后的副本。 |
 
-If a shared component type implements `IRefCounted`, you can use reference counting to detect when a value of the type is no longer stored by any world. For example, if a shared component value that implements `IRefCounted` contains a `NativeArray`, you can dispose the array when the value is no longer stored by any world.
+如果共享 component 类型实现 `IRefCounted`，则可以使用引用计数来检测任何 world 何时不再存储该类型的值。例如，如果实现 `IRefCounted` 的共享 component 值包含 `NativeArray`，则当任何 world 不再存储该值时，您可以处置该数组。
 
-If the shared component type is unmanaged, the methods of `IEquatable<T>` and `IRefCounted` can be Burst-compiled by adding the [`[BurstCompile]`](https://docs.unity3d.com/Packages/com.unity.burst@latest/index.html?subfolder=/api/Unity.Burst.BurstCompileAttribute.html) attribute to the methods and the struct itself.
+如果共享 component 类型是非托管的，则 `IEquatable<T>` 和 `IRefCounted` 的方法可以通过将 [`[BurstCompile]`](https://docs.unity3d.com/Packages/com.unity.burst@latest/index.html?subfolder=/api/Unity.Burst.BurstCompileAttribute.html) 属性添加到方法和结构本身来进行 Burst 编译。
 
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| **Having too many unique shared component values may result in chunk fragmentation.** <br> Because all entities in a chunk must share the same shared component values, if you give unique shared component values to a high number of entities, the entities will end up fragmented across many chunks. For example, if there are 500 entities of an archetype with a shared component and each entity has a unique shared component value, each entity is stored by itself in a separate chunk. This wastes most of the space in each chunk and also means that looping through all entities of the archetype requires visiting 500 chunks. This fragmentation largely negates the performance benefits of the ECS structure. To avoid this problem, try to use as few unique shared component values as possible. If, say, the 500 entities were to share only ten unique shared component values, they could be stored in as few as ten chunks. |
+| **拥有太多唯一的共享 component 值可能会导致 chunk 碎片。** <br> 因为 chunk 中的所有 entities 必须共享相同的共享 component 值，如果您提供唯一的共享值如果 component 值达到大量 entities，则 entities 最终将分散在许多 chunks 中。例如，如果 archetype 有 500 个 entities 与共享 component，并且每个 entity 都有唯一的共享 component 值，则每个 entity 都单独存储在单独的 entities 中。chunk。这浪费了每个 chunk 中的大部分空间，也意味着循环遍历 archetype 的所有 entities 需要访问 500 个 chunks。这种碎片很大程度上抵消了 ECS 结构的性能优势。为了避免此问题，请尝试使用尽可能少的唯一共享 component 值。例如，如果 500 个 entities 仅共享 10 个唯一的共享 component 值，则它们可以存储在少至 10 个 chunks 中。 |
 
 <br>
 
-# Cleanup components
+# 清理 components
 
-Cleanup components are special in two ways:
+清理 components 有两个特殊之处：
 
-- When an entity with cleanup components is destroyed, the non-cleanup components are removed, but the entity actually continues to exist until you remove all of its cleanup components individually.
-- When an entity is copied to another world, copied in serialization, or copied by the `Instantiate` method of `EntityManager`, any cleanup components of the original are *not* added to the new entity.
+- 当具有清理 components 的 entity 被销毁时，非清理 components 将被删除，但 entity 实际上继续存在，直到您单独删除其所有清理 components。
+- 当 entity 复制到另一个 world、以序列化方式复制或通过 `EntityManager` 的 `Instantiate` 方法复制时，原始 components 的任何清理都不会添加到新的 entity 中。
 
-The primary use case for cleanup components is to help initialize entities after their creation or cleanup entities after their destruction. For example, say we have entities representing monsters, and they all have a *Monster* tag component:
+清理 components 的主要用例是在 entities 创建后帮助初始化，或在 entities 销毁后清理 entities。例如，假设我们有 entities 代表怪物，它们都有一个 *Monster* 标签 component：
 
-1. We can find all monster entities needing initialization by querying for all entities which have the *Monster* component but which do *not* have a *MonsterCleanup* component. For all entities matching this query, we perform any required initialization and add *MonsterCleanup*.
-2. We can find all monster entities needing cleanup by querying for all entities which have the *MonsterCleanup* component but *not* the *Monster* component. For all entities matching this query, we perform any required cleanup and remove *MonsterCleanup*. Unless the entities have additional remaining cleanup components, this will destroy the entities.
+1. 我们可以通过查询所有具有 *Monster* component 但*不*具有 *MonsterCleanup* component 的 entities 来找到所有需要初始化的怪物 entities。对于与此 query 匹配的所有 entities，我们执行任何所需的初始化并添加 *MonsterCleanup*。
+2. 我们可以通过查询所有具有 *MonsterCleanup* component 但*不**怪物* component 的 entities 来找到所有需要清理的怪物 entities。对于与此 query 匹配的所有 entities，我们执行任何所需的清理并删除 *MonsterCleanup*。除非 entities 有额外的剩余清理 components，否则这将破坏 entities。
 
 | &#x1F4DD; NOTE |
 | :- |
-| In some case, you'll want to store information needed for cleanup in your cleanup components, but in many cases, an empty cleanup tag component is sufficient. |
+| 在某些情况下，您需要在清理 components 中存储清理所需的信息，但在许多情况下，空的清理标记 component 就足够了。 |
 
-Cleanup components come in four varieties:
+清理 components 有四种类型：
 
-|**Kind of cleanup component**|**Description**|
+|**清理类型 component**|**描述**|
 |---|---|
-| A struct implementing `ICleanupComponentData` | The cleanup variant of an unmanaged `IComponentData` type.|
-| A class implementing `ICleanupComponentData` | The cleanup variant of a managed `IComponentData` type.|
-| A struct implementing `ICleanupBufferElementData` | The cleanup variant of a dynamic buffer type.|
-| A struct implementing `ICleanupSharedComponentData` | The cleanup variant of a shared component type.|
+| 实现 `ICleanupComponentData` 的结构 | 非托管 `IComponentData` 类型的清理变体。|
+| 实现 `ICleanupComponentData` 的类 | 托管 `IComponentData` 类型的清理变体。|
+| 实现 `ICleanupBufferElementData` 的结构体 | 动态缓冲区类型的清理变体。|
+| 实现 `ICleanupSharedComponentData` 的结构 | 共享 component 类型的清理变体。|
 
 <br>
 
 # Chunk components
 
-Unlike a regular component, a chunk component is a single value belonging to the whole chunk, not any entity within the chunk.
+与常规 component 不同，chunk component 是属于整个 chunk 的单个值，而不是 chunk 中的任何 entity。
 
-Just like a regular component, a chunk component is defined as a struct or class implementing `IComponentData`, but a chunk component is added, removed, get, and set with these `EntityManager` methods:
+就像常规的 component 一样，chunk component 被定义为实现 `IComponentData` 的结构或类，但 chunk component 是用这些添加、删除、获取和设置的 `EntityManager` 方法：
 
-|**Method**|**Description**|
+|**方法**|**描述**|
 |----|---|
-| [`AddChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.AddChunkComponentData.html) | Adds a chunk component of type T to a chunk, where T is a managed or unmanaged `IComponentData`. |
-| [`RemoveChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.RemoveChunkComponentData.html) | Removes a chunk component of type T from a chunk, where T is a managed or unmanaged `IComponentData`. |
-| [`HasChunkComponent<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.HasChunkComponent.html) | Returns true if a chunk has a chunk component of type T. |
-| [`GetChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.GetChunkComponentData.html) | Retrieves the value of a chunk's chunk component of type T. |
-| [`SetChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.SetChunkComponentData.html) | Sets the value of a chunk's chunk component of type T. |
+| [`AddChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.AddChunkComponentData.html) | 将 T 类型的 chunk component 添加到 chunk，其中 T 是托管或非托管 `IComponentData`。 |
+| [`RemoveChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.RemoveChunkComponentData.html) | 从 chunk 中删除类型 T 的 chunk component，其中 T 是托管或非托管 `IComponentData`。 |
+| [`HasChunkComponent<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.HasChunkComponent.html) | 如果 chunk 具有 T 类型的 chunk component，则返回 true。 |
+| [`GetChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.GetChunkComponentData.html) | 检索类型 T 的 chunk 的 chunk component 的值。 |
+| [`SetChunkComponentData<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.SetChunkComponentData.html) | 设置 T 类型的 chunk 的 chunk component 的值。 |
 
 | &#x1F4DD; NOTE |
 | :- |
-| Shared components also store one value per chunk, but a shared component value logically belongs to the entities, not the chunk (which is why setting an entity's shared component value moves the entity to another chunk rather than modifying the value stored in the chunk). Chunk components truly belong to the chunk itself, and unlike unmanaged shared components, unmanaged chunk components are stored directly in the chunk.|
+| 共享 components 还为每个 chunk 存储一个值，但共享 component 值逻辑上属于 entities，而不是 chunk（这就是为什么设置 entity 的共享值） component 值将 entity 移动到另一个 chunk，而不是修改存储在 chunk 中的值。Chunk components 真正属于 chunk 本身，并且与非托管共享 components 不同，非托管 chunk components 直接存储在 chunk。|
 
 <br>
 
-# Blob assets
+# 斑点资产
 
-A Blob (Binary Large Object) asset is an immutable (unchanging), unmanaged piece of binary data stored in a contiguous block of bytes:
+Blob（二进制大型对象）资产是存储在连续字节块中的不可变（不变）、非托管的二进制数据：
 
-- Blob assets are efficient to copy and load because they are fully *relocatable*: all internal pointers are expressed as relative offsets instead of absolute addresses, so copying the whole Blob is as simple as copying every byte.
-- Although they are stored independently from entities, Blob assets may be _referenced_ from entity components.
-- Because they're immutable, Blob assets are inherently safe to access from multiple threads.
+- Blob 资源的复制和加载效率很高，因为它们完全可重定位：所有内部指针都表示为相对偏移量而不是绝对地址，因此复制整个 Blob 就像复制每个字节一样简单。
+- 尽管它们独立于 entities 存储，但 Blob 资源可能会从 entity components _ 引用 _。
+- 由于 Blob 资产是不可变的，因此从多个线程访问它们本质上是安全的。
 
 | &#x1F4DD; NOTE |
 | :- |
-| The name Blob "asset" is a bit misleading: a Blob asset is a piece of data in memory, not a project asset file! However, Blob assets are efficiently and easily serializable into files on disk, so it makes some sense to call them "assets". |
+| Blob“资产”这个名称有点误导：Blob 资产是内存中的一段数据，而不是项目资产文件！然而，Blob 资产可以高效且轻松地序列化为磁盘上的文件，因此将它们称为“资产”是有意义的。 |
 
-To create a Blob asset:
+要创建 Blob 资源：
 
-1. Create a [BlobBuilder](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.html).
-1. Call the builder's [`ConstructRoot<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.ConstructRoot.html) to set the Blob's 'root' (a struct of type T).
-1. Call the builder's [`Allocate<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.Allocate.html), [`Construct<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.Construct.html) and [`SetPointer<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.SetPointer.html) methods to fill in the rest of the Blob data (including [`BlobArray`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobArray-1.html)'s, [`BlobString`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobString.html)'s, and [`BlobPtr`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobPtr-1.html)).
-1. Call the builder's [CreateBlobAssetReference](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.CreateBlobAssetReference.html), which copies all the data in the builder to create the actual Blob asset and returns a [BlobAssetReference](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobAssetReference-1.html).
-1. Dispose the `BlobBuilder`.
+1. 创建一个 [BlobBuilder](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.html)。
+1. 调用构建器的 [`ConstructRoot<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.ConstructRoot.html) 来设置 Blob 的“根”（T 类型的结构体）。
+1. 调用构建器的 [`Allocate<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.Allocate.html)、[`Construct<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.Construct.html) 和 [`SetPointer<T>`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.SetPointer.html) 方法来填充其余的 Blob 数据（包括[`BlobArray`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobArray-1.html)、[`BlobString`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobString.html) 和 [`BlobPtr`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobPtr-1.html))。
+1. 调用构建器的 [CreateBlobAssetReference](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobBuilder.CreateBlobAssetReference.html)，它会复制构建器中的所有数据以创建实际的 Blob 资源并返回 [BlobAssetReference](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.BlobAssetReference-1.html)。
+1. 废弃 `BlobBuilder`。
 
-When a Blob asset is no longer needed, it should be disposed by calling `Dispose` on the `BlobAssetReference`.
+当不再需要 Blob 资产时，应通过在 `BlobAssetReference` 上调用 `Dispose` 来处置它。
 
-Blob assets referenced in a baked entity scene are serialized and loaded along with the scene. These Blob assets should *not* be manually disposed: they will be automatically disposed along with the scene.
+烘焙的 entity scene 中引用的 Blob 资源将被序列化并与 scene 一起加载。这些 Blob 资产不应*手动处置：它们将与 scene 一起自动处置。
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| All parts of a blob asset that contain internal pointers must always be accessed by reference. For example, the offset values in a BlobString struct are only correct relative to where the BlobString struct is stored inside the Blob; the offsets are not correct relative to *copies* of the struct. |
+| 包含内部指针的 Blob 资源的所有部分都必须始终通过引用进行访问。例如，BlobString 结构中的偏移值仅相对于 BlobString 结构在 Blob 内的存储位置而言才是正确的；相对于结构的*副本*，偏移量不正确。 |
 
 <br>
 
-# Version numbers
+# 版本号
 
-A world, its systems, and its chunks maintain several **'version numbers'** (numbers which are incremented by certain operations). By comparing version numbers, you can determine if certain data might have changed.
+world、其 systems 及其 chunks 维护多个**“版本号”**（通过某些操作递增的数字）。通过比较版本号，您可以确定某些数据是否已更改。
 
-All version numbers are 32-bit signed integers, so when incremented, they eventually wrap around. The proper way to compare version numbers then relies upon subtle quirks of how C# defines signed integer overflow:
+所有版本号都是 32 位有符号整数，因此当递增时，它们最终会回绕。比较版本号的正确方法依赖于 C# 如何定义有符号整数溢出的微妙怪癖：
 
 ```csharp
 // true if VersionB is more recent than VersionA
@@ -182,19 +182,19 @@ All version numbers are 32-bit signed integers, so when incremented, they eventu
 bool changed = (VersionB - VersionA) > 0;
 ```
 
-|**Version number**|**Description**|
+|**版本号**|**描述**|
 |---|---|
-| [`World.Version`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.World.Version.html) | Increased every time the world adds or removes a system or system group. |
-| [`EntityManager.GlobalSystemVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.GlobalSystemVersion.html) | Increased before every system update in the world. |
-| [`SystemState.LastSystemVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.SystemState.LastSystemVersion.html) | Assigned the value of the `GlobalSystemVersion` immediately after each time the system updates. |
-| [`EntityManager.EntityOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.EntityOrderVersion.html) | Increased every time a structural change is made in the world. |
+| [`World.Version`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.World.Version.html) | 每次 world 添加或删除 system 或 system 组时都会增加。 |
+| [`EntityManager.GlobalSystemVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.GlobalSystemVersion.html) | 在 world 中的每次 system 更新之前增加。 |
+| [`SystemState.LastSystemVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.SystemState.LastSystemVersion.html) | 每次更新 system 后立即分配 `GlobalSystemVersion` 的值。 |
+| [`EntityManager.EntityOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest/index.html?subfolder=/api/Unity.Entities.EntityManager.EntityOrderVersion.html) | 每次 world 中进行结构更改时都会增加。 |
 
-Each component type has its own version number, which is incremented by any operation that gets write access to the component type. This number can be retrieved by calling the method [`EntityManager.GetComponentOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetComponentOrderVersion.html).
+每个 component 类型都有自己的版本号，该版本号通过任何获得对 component 类型的写访问权限的操作来递增。该号码可以通过调用方法[`EntityManager.GetComponentOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityManager.GetComponentOrderVersion.html) 来检索。
 
-Each shared component *value* also has a version number that is increased every time a structural change affects a chunk having the value.
+每个共享的 component *值*还具有一个版本号，每次结构更改影响具有该值的 chunk 时，该版本号都会增加。
 
-A chunk stores a version number for each component type in the chunk. When a component type in a chunk is accessed for writing, its version number is assigned the value of `EntityManager.GlobalSystemVersion`, regardless of whether any component values are actually modified. These chunk version numbers can be retrieved by calling the [`ArchetypeChunk.GetChangeVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ArchetypeChunk.GetChangeVersion.html) method.
+chunk 在 chunk 中存储每个 component 类型的版本号。当 chunk 中的 component 类型被访问以进行写入时，其版本号将被分配为 `EntityManager.GlobalSystemVersion` 的值，无论是否实际修改了任何 component 值。这些 chunk 版本号可以通过调用 [`ArchetypeChunk.GetChangeVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ArchetypeChunk.GetChangeVersion.html) 方法来检索。
 
-A chunk also stores a version number for each component type which is assigned the value of `EntityManager.GlobalSystemVersion` every time a structural change affects the chunk. These chunk version numbers can be retrieved by calling the [`ArchetypeChunk.GetOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ArchetypeChunk.GetOrderVersion.html) method.
+chunk 还存储每个 component 类型的版本号，每次结构更改影响 chunk 时，都会为该类型分配 `EntityManager.GlobalSystemVersion` 的值。这些 chunk 版本号可以通过调用 [`ArchetypeChunk.GetOrderVersion`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ArchetypeChunk.GetOrderVersion.html) 方法来检索。
 
 <br>

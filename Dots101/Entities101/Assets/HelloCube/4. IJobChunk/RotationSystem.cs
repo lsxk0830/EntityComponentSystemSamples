@@ -27,10 +27,10 @@ namespace HelloCube.JobChunk
                 DeltaTime = SystemAPI.Time.DeltaTime
             };
 
-            // Unlike an IJobEntity, an IJobChunk must be manually passed a query.
-            // Furthermore, IJobChunk does not pass and assign the state.Dependency JobHandle implicitly.
-            // (This pattern of passing and assigning state.Dependency ensures that the entity jobs scheduled
-            // in different systems will depend upon each other as needed.)
+            // 与 IJobEntity 不同，IJobChunk 必须手动传递 query。
+            // 此外，IJobChunk 不会隐式传递和分配 state.Dependency JobHandle。
+            // （这种传递和分配 state.Dependency 的模式可确保 entity jobs 调度
+            // 不同的 systems 将根据需要相互依赖。）
             state.Dependency = job.Schedule(spinningCubesQuery, state.Dependency);
         }
     }
@@ -45,12 +45,12 @@ namespace HelloCube.JobChunk
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
             in v128 chunkEnabledMask)
         {
-            // The useEnableMask parameter is true when one or more entities in
-            // the chunk have components of the query that are disabled.
-            // If none of the query component types implement IEnableableComponent,
-            // we can assume that useEnabledMask will always be false.
-            // However, it's good practice to add this guard check just in case
-            // someone later changes the query or component types.
+            // 当 entities 中的一个或多个时，useEnableMask 参数为 true
+            // chunk 的 query 的 components 被禁用。
+            // 如果没有一个 query component 类型实现 IEnableableComponent，
+            // 我们可以假设 useEnabledMask 始终为假。
+            // 但是，最好添加此防护检查以防万一
+            // 后来有人更改了 query 或 component 类型。
             Assert.IsFalse(useEnabledMask);
 
             var transforms = chunk.GetNativeArray(ref TransformTypeHandle);

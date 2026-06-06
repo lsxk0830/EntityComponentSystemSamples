@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Unity.NetCode.Samples.PlayerList
 {
-    /// <summary>Singleton component enabling the PlayerLists feature, allowing players to query who else is connected to the server.</summary>
+    /// <summary>Singleton component 启用 PlayerLists 功能，允许玩家 query 还有其他人连接到 server.</summary>
     public struct EnablePlayerListsFeature : IComponentData
     {
         /// <inheritdoc cref="PlayerListNotificationBuffer" />
-        /// <remarks>Set to -1 to disable this feature.</remarks>
+        /// 将 <remarks>Set 设为 -1 以禁用此 feature.</remarks>
         public double EventListEntryDurationSeconds;
     }
 

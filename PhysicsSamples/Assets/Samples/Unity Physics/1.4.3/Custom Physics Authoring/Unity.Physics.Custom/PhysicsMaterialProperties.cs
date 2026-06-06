@@ -18,8 +18,8 @@ namespace Unity.Physics.Authoring
 
         PhysicsCategoryTags CollidesWith { get; set; }
 
-        // TODO: Enable Mass Factors?
-        // TODO: Surface Velocity?
+        // TODO: 启用 Mass 因子吗？
+        // TODO: 表面速度？
 
         CustomPhysicsMaterialTags CustomTags { get; set; }
     }
@@ -233,7 +233,7 @@ namespace Unity.Physics.Authoring
         {
             if (m_SerializedVersion < k_LatestVersion)
             {
-                // old data from version < 1 have been removed
+                // 版本 < 1 的旧数据已被删除
                 if (m_SerializedVersion < 1)
                     m_SerializedVersion = 1;
             }

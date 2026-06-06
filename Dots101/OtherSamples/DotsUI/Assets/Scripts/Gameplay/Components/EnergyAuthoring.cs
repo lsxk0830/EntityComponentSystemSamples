@@ -6,7 +6,7 @@ namespace Unity.DotsUISample
     public class EnergyAuthoring : MonoBehaviour
     {
         public int Index;
-        
+
         public class Baker : Baker<EnergyAuthoring>
         {
             public override void Bake(EnergyAuthoring authoring)
@@ -19,10 +19,10 @@ namespace Unity.DotsUISample
             }
         }
     }
-    
+
     public struct Energy : IComponentData
     {
         public bool Collected;
-        public int Index;  // index of the energy collectable
+        public int Index;  // 可收集能源指数
     }
 }

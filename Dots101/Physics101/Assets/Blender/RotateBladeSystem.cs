@@ -14,7 +14,7 @@ namespace Blender
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (bladeData, velocity) in 
+            foreach (var (bladeData, velocity) in
                      SystemAPI.Query<RefRO<Blade>, RefRW<PhysicsVelocity>>())
             {
                 velocity.ValueRW.Angular = bladeData.ValueRO.AngularVelocity;

@@ -25,7 +25,7 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
 {
     public override void CreateScene(SoftJointDemoScene sceneSettings)
     {
-        // Make soft ball and sockets
+        // 制作软球和插座
         {
             BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new BoxGeometry
             {
@@ -36,23 +36,23 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             });
             CreatedColliders.Add(collider);
 
-            // Make joints with different spring frequency.  The leftmost joint should oscillate at 0.5hz, the next at 1hz, the next at 1.5hz, etc.
+            // 用不同的弹簧频率制作接头。最左边的 joint 应以 0.5hz 振荡，下一个以 1hz 振荡，下一个以 1.5hz 振荡，依此类推。
             for (int i = 0; i < 10; i++)
             {
-                // Create a body
+                // 创建一个身体
                 float3 position = new float3((i - 4.5f) * 1.0f, 0, 0);
                 float3 velocity = new float3(0, -10.0f, 0);
                 Entity body = CreateDynamicBody(
                     position, quaternion.identity, collider, velocity, float3.zero, 1.0f);
 
-                // Create the ball and socket joint
+                // 创建球窝 joint
                 float3 pivotLocal = float3.zero;
                 float3 pivotInWorld = math.transform(GetBodyTransform(body), pivotLocal);
 
                 var jointData = PhysicsJoint.CreateBallAndSocket(pivotLocal, pivotInWorld);
                 var constraints = jointData.GetConstraints();
                 var constraint = constraints[0];
-                // Choose a small damping value instead of 0 to improve stability of the joints
+                // 选择较小的阻尼值而不是 0，以提高关节的稳定性
                 constraint.DampingRatio = 0.05f;
                 constraint.SpringFrequency = 0.5f * (float)(i + 1);
                 constraints[0] = constraint;
@@ -62,7 +62,7 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             }
         }
 
-        //Make soft limited hinges
+        //制作软限位铰链
         {
             BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new BoxGeometry
             {
@@ -73,19 +73,19 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             });
             CreatedColliders.Add(collider);
 
-            // First row has soft limit with hard hinge + pivot, second row has everything soft
+            // 第一排有软限制，带有硬铰链+枢轴，第二排有所有软限制
             for (int j = 0; j < 2; j++)
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    // Create a body
+                    // 创建一个身体
                     float3 position = new float3((i - 4.5f) * 1.0f, 0, (j + 1) * 3.0f);
                     float3 velocity = new float3(0, -10.0f, 0);
                     float3 angularVelocity = new float3(0, 0, -10.0f);
                     Entity body = CreateDynamicBody(
                         position, quaternion.identity, collider, velocity, angularVelocity, 1.0f);
 
-                    // Create the limited hinge joint
+                    // 创建有限铰链 joint
                     float3 pivotLocal = new float3(0, 0, 0);
                     float3 pivotInWorld = math.transform(GetBodyTransform(body), pivotLocal);
                     float3 axisLocal = new float3(0, 0, 1);
@@ -97,12 +97,12 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
                     var frameWorld = new BodyFrame { Axis = axisInWorld, PerpendicularAxis = perpendicularInWorld, Position = pivotInWorld };
                     var jointData = PhysicsJoint.CreateLimitedHinge(frameLocal, frameWorld, default);
 
-                    // First constraint is the limit, next two are the hinge and pivot
+                    // 第一个 constraint 是极限，接下来两个是铰链和枢轴
                     var constraints = jointData.GetConstraints();
                     for (int k = 0; k < 1 + 2 * j; k++)
                     {
                         var constraint = constraints[k];
-                        // Choose a small damping value instead of 0 to improve stability of the joints
+                        // 选择较小的阻尼值而不是 0，以提高关节的稳定性
                         constraint.DampingRatio = 0.05f;
                         constraint.SpringFrequency = 0.5f * (i + 1);
                         constraints[k] = constraint;
@@ -114,7 +114,7 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             }
         }
 
-        // Make a soft prismatic
+        // 制作一个软棱柱体
         {
             BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new BoxGeometry
             {
@@ -125,13 +125,13 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             });
             CreatedColliders.Add(collider);
 
-            // Create a body
+            // 创建一个身体
             float3 position = new float3(0, 0, 9.0f);
             float3 velocity = new float3(50.0f, 0, 0);
             Entity body = CreateDynamicBody(
                 position, quaternion.identity, collider, velocity, float3.zero, 1.0f);
 
-            // Create the prismatic joint
+            // 创建棱柱 joint
             float3 pivotLocal = float3.zero;
             float3 pivotInWorld = math.transform(GetBodyTransform(body), pivotLocal);
             float3 axisLocal = new float3(1, 0, 0);
@@ -144,7 +144,7 @@ public partial class SoftJointDemoCreationSystem : SceneCreationSystem<SoftJoint
             var jointData = PhysicsJoint.CreatePrismatic(localFrame, worldFrame, new FloatRange(-2f, 2f));
             var constraints = jointData.GetConstraints();
             var constraint = constraints[0];
-            // Choose a small damping value instead of 0 to improve stability of the joints
+            // 选择较小的阻尼值而不是 0，以提高关节的稳定性
             constraint.DampingRatio = 0.05f;
             constraint.SpringFrequency = 5.0f;
             constraints[0] = constraint;

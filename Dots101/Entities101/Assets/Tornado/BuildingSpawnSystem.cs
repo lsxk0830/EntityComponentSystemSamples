@@ -26,7 +26,7 @@ namespace Tutorials.Tornado
             var points = new NativeList<float3>(Allocator.Temp);
             var connectivity = new NativeList<byte>(Allocator.Temp);
 
-            // buildings
+            // 建筑物
             for (int i = 0; i < 35; i++)
             {
                 int height = random.NextInt(4, 12);
@@ -48,7 +48,7 @@ namespace Tutorials.Tornado
                 }
             }
 
-            // ground details
+            // 地面细节
             for (int i = 0; i < 600; i++)
             {
                 var posA = new float3(random.NextFloat(-55f, 55f), 0f, random.NextFloat(-55f, 55f));

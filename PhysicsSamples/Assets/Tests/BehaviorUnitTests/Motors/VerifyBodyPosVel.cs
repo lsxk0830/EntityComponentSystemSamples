@@ -88,7 +88,7 @@ namespace Unity.Physics.Tests
                 VerifyBodyPosVelData data = state.EntityManager.GetComponentData<VerifyBodyPosVelData>(entity);
                 if (data.StartAtFrame > m_FrameCount)
                 {
-                    // Desired frame not reached yet
+                    // 尚未达到所需的帧
                     continue;
                 }
 
@@ -120,7 +120,7 @@ namespace Unity.Physics.Tests
                 {
                     var rot = state.EntityManager.GetComponentData<LocalTransform>(entity).Rotation;
 
-                    // Before comparing orientations, make sure we properly handle 180 deg rotations around an axis (it could be 180 around axis or -180 around -axis).
+                    // 在比较方向之前，请确保我们正确处理绕轴 180 度旋转（可以是绕轴 180 度或绕轴 -180 度）。
                     Assert.IsTrue(math.distance(AbsIfHalfCircle(rot).value, AbsIfHalfCircle(data.ExpectedOrientation).value) <= data.Tolerance,
                         $"{m_FrameCount}: Actual orientation {rot} of Entity {entity.Index} is not close enough to expected one {data.ExpectedOrientation}");
                 }
@@ -129,7 +129,7 @@ namespace Unity.Physics.Tests
         }
 
         /// <summary>
-        /// If the specified quaternion is 180 degrees around some axis, returns its absolute value (abs of each component)
+        /// 如果指定的四元数绕某个轴 180 度，则返回其绝对值（每个 component 的绝对值）
         /// </summary>
         private static quaternion AbsIfHalfCircle(quaternion q)
         {

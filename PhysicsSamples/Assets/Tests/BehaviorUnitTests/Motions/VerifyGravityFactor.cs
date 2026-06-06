@@ -46,7 +46,7 @@ namespace Unity.Physics.Tests
                 {
                     var transform = state.EntityManager.GetComponentData<LocalTransform>(entity);
 
-                    // Sphere should never move due to gravity factor being 0
+                    // 由于重力系数为 0，球体不应移动
                     Assert.AreEqual(transform.Position.x, 0.0f);
                     Assert.AreEqual(transform.Position.y, 1.0f);
                     Assert.AreEqual(transform.Position.z, 0.0f);

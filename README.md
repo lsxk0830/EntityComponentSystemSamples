@@ -1,74 +1,74 @@
 
-*The sample projects in this repo use Unity 6.2 and the 1.4 releases of the `Entities`, `Netcode`, `Physics`, and `Entities.Graphics` packages.*
+*此仓库中的示例项目使用 Unity 6.2 和 `Entities`、`Netcode`、`Physics` 和 `Entities.Graphics` packages 的 1.4 版本。*
 
-# DOTS Samples
+# DOTS 示例
 
-The DOTS package sample projects contain many small samples that cover most of the functionality in the packages:
+DOTS package 示例项目包含许多小示例，涵盖了 packages 中的大部分功能：
 
-- [Entities samples](./EntitiesSamples/README.md)
-- [Physics samples](./PhysicsSamples/README.md)
-- [Netcode samples](./NetcodeSamples/README.md)
-- [Entities.Graphics HDRP samples](./GraphicsSamples/HDRPSamples/README.md)
-- [Entities.Graphics URP samples](./GraphicsSamples/URPSamples/README.md)
+- [Entities 示例](./EntitiesSamples/README.md)
+- [Physics 示例](./PhysicsSamples/README.md)
+- [Netcode 示例](./NetcodeSamples/README.md)
+- [Entities.Graphics HDRP 示例](./GraphicsSamples/HDRPSamples/README.md)
+- [Entities.Graphics URP 示例](./GraphicsSamples/URPSamples/README.md)
 
-For those new to DOTS, we recommend starting with the DOTS 101 sample projects and materials below:
+对于 DOTS 的新手，我们建议从以下 DOTS 101 示例项目和材料开始：
 
-## The Job System 101
+## Job System 101
 
-- [Document: Unity Job System 101](./UnityJobSystem101.md)
-- [Sample project: Unity Job System 101](./Dots101/Jobs101/)
-- [Video: The C# Job system](https://youtu.be/jdW66hA-Qu8) (11 minutes)
-- [Video: Walkthrough of the jobs sample](https://youtu.be/oOgNg2gL2yw) (17 minutes)
+- [文档：Unity Job System 101](./UnityJobSystem101.md)
+- [示例项目：Unity Job System 101](./Dots101/Jobs101/)
+- [视频：C# Job system](https://youtu.be/jdW66hA-Qu8)（11 分钟）
+- [视频：jobs 示例演练](https://youtu.be/oOgNg2gL2yw)（17 分钟）
 
 ## Entities 101
 
-- [Document: Unity Entities 101](./UnityEntities101.md)
-- [Sample project: Unity Entities 101](./Dots101/Entities101/)
-- [Video: ECS Entities and components](https://youtu.be/jzCEzNoztzM) (10 minutes)
-- [Video: ECS Systems](https://youtu.be/k07I-DpCcvE) (7 minutes)
-- [Video: ECS Baking](https://youtu.be/r337nXZFYeA) (6 minutes)
-- [Video: HelloCube samples](https://youtu.be/32TLgtA9yUM) (30 minutes) ([code](./Dots101/Entities101/Assets/HelloCube/)) 
-- [Video: Kickball sample](https://youtu.be/P6_3L7RTcm0) (55 minutes) ([code](./Dots101/Entities101/Assets/Kickball/)) 
-- [Video: StateChange sample](https://youtu.be/KC-EyCh5TrY) (14 minutes) ([code](./Dots101/Entities101/Assets/HelloCube/14.%20StateChange/)) 
+- [文档：Unity Entities 101](./UnityEntities101.md)
+- [示例项目：Unity Entities 101](./Dots101/Entities101/)
+- [视频：ECS Entities 和 components](https://youtu.be/jzCEzNoztzM)（10 分钟）
+- [视频：ECS Systems](https://youtu.be/k07I-DpCcvE)（7 分钟）
+- [视频：ECS Baking](https://youtu.be/r337nXZFYeA)（6 分钟）
+- [视频：HelloCube 示例](https://youtu.be/32TLgtA9yUM)（30 分钟）（[代码](./Dots101/Entities101/Assets/HelloCube/)）
+- [视频：踢球示例](https://youtu.be/P6_3L7RTcm0)（55 分钟）（[代码](./Dots101/Entities101/Assets/Kickball/)）
+- [视频：StateChange 示例](https://youtu.be/KC-EyCh5TrY)（14 分钟）（[代码](./Dots101/Entities101/Assets/HelloCube/14.%20StateChange/)）
 
-Additional Entities material on Unity Learn:
+Unity Learn 上的附加 Entities 材料：
 
-- [Tanks tutorial](https://learn.unity.com/tutorial/65b3e48fedbc2a611fc291a7) and [walkthrough video](https://youtu.be/jAVVxoWU5lo) (23 minutes)
-- [DOTS Bootcamp](https://learn.unity.com/tutorial/dots-bootcamp) ([code](./Dots101/Entities101/Assets/Firefighters/README.md))
+- [坦克教程](https://learn.unity.com/tutorial/65b3e48fedbc2a611fc291a7) 和 [演练视频](https://youtu.be/jAVVxoWU5lo)（23 分钟）
+- [DOTS 训练营](https://learn.unity.com/tutorial/dots-bootcamp) ([代码](./Dots101/Entities101/Assets/Firefighters/README.md))
 
 ## Physics 101
 
-- [Document: Unity Physics 101](./UnityPhysics101.md)
-- [Sample project: Unity Physics 101](./Dots101/Physics101/)
-- [Video: Physics 101](https://youtu.be/EGcHDZeDTtA)
+- [文件：Unity Physics 101](./UnityPhysics101.md)
+- [示例项目：Unity Physics 101](./Dots101/Physics101/)
+- [视频：Physics 101](https://youtu.be/EGcHDZeDTtA)
 
 ## Netcode 101
 
-- [Document: Unity Netcode for Entities 101](./UnityNetcodeforEntities101.md)
-- [Sample project: Unity Netcode for Entities 101](./Dots101/Netcode101/)
-- [Video: Netcode 101](https://youtu.be/f-4NR30ieWg)
+- [文档：Unity Netcode for Entities 101](./UnityNetcodeforEntities101.md)
+- [示例项目：Unity Netcode for Entities 101](./Dots101/Netcode101/)
+- [视频：Netcode 101](https://youtu.be/f-4NR30ieWg)
 
-## Other samples
+## 其他示例
 
-- [Sample project: DOTS UI](./Dots101/OtherSamples/DotsUI/Assets/README.md): Demonstrates the use of UI Toolkit in an ECS context.
-- [Video: DOTS UI (walkthrough)](https://youtu.be/72EaJ1OW9Nw)
-- [Sample project: Content Management 101](./Dots101/ContentManagement101/README.md): A starter example of how to use the Content Management API.
-- [Sample project: ECS Network Racing](https://github.com/Unity-Technologies/ECS-Network-Racing-Sample): A small DOTS game using Netcode for Entities and Unity Physics.
+- [示例项目：DOTS UI](./Dots101/OtherSamples/DotsUI/Assets/README.md)：演示在 ECS 上下文中使用 UI 工具包。
+- [视频：DOTS UI（演练）](https://youtu.be/72EaJ1OW9Nw)
+- [示例项目：内容管理 101](./Dots101/ContentManagement101/README.md)：如何使用内容管理 API 的入门示例。
+- [示例项目：ECS Network Racing](https://github.com/Unity-Technologies/ECS-Network-Racing-Sample)：使用 Netcode for Entities 和 Unity Physics 的小型 DOTS 游戏。
 
-## Additional material 
+## 附加材料
 
-- [Document: Introduction to DOTS Ebook](https://unity.com/resources/introduction-to-dots-ebook)
-- [Document: Misconceptions about DOTS and Entities](https://docs.google.com/document/d/18hFIQipNxTsKsWk9eRroRwkGgswWs6m40X8N4Kkjhy4/edit?usp=sharing)
-- [Document: Performance checklist](https://docs.google.com/document/d/1QQZz6xzmWpe6NMdL3t2o7RXmya6UFyl_Xgo3KPfGxzQ/edit?usp=sharing)
-- [Cheat sheet: collections](./EntitiesSamples/Docs/cheatsheet/collections.md)
-- [Cheat sheet: mathematics](./EntitiesSamples/Docs/cheatsheet/mathematics.md)
+- 【文档：DOTS 电子书介绍】(https://unity.com/resources/introduction-to-dots-ebook)
+- [文档：关于 DOTS 和 Entities 的误解](https://docs.google.com/document/d/18hFIQipNxTsKsWk9eRroRwkGgswWs6m40X8N4Kkjhy4/edit?usp=sharing)
+- [文档：绩效检查表](https://docs.google.com/document/d/1QQZz6xzmWpe6NMdL3t2o7RXmya6UFyl_Xgo3KPfGxzQ/edit?usp=sharing)
+- [备忘单：集合](./EntitiesSamples/Docs/cheatsheet/collections.md)
+- [备忘单：数学](./EntitiesSamples/Docs/cheatsheet/mathematics.md)
 
-## Package manuals
+## Package 手册
 
-- [Entities manual and API reference](https://docs.unity3d.com/Packages/com.unity.entities@latest/)
-- [Collections manual and API reference](https://docs.unity3d.com/Packages/com.unity.collections@latest/)
-- [Burst manual and API reference](https://docs.unity3d.com/Packages/com.unity.burst@latest/)
-- [Mathematics manual and API reference](https://docs.unity3d.com/Packages/com.unity.mathematics@latest/)
-- [Job system manual](https://docs.unity3d.com/Manual/JobSystem.html)
+- 【Entities 手册和 API 参考】(https://docs.unity3d.com/Packages/com.unity.entities@latest/)
+- 【收藏手册及 API 参考】(https://docs.unity3d.com/Packages/com.unity.collections@latest/)
+- [Burst 手册和 API 参考](https://docs.unity3d.com/Packages/com.unity.burst@latest/)
+- 【数学手册及 API 参考】(https://docs.unity3d.com/Packages/com.unity.mathematics@latest/)
+- [Job system 手册](https://docs.unity3d.com/Manual/JobSystem.html)
 
 

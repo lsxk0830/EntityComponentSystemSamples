@@ -18,16 +18,16 @@ namespace Unity.DotsUISample
         public void OnUpdate(ref SystemState state)
         {
             var game = SystemAPI.GetSingletonRW<GameData>();
-            
+
             if (game.ValueRO.State == GameState.Init)
             {
                 GameInput.Initialize();
-                
+
                 var doc = Object.FindFirstObjectByType<UIDocument>();
                 VisualElement root = doc.rootVisualElement;
-                
+
                 game.ValueRW.State = GameState.SplashScreen;
-                
+
                 var screens = new UIScreens
                 {
                     SplashScreen = SplashScreen.Instantiate(root.Q<VisualElement>("splash__container")),
@@ -39,7 +39,7 @@ namespace Unity.DotsUISample
                     HintScreen = HintScreen.Instantiate(root.Q<VisualElement>("hud__action-helper")),
                     Camera = Object.FindFirstObjectByType<Camera>(),
                 };
-                
+
                 screens.SplashScreen.Value.Show();
 
                 var entity = state.EntityManager.CreateEntity();
@@ -53,7 +53,7 @@ namespace Unity.DotsUISample
                     screens.ValueRO.SplashScreen.Value.Hide();
                     screens.ValueRO.DialogueScreen.Value.SetDialogueData(game.ValueRW.StartDialogue.Value);
                     screens.ValueRO.DialogueScreen.Value.Show();
-                    
+
                     game.ValueRW.State = GameState.OpeningDialogue;
                 }
             }
@@ -63,15 +63,15 @@ namespace Unity.DotsUISample
                 if (screens.ValueRO.DialogueScreen.Value.isDone)
                 {
                     screens.ValueRW.DialogueScreen.Value.Hide();
-                    
+
                     screens.ValueRO.HUDScreen.Value.Show();
                     screens.ValueRO.QuestScreen.Value.SetQuestData(
-                        game.ValueRW.Quest.Value,  
-                        SystemAPI.GetSingletonBuffer<CollectableCount>(), 
+                        game.ValueRW.Quest.Value,
+                        SystemAPI.GetSingletonBuffer<CollectableCount>(),
                         game.ValueRW.Collectables.Value
                     );
                     screens.ValueRO.QuestScreen.Value.Show();
-                    
+
                     game.ValueRW.State = GameState.Questing;
                 }
             }
@@ -79,7 +79,7 @@ namespace Unity.DotsUISample
             {
                 if (game.ValueRW.Quest.Value.Done)
                 {
-                    // kill player momentum
+                    // 杀死玩家的动力
                     foreach (var velocity in
                              SystemAPI.Query<RefRW<PhysicsVelocity>>()
                                  .WithAll<Player>())
@@ -92,10 +92,10 @@ namespace Unity.DotsUISample
                     screens.ValueRO.QuestScreen.Value.Hide();
                     screens.ValueRO.InventoryScreen.Value.Hide();
                     screens.ValueRO.HelpScreen.Value.Hide();
-                    
+
                     screens.ValueRO.DialogueScreen.Value.SetDialogueData(game.ValueRW.EndDialogue.Value);
                     screens.ValueRO.DialogueScreen.Value.Show();
-                    
+
                     game.ValueRW.State = GameState.ClosingDialogue;
                 }
             }

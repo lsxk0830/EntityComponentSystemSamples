@@ -1,4 +1,4 @@
-// source:
+// 来源：
 // https://github.com/PixTrick/PixTrickCustomShadows/blob/main/CustomShadowsTutorial/CustomLighting.hlsl
 
 #ifndef CUSTOM_LIGHTING_INCLUDED

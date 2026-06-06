@@ -19,14 +19,14 @@ namespace Tutorials.Firefighters
     public struct Bot : IComponentData
     {
         public BotState State;
-        public float2 TargetPos;   // Where the bot is moving to.
-        public float2 LinePos;     // The bot's place in line where they stand when idle.
-        public Entity NextBot;     // The next bot in line (will pass the bucket to this bot).
-        public bool IsDouser;      // Is the bot at end of the line that douses the fire.
-        public bool IsFiller;      // Is the bot at the end of the line that fills the bucket. Also responsible for fetching the bucket.
-        public Entity Bucket;      // The bucket that the bot is carrying.
-        public bool IsCarrying;    // True if carrying a bucket.
-        public Entity Team;        // The team to which the bot belongs.
+        public float2 TargetPos;   // 机器人要移动到的地方。
+        public float2 LinePos;     // 机器人在空闲时站立的位置。
+        public Entity NextBot;     // 排队的下一个机器人（将把桶传递给该机器人）。
+        public bool IsDouser;      // 机器人是在最后灭火的机器人。
+        public bool IsFiller;      // 是位于填充桶的行末端的机器人。还负责取桶。
+        public Entity Bucket;      // 机器人携带的桶。
+        public bool IsCarrying;    // 如果携带水桶则为真。
+        public Entity Team;        // 机器人所属的团队。
 
         public readonly bool IsMoving()
         {

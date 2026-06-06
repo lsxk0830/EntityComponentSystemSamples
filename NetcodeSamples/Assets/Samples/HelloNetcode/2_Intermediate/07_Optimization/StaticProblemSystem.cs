@@ -22,7 +22,7 @@ namespace Samples.HelloNetcode
             }
 
 
-            /* This is intentionally incorrect. We grab write access to the transform data but never modify it. */
+            /* 这是故意不正确的。我们获取对转换数据的写访问权，但从不修改它。 */
             foreach (var trans in SystemAPI.Query<RefRW<LocalTransform>>())
             {
 

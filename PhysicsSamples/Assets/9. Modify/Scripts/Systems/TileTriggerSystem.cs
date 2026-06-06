@@ -1,6 +1,6 @@
-// A system that processes trigger events and updates the TileTriggerCounter component on the tile entity
-// Structural changes are not allowed in this system, so triggers are processed in the SpawnColliderFromTriggerSystem
-// Triggers larger than the MaxTriggerCount are ignored.
+// 处理 trigger 事件并更新磁贴 entity 上的 TileTriggerCounter component 的 system
+// 此 system 中不允许进行结构更改，因此触发器在 SpawnColliderFromTriggerSystem 中处理
+// 大于 MaxTriggerCount 的触发器将被忽略。
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Physics;
@@ -8,7 +8,7 @@ using Unity.Physics.Systems;
 
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
-[UpdateAfter(typeof(PhysicsSimulationGroup))] //events are valid AFTER this has finished
+[UpdateAfter(typeof(PhysicsSimulationGroup))] //事件有效 AFTER 已完成
 public partial struct TileTriggerSystem : ISystem
 {
     ComponentDataHandles m_Handles;
@@ -53,7 +53,7 @@ public partial struct TileTriggerSystem : ISystem
     {
     }
 
-    // This trigger is later used to spawn colliders in SpawnColliderFromTriggerSystem (structural changes can't be done here)
+    // 这个 trigger 稍后用于在 SpawnColliderFromTriggerSystem 中生成 colliders（此处无法进行结构更改）
     [BurstCompile]
     struct TriggerColliderChangeJob : ITriggerEventsJob
     {
@@ -61,22 +61,22 @@ public partial struct TileTriggerSystem : ISystem
 
         public void Execute(TriggerEvent triggerEvent)
         {
-            // get the two entities involved in the trigger event
+            // 获取 trigger 事件涉及的两个 entities
             Entity entityA = triggerEvent.EntityA;
             Entity entityB = triggerEvent.EntityB;
 
-            // The entity that has a TileTriggerCounter is the trigger body
+            // 具有 TileTriggerCounter 的 entity 是 trigger 主体
             bool isBodyATrigger = TriggerColliderChangeGroup.HasComponent(entityA);
             bool isBodyBTrigger = TriggerColliderChangeGroup.HasComponent(entityB);
 
-            // Ignoring Triggers overlapping other Triggers
+            // 忽略与其他触发器重叠的触发器
             if (isBodyATrigger && isBodyBTrigger)
                 return;
 
-            var triggerEntity = isBodyATrigger ? entityA : entityB; //entity of tile
+            var triggerEntity = isBodyATrigger ? entityA : entityB; //瓷砖 entity
 
             var tileComponent = TriggerColliderChangeGroup[triggerEntity];
-            if (tileComponent.TriggerCount < tileComponent.MaxTriggerCount) // limit how many times the trigger can be triggered
+            if (tileComponent.TriggerCount < tileComponent.MaxTriggerCount) // 限制 trigger 可以被触发的次数
             {
                 tileComponent.TriggerCount++;
                 TriggerColliderChangeGroup[triggerEntity] = tileComponent;

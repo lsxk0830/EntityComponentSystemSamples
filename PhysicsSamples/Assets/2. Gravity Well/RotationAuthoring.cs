@@ -6,7 +6,7 @@ namespace Conversion
 {
     public class RotationAuthoring : MonoBehaviour
     {
-        public Vector3 LocalAngularVelocity = Vector3.zero; // in degrees/sec
+        public Vector3 LocalAngularVelocity = Vector3.zero; // 以度/秒为单位
 
         class Baker : Baker<RotationAuthoring>
         {
@@ -15,7 +15,7 @@ namespace Conversion
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new Rotation
                 {
-                    // We can convert to radians/sec once here.
+                    // 我们可以在这里转换为弧度/秒。
                     LocalAngularVelocity = math.radians(authoring.LocalAngularVelocity),
                 });
             }
@@ -24,6 +24,6 @@ namespace Conversion
 
     public struct Rotation : IComponentData
     {
-        public float3 LocalAngularVelocity; // in radian/sec
+        public float3 LocalAngularVelocity; // 以弧度/秒为单位
     }
 }

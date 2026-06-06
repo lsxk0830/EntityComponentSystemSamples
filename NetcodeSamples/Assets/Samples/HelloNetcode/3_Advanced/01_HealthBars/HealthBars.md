@@ -1,28 +1,28 @@
-# HelloNetcode Hit-scan Weapon sample
+# HelloNetcode 命中扫描武器示例
 
-This samples shows how you can implement a world space health bars.
+此示例展示了如何实现 world 空间健康栏。
 
-## Requirements
+## 要求
 
-The spawn player sample is used to trigger the auto spawning of the player when connection is established. The dynamic physics objects from the physics sample are used.
-Character controller is used for moving the character around. 
+生成播放器示例用于 trigger 在建立连接时自动生成播放器。使用Physics 示例中的动态物理对象。
+角色控制器用于移动角色。
 
 * GoInGame
 * SpawnPlayer
 * Physics
 * CharacterController
 * HitScanWeapon
-* Respawning
+* 重生
 
-## Sample description
+## 示例描述
 
-This sample builds on the hit scan weapon sample and the respawn sample which added health. This sample shows how to display this health component as a world space health bar.
-To see this enter play mode with at least one thin client enabled in the play mode tools window. You will see that above all players a health bar is visible, a black background and a green bar within.
+该示例建立在命中扫描武器示例和增加生命值的重生示例的基础上。此示例演示如何将此运行状况 component 显示为 world 空间运行状况栏。
+要查看此内容，请进入播放模式，并在播放模式工具窗口中启用至少一个薄 client。您会看到，在所有玩家上方，都有一个可见的生命条，黑色背景，里面有一个绿色条。
 
-As you shoot and hit you will see the health bar tick down until it is empty which will trigger the respawning as described in the sample named Respawning.
-The health will respawn at full health together with the character in its new position.
+当您射击并击中时，您将看到生命条滴答作响，直到它为空，这将 trigger 重生，如名为“重生”的示例中所述。
+生命值将以完全健康状态重生，角色也将处于新位置。
 
-## Note
+## 笔记
 
-The `HealthBarSpawnerAuthoring` is creating a IComponent as a class rather than a struct. This is because we need to maintain the reference to the gameobject of the healthbar prefab.
-In the `SpawnHealthBarSystem` we instantiate the gameobject using the regular Object.Instantiate method. 
+`HealthBarSpawnerAuthoring` 正在创建 IComponent 作为类而不是结构。这是因为我们需要维护对生命条 prefab 的游戏对象的引用。
+在 `SpawnHealthBarSystem` 中，我们使用常规的 Object.Instantiate 方法实例化游戏对象。

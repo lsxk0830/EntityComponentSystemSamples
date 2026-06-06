@@ -1,4 +1,4 @@
-//#define ENABLE_NETCODE_SAMPLE_SECURE
+//#定义 ENABLE_NETCODE_SAMPLE_SECURE
 using Unity.Entities;
 using Unity.NetCode;
 
@@ -6,8 +6,8 @@ namespace Samples.HelloNetcode
 {
 #if ENABLE_NETCODE_SAMPLE_SECURE
     /// <summary>
-    /// Register client and server using TLS configuration.
-    /// The configuration is retrieved from <see cref="SecureParameters"/>.
+    /// 使用 TLS 配置注册 client 和 server。
+    /// 配置是从 <see cref="SecureParameters"/> 检索的。
     /// </summary>
     public struct SecureDriverConstructor : INetworkStreamDriverConstructor
     {

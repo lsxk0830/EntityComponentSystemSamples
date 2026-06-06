@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Streaming.SceneManagement.Common
 {
-    // Authoring class to mark an entity as relevant. This is used in samples where the position of an entity
-    // (e.g. the player or camera) indicates which scene/sections to load.
+    // Authoring 类将 entity 标记为相关。这用于 entity 位置的示例
+    // （e.g。播放器或摄像机）指示要加载的 scene/部分。
     public class RelevantAuthoring : MonoBehaviour
     {
         class Baker : Baker<RelevantAuthoring>

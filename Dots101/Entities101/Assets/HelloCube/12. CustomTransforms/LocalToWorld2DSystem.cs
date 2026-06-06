@@ -9,13 +9,13 @@ using Unity.Transforms;
 
 namespace HelloCube.CustomTransforms
 {
-    // This system computes a transform matrix for each entity with a LocalTransform2D.
+    // 此 system 使用 LocalTransform2D 计算每个 entity 的变换矩阵。
 
-    // For root-level / world-space entities with no Parent, the LocalToWorld can be
-    // computed directly from the entity's LocalTransform2D.
+    // 对于没有父级的根级/world 空间 entities，LocalToWorld 可以是
+    // 直接从 entity 的 LocalTransform2D 计算。
 
-    // For child entities, each unique hierarchy is traversed recursively, computing each child's LocalToWorld
-    // by composing its LocalTransform with its parent's transform.
+    // 对于子 entities，递归遍历每个唯一的层次结构，计算每个子的 LocalToWorld
+    // 通过将其 LocalTransform 与其父级的变换组合起来。
 
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(TransformSystemGroup))]
@@ -44,7 +44,7 @@ namespace HelloCube.CustomTransforms
                 .WithAll<LocalTransform2D, Parent>()
                 .WithAllRW<LocalToWorld>().Build().GetEntityQueryMask();
 
-            // compute LocalToWorld for all root-level entities
+            // 计算所有根级 entities 的 LocalToWorld
             var rootJob = new ComputeRootLocalToWorldJob
             {
                 LocalTransform2DTypeHandleRO = SystemAPI.GetComponentTypeHandle<LocalTransform2D>(true),
@@ -54,7 +54,7 @@ namespace HelloCube.CustomTransforms
             };
             state.Dependency = rootJob.ScheduleParallelByRef(rootsQuery, state.Dependency);
 
-            // compute LocalToWorld for all child entities
+            // 为所有子 entities 计算 LocalToWorld
             var childJob = new ComputeChildLocalToWorldJob
             {
                 LocalToWorldWriteGroupMask = localToWorldWriteGroupMask,

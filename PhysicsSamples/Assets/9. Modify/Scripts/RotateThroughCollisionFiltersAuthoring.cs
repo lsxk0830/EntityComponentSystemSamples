@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Unity.Physics
 {
     /// <summary>
-    /// A countdown timer for changing the collision filter on an entity. When the countdown expires, the collision
-    /// filter is changed to the next filter in the list and the countdown is reset.
+    /// 用于更改 entity 上的碰撞过滤器的倒计时器。当倒计时结束时，碰撞
+    /// 过滤器更改为列表中的下一个过滤器，并重置倒计时。
     /// </summary>
     public struct ChangeCollisionFilterCountdown : IComponentData
     {
@@ -14,8 +14,8 @@ namespace Unity.Physics
     }
 
     /// <summary>
-    /// A component that stores the material indices for the red, green and blue materials for mapping to the
-    /// RenderMeshArray in a scene
+    /// component 存储用于映射到的红色、绿色和蓝色材质的材质索引
+    /// RenderMeshArray 中的 scene
     /// </summary>
     public struct ColoursForFilter : IComponentData
     {

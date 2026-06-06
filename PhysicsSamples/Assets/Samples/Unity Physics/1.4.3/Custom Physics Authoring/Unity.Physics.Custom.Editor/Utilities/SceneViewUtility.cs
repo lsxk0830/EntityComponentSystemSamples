@@ -77,7 +77,7 @@ namespace Unity.Physics.Editor
         static Func<float> s_GetProgress;
 
         public static void DisplayProgressNotification(string message, Func<float> getProgress) =>
-            // insert an extra line to make room for progress bar
+            // 插入额外的一行，为进度条腾出空间
             DisplayNotificationInSceneView(getProgress == null ? message : $"{message}\n", false, getProgress);
 
         public static void DisplayPersistentNotification(string message) =>

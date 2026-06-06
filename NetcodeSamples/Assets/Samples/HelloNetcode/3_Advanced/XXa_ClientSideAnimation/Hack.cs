@@ -10,11 +10,11 @@ namespace Samples.HelloNetcode
     }
 
     /// <summary>
-    /// This is a necessary hack to make the ClientSideAnimation.unity scene work in standalone in the case
-    /// where this scene is the only one added to the build settings.
+    /// 这是使 ClientSideAnimation.unity scene 在这种情况下独立工作的必要技巧
+    /// 其中 scene 是唯一添加到构建设置中的。
     ///
-    /// It fixes an issue during baking by forcing a reference the clips that
-    /// is necessary for the animator state machine to work.
+    /// 它通过强制引用剪辑来修复 baking 期间的问题
+    /// 对于动画状态机的工作是必要的。
     /// </summary>
     public class Hack : MonoBehaviour
     {

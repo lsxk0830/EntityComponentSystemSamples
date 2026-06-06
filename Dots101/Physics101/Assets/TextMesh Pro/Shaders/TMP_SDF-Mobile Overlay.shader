@@ -1,7 +1,7 @@
-// Simplified SDF shader:
-// - No Shading Option (bevel / bump / env map)
-// - No Glow Option
-// - Softness is applied on both side of the outline
+// 简化的 SDF 着色器：
+// - 无着色选项（斜角/凹凸/环境贴图）
+// - 无发光选项
+// - 轮廓两侧均应用柔和度
 
 Shader "TextMeshPro/Mobile/Distance Field Overlay" {
 
@@ -110,12 +110,12 @@ SubShader {
 			float4	vertex			: SV_POSITION;
 			fixed4	faceColor		: COLOR;
 			fixed4	outlineColor	: COLOR1;
-			float4	texcoord0		: TEXCOORD0;			// Texture UV, Mask UV
+			float4	texcoord0		: TEXCOORD0;			// 纹理 UV，掩模 UV
 			half4	param			: TEXCOORD1;			// Scale(x), BiasIn(y), BiasOut(z), Bias(w)
-			half4	mask			: TEXCOORD2;			// Position in clip space(xy), Softness(zw)
+			half4	mask			: TEXCOORD2;			// 剪辑空间中的位置(xy)，柔软度(zw)
 
 		    #if (UNDERLAY_ON | UNDERLAY_INNER)
-			float4	texcoord1		: TEXCOORD3;			// Texture UV, alpha, reserved
+			float4	texcoord1		: TEXCOORD3;			// 纹理 UV，alpha，保留
 			half2	underlayParam	: TEXCOORD4;			// Scale(x), Bias(y)
 		    #endif
 		};
@@ -183,11 +183,11 @@ SubShader {
 			float2 layerOffset = float2(x, y);
 		    #endif
 
-			// Generate UV for the Masking Texture
+			// 为遮罩纹理生成 UV
 			float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
 			float2 maskUV = (vert.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
 
-			// Populate structure for pixel shader
+			// 填充像素着色器的结构
 			output.vertex = vPosition;
 			output.faceColor = faceColor;
 			output.outlineColor = outlineColor;
@@ -228,7 +228,7 @@ SubShader {
 			c += float4(_UnderlayColor.rgb * _UnderlayColor.a, _UnderlayColor.a) * (1 - saturate(d - input.underlayParam.y)) * sd * (1 - c.a);
 		    #endif
 
-		    // Alternative implementation to UnityGet2DClipping with support for softness.
+		    // UnityGet2DClipping 的替代实现，支持软性。
 		    #if UNITY_UI_CLIP_RECT
 			half2 m = saturate((_ClipRect.zw - _ClipRect.xy - abs(input.mask.xy)) * input.mask.zw);
 			c *= m.x * m.y;

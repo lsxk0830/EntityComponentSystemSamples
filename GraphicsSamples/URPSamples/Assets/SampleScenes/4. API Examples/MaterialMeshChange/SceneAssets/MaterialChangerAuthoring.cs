@@ -48,7 +48,7 @@ public partial class MaterialChangerSystem : SystemBase
 
     private void RegisterMaterial(EntitiesGraphicsSystem hybridRendererSystem, Material material)
     {
-        // Only register each mesh once, so we can also unregister each mesh just once
+        // 每个网格只注册一次，所以我们也可以只注销每个网格一次
         if (!m_MaterialMapping.ContainsKey(material))
             m_MaterialMapping[material] = hybridRendererSystem.RegisterMaterial(material);
     }
@@ -67,7 +67,7 @@ public partial class MaterialChangerSystem : SystemBase
 
     private void UnregisterMaterials()
     {
-        // Can't call this from OnDestroy(), so we can't do this on teardown
+        // 无法从 OnDestroy() 调用此函数，因此我们无法在拆卸时执行此操作
         var hybridRenderer = World.GetExistingSystemManaged<EntitiesGraphicsSystem>();
         if (hybridRenderer == null)
             return;

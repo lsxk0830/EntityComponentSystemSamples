@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 
 namespace Samples.HelloNetcode
 {
-    // Stores the impulse to be applied by the character controller body
+    // 存储由角色控制器主体施加的脉冲
     public struct DeferredCharacterControllerImpulse
     {
         public Entity Entity;
@@ -112,7 +112,7 @@ namespace Samples.HelloNetcode
             #endregion
         }
 
-        // A collector which stores only the closest hit different from itself, the triggers, and predefined list of values it hit.
+        // 一个收集器，仅存储与其自身不同的最接近的命中、触发器以及它命中的预定义值列表。
         public struct CharacterControllerClosestHitCollector<T> : ICollector<T> where T : struct, IQueryResult
         {
             public bool EarlyOutOnFirstHit => false;
@@ -153,25 +153,25 @@ namespace Samples.HelloNetcode
             {
                 Assert.IsTrue(hit.Fraction <= MaxFraction);
 
-                // Check self hits and trigger hits
+                // 检查自我命中和 trigger 命中
                 if ((hit.RigidBodyIndex == m_selfRBIndex) || (hit.Material.CollisionResponse == CollisionResponsePolicy.RaiseTriggerEvents))
                 {
                     return false;
                 }
 
-                // Check predefined hits
+                // 检查预定义的命中
                 for (int i = 0; i < m_PredefinedConstraints.Length; i++)
                 {
                     SurfaceConstraintInfo constraint = m_PredefinedConstraints[i];
                     if (constraint.RigidBodyIndex == hit.RigidBodyIndex &&
                         constraint.ColliderKey.Equals(hit.ColliderKey))
                     {
-                        // Hit was already defined, skip it
+                        // 命中已经定义，跳过它
                         return false;
                     }
                 }
 
-                // Finally, accept the hit
+                // 最后接受打击
                 MaxFraction = hit.Fraction;
                 m_ClosestHit = hit;
                 NumHits = 1;
@@ -188,10 +188,10 @@ namespace Samples.HelloNetcode
             surfaceNormal = float3.zero;
             surfaceVelocity = float3.zero;
 
-            // Up direction must be normalized
+            // 向上方向必须标准化
             Assert.IsTrue(Unity.Physics.Math.IsNormalized(stepInput.Up));
 
-            // Query the world
+            // Query world
             NativeList<ColliderCastHit> castHits = new NativeList<ColliderCastHit>(k_DefaultQueryHitsCapacity, Allocator.Temp);
             CharacterControllerAllHitsCollector<ColliderCastHit> castHitsCollector = new CharacterControllerAllHitsCollector<ColliderCastHit>(
                 stepInput.RigidBodyIndex, 1.0f, ref castHits, physicsWorldSingleton);
@@ -202,7 +202,7 @@ namespace Samples.HelloNetcode
                 physicsWorldSingleton.PhysicsWorld.CastCollider(input, ref castHitsCollector);
             }
 
-            // If no hits, proclaim unsupported state
+            // 如果没有命中，则声明不受支持的状态
             if (castHitsCollector.NumHits == 0)
             {
                 characterState = CharacterSupportState.Unsupported;
@@ -211,7 +211,7 @@ namespace Samples.HelloNetcode
 
             float maxSlopeCos = math.cos(stepInput.MaxSlope);
 
-            // Iterate over distance hits and create constraints from them
+            // 迭代距离命中并从中创建约束
             NativeList<SurfaceConstraintInfo> constraints = new NativeList<SurfaceConstraintInfo>(k_DefaultConstraintsCapacity, Allocator.Temp);
             float maxDisplacementLength = math.length(maxDisplacement);
             for (int i = 0; i < castHitsCollector.NumHits; i++)
@@ -222,7 +222,7 @@ namespace Samples.HelloNetcode
                     stepInput.SkinWidth, maxSlopeCos, ref constraints);
             }
 
-            // Velocity for support checking
+            // 支持检查的速度
             float3 initialVelocity = maxDisplacement / stepInput.DeltaTime;
             Math.ClampToMaxLength(stepInput.MaxMovementSpeed, ref initialVelocity);
 
@@ -232,7 +232,7 @@ namespace Samples.HelloNetcode
             SimplexSolver.Solve(stepInput.DeltaTime, stepInput.DeltaTime, stepInput.Up, stepInput.MaxMovementSpeed,
                 constraints, ref outPosition, ref outVelocity, out float integratedTime, false);
 
-            // Get info on surface
+            // 获取表面信息
             int numSupportingPlanes = 0;
             {
                 for (int j = 0; j < constraints.Length; j++)
@@ -256,21 +256,21 @@ namespace Samples.HelloNetcode
                 }
             }
 
-            // Check support state
+            // 检查支持状态
             {
                 if (math.lengthsq(initialVelocity - outVelocity) < k_SimplexSolverEpsilonSq)
                 {
-                    // If velocity hasn't changed significantly, declare unsupported state
+                    // 如果速度没有显着变化，则声明不支持状态
                     characterState = CharacterSupportState.Unsupported;
                 }
                 else if (math.lengthsq(outVelocity) < k_SimplexSolverEpsilonSq && numSupportingPlanes > 0)
                 {
-                    // If velocity is very small, declare supported state
+                    // 如果速度很小，则声明支持状态
                     characterState = CharacterSupportState.Supported;
                 }
                 else
                 {
-                    // Check if sliding
+                    // 检查是否滑动
                     outVelocity = math.normalize(outVelocity);
                     float slopeAngleSin = math.max(0.0f, math.dot(outVelocity, -stepInput.Up));
                     float slopeAngleCosSq = 1 - slopeAngleSin * slopeAngleSin;
@@ -284,7 +284,7 @@ namespace Samples.HelloNetcode
                     }
                     else
                     {
-                        // If numSupportingPlanes is 0, surface normal is invalid, so state is unsupported
+                        // 如果 numSupportingPlanes 为 0，则表面法线无效，因此不支持状态
                         characterState = CharacterSupportState.Unsupported;
                     }
                 }
@@ -295,7 +295,7 @@ namespace Samples.HelloNetcode
             CharacterControllerStepInput stepInput, float characterMass, bool affectBodies, ref PhysicsCollider collider,
             ref RigidTransform transform, ref float3 linearVelocity, ref NativeStream.Writer deferredImpulseWriter)
         {
-            // Copy parameters
+            // 复制参数
             float deltaTime = stepInput.DeltaTime;
             float3 up = stepInput.Up;
             PhysicsWorld world = stepInput.PhysicsWorldSingleton.PhysicsWorld;
@@ -313,7 +313,7 @@ namespace Samples.HelloNetcode
             {
                 NativeList<SurfaceConstraintInfo> constraints = new NativeList<SurfaceConstraintInfo>(k_DefaultConstraintsCapacity, Allocator.Temp);
 
-                // Do a collider cast
+                // 进行 collider 演员表
                 {
                     float3 displacement = newVelocity * remainingTime;
                     NativeList<ColliderCastHit> triggerHits = default;
@@ -323,7 +323,7 @@ namespace Samples.HelloNetcode
                     ColliderCastInput input = new ColliderCastInput(collider.Value, newPosition, newPosition + displacement, orientation);
                     stepInput.PhysicsWorldSingleton.PhysicsWorld.CastCollider(input, ref collector);
 
-                    // Iterate over hits and create constraints from them
+                    // 迭代命中并从中创建约束
                     for (int hitIndex = 0; hitIndex < collector.NumHits; hitIndex++)
                     {
                         ColliderCastHit hit = collector.AllHits[hitIndex];
@@ -333,10 +333,10 @@ namespace Samples.HelloNetcode
                     }
                 }
 
-                // Then do a collider distance for penetration recovery,
-                // but only fix up penetrating hits
+                // 然后做一个 collider 距离进行穿透恢复，
+                // 但只修复穿透性命中
                 {
-                    // Collider distance query
+                    // Collider 距离 query
                     NativeList<DistanceHit> distanceHits = new NativeList<DistanceHit>(k_DefaultQueryHitsCapacity, Allocator.Temp);
                     CharacterControllerAllHitsCollector<DistanceHit> distanceHitsCollector = new CharacterControllerAllHitsCollector<DistanceHit>(
                         stepInput.RigidBodyIndex, stepInput.ContactTolerance, ref distanceHits, stepInput.PhysicsWorldSingleton);
@@ -345,7 +345,7 @@ namespace Samples.HelloNetcode
                         stepInput.PhysicsWorldSingleton.PhysicsWorld.CalculateDistance(input, ref distanceHitsCollector);
                     }
 
-                    // Iterate over penetrating hits and fix up distance and normal
+                    // 迭代穿透命中并修复距离和正常
                     int numConstraints = constraints.Length;
                     for (int hitIndex = 0; hitIndex < distanceHitsCollector.NumHits; hitIndex++)
                     {
@@ -354,24 +354,24 @@ namespace Samples.HelloNetcode
                         {
                             bool found = false;
 
-                            // Iterate backwards to locate the original constraint before the max slope constraint
+                            // 向后迭代以在最大斜率 constraint 之前找到原始 constraint
                             for (int constraintIndex = numConstraints - 1; constraintIndex >= 0; constraintIndex--)
                             {
                                 SurfaceConstraintInfo constraint = constraints[constraintIndex];
                                 if (constraint.RigidBodyIndex == hit.RigidBodyIndex &&
                                     constraint.ColliderKey.Equals(hit.ColliderKey))
                                 {
-                                    // Fix up the constraint (normal, distance)
+                                    // 修复 constraint（正常，距离）
                                     {
-                                        // Create new constraint
+                                        // 创建新的 constraint
                                         CreateConstraintFromHit(stepInput.PhysicsWorldSingleton.PhysicsWorld, hit.RigidBodyIndex, hit.ColliderKey,
                                             hit.Position, hit.SurfaceNormal, hit.Distance,
                                             stepInput.SkinWidth, out SurfaceConstraintInfo newConstraint);
 
-                                        // Resolve its penetration
+                                        // 解决其渗透
                                         ResolveConstraintPenetration(ref newConstraint);
 
-                                        // Write back
+                                        // 回信
                                         constraints[constraintIndex] = newConstraint;
                                     }
 
@@ -380,7 +380,7 @@ namespace Samples.HelloNetcode
                                 }
                             }
 
-                            // Add penetrating hit not caught by collider cast
+                            // 添加 collider 施法未捕获的穿透击中
                             if (!found)
                             {
                                 CreateConstraint(stepInput.PhysicsWorldSingleton.PhysicsWorld, stepInput.Up,
@@ -391,33 +391,33 @@ namespace Samples.HelloNetcode
                     }
                 }
 
-                // Min delta time for solver to break
+                // 求解器中断的最小增量时间
                 float minDeltaTime = 0.0f;
                 if (math.lengthsq(newVelocity) > k_SimplexSolverEpsilonSq)
                 {
-                    // Min delta time to travel at least 1cm
+                    // 移动至少 1 厘米的最小增量时间
                     minDeltaTime = 0.01f / math.length(newVelocity);
                 }
 
-                // Solve
+                // 解决
                 float3 prevVelocity = newVelocity;
                 float3 prevPosition = newPosition;
                 SimplexSolver.Solve(remainingTime, minDeltaTime, up, stepInput.MaxMovementSpeed, constraints, ref newPosition, ref newVelocity, out float integratedTime);
 
-                // Apply impulses to hit bodies and store collision events
+                // 应用脉冲来撞击物体并存储碰撞事件
                 if (affectBodies)
                 {
                     CalculateAndStoreDeferredImpulsesAndCollisionEvents(stepInput, affectBodies, characterMass,
                         prevVelocity, constraints, ref deferredImpulseWriter);
                 }
 
-                // Calculate new displacement
+                // 计算新的位移
                 float3 newDisplacement = newPosition - prevPosition;
 
-                // If simplex solver moved the character we need to re-cast to make sure it can move to new position
+                // 如果单纯形解算器移动了角色，我们需要重新投射以确保它可以移动到新位置
                 if (math.lengthsq(newDisplacement) > k_SimplexSolverEpsilon)
                 {
-                    // Check if we can walk to the position simplex solver has suggested
+                    // 检查我们是否可以走到单纯形求解器建议的位置
                     var newCollector = new CharacterControllerClosestHitCollector<ColliderCastHit>(constraints, stepInput.PhysicsWorldSingleton, stepInput.RigidBodyIndex, 1.0f);
 
                     ColliderCastInput input = new ColliderCastInput(collider.Value, prevPosition, prevPosition + newDisplacement, orientation);
@@ -428,7 +428,7 @@ namespace Samples.HelloNetcode
                     {
                         ColliderCastHit hit = newCollector.ClosestHit;
 
-                        // Move character along the newDisplacement direction until it reaches this new contact
+                        // 沿 newDisplacement 方向移动角色，直到到达此新联系人
                         {
                             Assert.IsTrue(hit.Fraction >= 0.0f && hit.Fraction <= 1.0f);
 
@@ -438,14 +438,14 @@ namespace Samples.HelloNetcode
                     }
                 }
 
-                // Reduce remaining time
+                // 减少剩余时间
                 remainingTime -= integratedTime;
 
-                // Write back position so that the distance query will update results
+                // 写回位置，以便距离 query 将更新结果
                 transform.pos = newPosition;
             }
 
-            // Write back final velocity
+            // 写回最终速度
             linearVelocity = newVelocity;
         }
 
@@ -478,26 +478,26 @@ namespace Samples.HelloNetcode
 
             float distance = newConstraint.Plane.Distance;
 
-            // Calculate distance to the original plane along the new normal.
-            // Clamp the new distance to 2x the old distance to avoid penetration recovery explosions.
+            // 计算沿新法线到原始平面的距离。
+            // 将新距离限制为旧距离的 2 倍，以避免穿透恢复爆炸。
             newConstraint.Plane.Distance = distance / math.max(math.dot(newConstraint.Plane.Normal, constraint.Plane.Normal), 0.5f);
 
             if (newConstraint.Plane.Distance < 0.0f)
             {
-                // Disable penetration recovery for the original plane
+                // 禁用原始平面的穿透恢复
                 constraint.Plane.Distance = 0.0f;
 
-                // Prepare velocity to resolve penetration
+                // 准备速度以解决渗透问题
                 ResolveConstraintPenetration(ref newConstraint);
             }
 
-            // Output max slope constraint
+            // 输出最大斜率 constraint
             maxSlopeConstraint = newConstraint;
         }
 
         private static void ResolveConstraintPenetration(ref SurfaceConstraintInfo constraint)
         {
-            // Fix up the velocity to enable penetration recovery
+            // 修复速度以实现穿透恢复
             if (constraint.Plane.Distance < 0.0f)
             {
                 float3 newVel = constraint.Velocity - constraint.Plane.Normal * constraint.Plane.Distance;
@@ -513,7 +513,7 @@ namespace Samples.HelloNetcode
             CreateConstraintFromHit(world, hitRigidBodyIndex, hitColliderKey, hitPosition,
                 hitSurfaceNormal, hitDistance, skinWidth, out SurfaceConstraintInfo constraint);
 
-            // Check if max slope plane is required
+            // 检查是否需要最大坡度平面
             float verticalComponent = math.dot(constraint.Plane.Normal, up);
             bool shouldAddPlane = verticalComponent > k_SimplexSolverEpsilon && verticalComponent < maxSlopeCos;
             if (shouldAddPlane)
@@ -523,10 +523,10 @@ namespace Samples.HelloNetcode
                 constraints.Add(maxSlopeConstraint);
             }
 
-            // Prepare velocity to resolve penetration
+            // 准备速度以解决渗透问题
             ResolveConstraintPenetration(ref constraint);
 
-            // Add original constraint to the list
+            // 将原始 constraint 添加到列表中
             constraints.Add(constraint);
         }
 
@@ -547,7 +547,7 @@ namespace Samples.HelloNetcode
                     continue;
                 }
 
-                // Skip static bodies if needed to calculate impulse
+                // 如果需要计算冲量，请跳过静态物体
                 if (affectBodies && (rigidBodyIndex < world.NumDynamicBodies))
                 {
                     RigidBody body = world.Bodies[rigidBodyIndex];
@@ -557,7 +557,7 @@ namespace Samples.HelloNetcode
 
                     float projectedVelocity = math.dot(pointRelVel, constraint.Plane.Normal);
 
-                    // Required velocity change
+                    // 所需的速度变化
                     float deltaVelocity = -projectedVelocity * stepInput.Damping;
 
                     float distance = constraint.Plane.Distance;
@@ -566,11 +566,11 @@ namespace Samples.HelloNetcode
                         deltaVelocity += (distance / stepInput.DeltaTime) * stepInput.Tau;
                     }
 
-                    // Calculate impulse
+                    // 计算脉冲
                     MotionVelocity mv = world.MotionVelocities[rigidBodyIndex];
                     if (deltaVelocity < 0.0f)
                     {
-                        // Impulse magnitude
+                        // 脉冲幅度
                         float impulseMagnitude = 0.0f;
                         {
                             float objectMassInv = GetInvMassAtPoint(constraint.HitPosition, constraint.Plane.Normal, body, mv);
@@ -580,21 +580,21 @@ namespace Samples.HelloNetcode
                         impulse = impulseMagnitude * constraint.Plane.Normal;
                     }
 
-                    // Add gravity
+                    // 添加重力
                     {
-                        // Effect of gravity on character velocity in the normal direction
+                        // 重力对法线方向上角色速度的影响
                         float3 charVelDown = stepInput.Gravity * stepInput.DeltaTime;
                         float relVelN = math.dot(charVelDown, constraint.Plane.Normal);
 
-                        // Subtract separation velocity if separating contact
+                        // 如果分离接触则减去分离速度
                         {
                             bool isSeparatingContact = projectedVelocity < 0.0f;
                             float newRelVelN = relVelN - projectedVelocity;
                             relVelN = math.select(relVelN, newRelVelN, isSeparatingContact);
                         }
 
-                        // If resulting velocity is negative, an impulse is applied to stop the character
-                        // from falling into the body
+                        // 如果生成的速度为负，则会施加脉冲来停止角色
+                        // 以免落入体内
                         {
                             float3 newImpulse = impulse;
                             newImpulse += relVelN * characterMass * constraint.Plane.Normal;
@@ -602,7 +602,7 @@ namespace Samples.HelloNetcode
                         }
                     }
 
-                    // Store impulse
+                    // 储存冲动
                     deferredImpulseWriter.Write(
                         new DeferredCharacterControllerImpulse()
                         {

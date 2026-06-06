@@ -6,11 +6,11 @@ namespace Unity.DotsUISample
     [CreateAssetMenu(fileName = "New Collectables List", menuName = "Collectables")]
     public class CollectablesData : ScriptableObject
     {
-        // the number and order of collectables in the list
-        // must match the members of the CollectableType enum
+        // 列表中收藏品的数量和顺序
+        // 必须与 CollectableType 枚举的成员匹配
         public CollectableItem[] Collectables;
     }
-    
+
     [Serializable]
     public struct CollectableItem
     {

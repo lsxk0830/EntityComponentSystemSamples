@@ -7,7 +7,7 @@ struct VehicleInput : IComponentData
     public float2 Looking;
     public float2 Steering;
     public float Throttle;
-    public int Change; // positive to change to a subsequent vehicle, negative to change to a previous one
+    public int Change; // 正值表示更换为后续车辆，负值表示更换为前一车辆
 }
 
 [RequireMatchingQueriesForUpdate]

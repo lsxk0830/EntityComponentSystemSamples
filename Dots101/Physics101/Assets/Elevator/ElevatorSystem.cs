@@ -19,29 +19,29 @@ namespace Elevator
             foreach (var (elevator, trans, velocity) in
                      SystemAPI.Query<RefRW<Elevator>, RefRO<LocalTransform>, RefRW<PhysicsVelocity>>())
             {
-                // if not moving...
+                // 如果不动的话。..
                 if (velocity.ValueRW.Linear.y == 0)
                 {
-                    // go up
+                    // 上
                     velocity.ValueRW.Linear.y = elevator.ValueRO.Speed;
                 }
-                // if going up...
+                // 如果往上走。..
                 else if (velocity.ValueRW.Linear.y > 0)
                 {
-                    // if hit top...
+                    // 如果打到顶部。..
                     if (trans.ValueRO.Position.y > elevator.ValueRO.MaxHeight)
                     {
-                        // go down
+                        // 下去
                         velocity.ValueRW.Linear.y = -elevator.ValueRO.Speed;
                     }
                 }
-                // if going down...
+                // 如果往下。..
                 else
                 {
-                    // if hit bottom...
+                    // 如果触底。..
                     if (trans.ValueRO.Position.y < elevator.ValueRO.MinHeight)
                     {
-                        // go up
+                        // 上
                         velocity.ValueRW.Linear.y = elevator.ValueRO.Speed;
                     }
                 }

@@ -1,19 +1,19 @@
 # HybridEntitiesConversion
 
-This sample demonstrates the graphics related companion components that you can put in a Subscene. Note that **Particle System** does not preview in subscenes but will simulate correctly at runtime.
+此示例演示了与图形相关的配套产品 components，您可以将其放入子场景中。请注意，**粒子 System** 不会在 subscenes 中预览，但会在运行时正确模拟。
 
 <img src="../../../../READMEimages/HybridEntitiesConversion.PNG" width="600">
 
-## What does it show?
+## 它显示了什么？
 
-The scene contains a Subscene in which there are Lights, Volumes, and other objects. Entities Graphics supports all these graphics related components.
+scene 包含一个子场景，其中有灯光、体积和其他对象。Entities Graphics 支持所有这些与 components 相关的图形。
 
-## How to use this sample scene?
+## 如何使用这个示例 scene？
 
-1. In the Hierarchy, select the Subscene
-2. In the Inspector, click Open
-3. In the Hierarchy, see the objects in the Subscene.
+1. 在 Hierarchy 中，选择子场景
+2. 在 Inspector 中，单击“打开”
+3. 在 Hierarchy 中，查看子场景中的对象。
 
-## More information
+## 更多信息
 
-For more information about companion components, see the [Companion components documentation](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/companion-components.html).
+有关配套 components 的更多信息，请参阅[配套 components 文档](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.0/manual/companion-components.html)。

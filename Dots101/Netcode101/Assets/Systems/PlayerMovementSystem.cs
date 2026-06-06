@@ -29,8 +29,8 @@ namespace KickBall
                 {
                     continue;
                 }
-                
-                // ... todo disallow player from walking through obstacles
+
+                // ... todo 禁止玩家穿过障碍物
 
                 var move = new float3(input.ValueRO.Horizontal, 0, input.ValueRO.Vertical) * speed;
                 playerTransform.ValueRW.Position += move;

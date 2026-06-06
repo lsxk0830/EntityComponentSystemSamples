@@ -5,12 +5,12 @@ using Unity.Entities;
 namespace Unity.Physics.Systems
 {
     /// <summary>
-    /// Utility class for running physics simulation immediately on the main thread.
-    /// Not suitable for a field in an ECS job!
+    /// 用于立即在主线程上运行物理模拟的实用程序类。
+    /// 不适合 ECS job 中的字段！
     /// </summary>
     public struct ImmediatePhysicsWorldStepper : IDisposable
     {
-        // Simulation context
+        // 模拟环境
         public SimulationContext SimulationContext;
 #if HAVOK_PHYSICS_EXISTS
         public Havok.Physics.SimulationContext HavokSimulationContext;
@@ -19,7 +19,7 @@ namespace Unity.Physics.Systems
         public bool Created;
 
         /// <summary>
-        /// Create method. Use this instead of constructor.
+        /// 创建方法。使用它代替构造函数。
         /// </summary>
         public static ImmediatePhysicsWorldStepper Create()
         {
@@ -36,7 +36,7 @@ namespace Unity.Physics.Systems
 
 #if HAVOK_PHYSICS_EXISTS
         /// <summary>
-        /// Create method. Provides an option to pass in HavokConfiguration (for example, VDB options).
+        /// 创建方法。提供传入 HavokConfiguration 的选项（例如，VDB 选项）。
         /// </summary>
         /// <param name="havokConfiguration"></param>
         public static ImmediatePhysicsWorldStepper Create(Havok.Physics.HavokConfiguration havokConfiguration)
@@ -51,7 +51,7 @@ namespace Unity.Physics.Systems
 #endif
 
         /// <summary>
-        /// Steps the UnityPhysics simulation (on current thread)
+        /// 步骤 UnityPhysics 模拟（在当前线程上）
         /// </summary>
         public static void StepUnityPhysicsSimulationImmediate(in SimulationStepInput stepInput, ref SimulationContext simulationContext)
         {
@@ -60,7 +60,7 @@ namespace Unity.Physics.Systems
 
 #if HAVOK_PHYSICS_EXISTS
         /// <summary>
-        /// Steps the HavokPhysics simulation (on current thread)
+        /// 步骤 HavokPhysics 模拟（在当前线程上）
         /// </summary>
         public static void StepHavokPhysicsSimulationImmediate(in SimulationStepInput stepInput, ref Havok.Physics.SimulationContext havokSimulationContext)
         {
@@ -79,7 +79,7 @@ namespace Unity.Physics.Systems
         }
 
         /// <summary>
-        /// Prepares simulation context and steps the simulation (on current thread)
+        /// 准备模拟上下文并逐步执行模拟（在当前线程上）
         /// </summary>
         public void StepImmediate(SimulationType simType, ref PhysicsWorld physicsWorld, in SimulationStepInput stepInput)
         {

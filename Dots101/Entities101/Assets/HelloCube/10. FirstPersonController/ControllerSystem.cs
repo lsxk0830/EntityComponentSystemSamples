@@ -23,12 +23,12 @@ namespace HelloCube.FirstPersonController
             foreach (var (transform, controller) in
                      SystemAPI.Query<RefRW<LocalTransform>, RefRW<Controller>>())
             {
-                // Move around with WASD
+                // 与 WASD 一起走动
                 var move = new float3(input.Horizontal, 0, input.Vertical);
                 move = move * controller.ValueRO.PlayerSpeed * SystemAPI.Time.DeltaTime;
                 move = math.mul(transform.ValueRO.Rotation, move);
 
-                // Fall down / gravity
+                // 坠落/重力
                 controller.ValueRW.VerticalSpeed -= 10.0f * SystemAPI.Time.DeltaTime;
                 controller.ValueRW.VerticalSpeed = math.max(-10.0f, controller.ValueRO.VerticalSpeed);
                 move.y = controller.ValueRO.VerticalSpeed * SystemAPI.Time.DeltaTime;
@@ -39,15 +39,15 @@ namespace HelloCube.FirstPersonController
                     transform.ValueRW.Position *= new float3(1, 0, 1);
                 }
 
-                // Turn player
+                // 轮流玩家
                 var turnPlayer = input.MouseX * controller.ValueRO.MouseSensitivity * SystemAPI.Time.DeltaTime;
                 transform.ValueRW = transform.ValueRO.RotateY(turnPlayer);
 
-                // Camera look up/down
+                // 相机向上/向下看
                 var turnCam = -input.MouseY * controller.ValueRO.MouseSensitivity * SystemAPI.Time.DeltaTime;
                 controller.ValueRW.CameraPitch += turnCam;
 
-                // Jump
+                // 跳
                 if (input.Space)
                 {
                     controller.ValueRW.VerticalSpeed = controller.ValueRO.JumpSpeed;

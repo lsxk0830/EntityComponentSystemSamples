@@ -4,7 +4,7 @@ using Unity.Rendering;
 
 namespace Unity.NetCode.Samples.Common
 {
-    /// <summary>Denotes that a ghost will be set to the debug color specified in <see cref="NetworkIdDebugColorUtility"/>.</summary>
+    /// <summary>Denotes 将 ghost 设置为 <see cref="NetworkIdDebugColorUtility"/>.</summary> 中指定的调试颜色
     public struct SetPlayerToDebugColor : IComponentData
     {
     }

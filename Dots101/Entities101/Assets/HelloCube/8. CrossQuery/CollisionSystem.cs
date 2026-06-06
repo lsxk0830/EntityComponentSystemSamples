@@ -23,7 +23,7 @@ namespace HelloCube.CrossQuery
                 .WithAll<LocalTransform, DefaultColor, URPMaterialPropertyBaseColor>().Build();
 
 #if false
-            // More complex solution, but it avoids creating temporary copies of the box components
+            // 更复杂的解决方案，但它避免创建盒子 components 的临时副本
             new CollisionJob
             {
                 LocalTransformTypeHandle = SystemAPI.GetComponentTypeHandle<LocalTransform>(true),
@@ -34,7 +34,7 @@ namespace HelloCube.CrossQuery
             }.ScheduleParallel(boxQuery, state.Dependency).Complete();
 #else
 
-            // Simple solution, but it requires creating temporary copies of all box translations and entity IDs
+            // 简单的解决方案，但它需要创建所有框翻译和 entity IDs 的临时副本
             var boxTransforms = boxQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
             var boxEntities = boxQuery.ToEntityArray(Allocator.Temp);
 
@@ -42,19 +42,19 @@ namespace HelloCube.CrossQuery
                      in SystemAPI.Query<RefRO<LocalTransform>, RefRO<DefaultColor>, RefRW<URPMaterialPropertyBaseColor>>()
                          .WithEntityAccess())
             {
-                // reset color of the box to its default
+                // 将框的颜色重置为其默认值
                 color.ValueRW.Value = defaultColor.ValueRO.Value;
 
-                // change the color if this box intersects another
+                // 如果此框与另一个框相交，则更改颜色
                 for (int i = 0; i < boxTransforms.Length; i++)
                 {
                     var otherEnt = boxEntities[i];
                     var otherTrans = boxTransforms[i];
 
-                    // A box should not intersect with itself, so we check if the other entity's id matches the current entity's id.
+                    // 盒子不应该与自身相交，因此我们检查另一个 entity 的 id 是否与当前 entity 的 id 匹配。
                     if (entity != otherEnt && math.distancesq(transform.ValueRO.Position, otherTrans.Position) < 1)
                     {
-                        color.ValueRW.Value.y = 0.5f; // set green channel
+                        color.ValueRW.Value.y = 0.5f; // 设置绿色通道
                         break;
                     }
                 }
@@ -87,7 +87,7 @@ namespace HelloCube.CrossQuery
                 var baseColor = baseColors[i];
                 var entity = entities[i];
 
-                // reset to default color
+                // 重置为默认颜色
                 baseColor.Value = defaultColors[i].Value;
 
                 for (int j = 0; j < OtherChunks.Length; j++)
@@ -103,7 +103,7 @@ namespace HelloCube.CrossQuery
 
                         if (entity != otherEntity && math.distancesq(transform.Position, otherTranslation.Position) < 1)
                         {
-                            baseColor.Value.y = 0.5f; // set green channel
+                            baseColor.Value.y = 0.5f; // 设置绿色通道
                             break;
                         }
                     }

@@ -1,86 +1,86 @@
-# Entity command buffers
+# Entity 命令缓冲区
 
-We can defer changes to entities by recording commands into an [`EntityCommandBuffer`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.html). The recorded commands are executed later when we call [`Playback()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.Playback.html) on the main thread.
+我们可以通过将命令记录到 [`EntityCommandBuffer`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.html) 来推迟对 entities 的更改。录制的命令稍后在主线程调用 [`Playback()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.Playback.html) 时执行。
 
-Deferring changes with an `EntityCommandBuffer` is particularly useful in jobs because jobs generally shouldn't directly make [structural changes](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html) (*i.e.* create entities, destroy entities, add components, or remove components). Instead, jobs should record commands to be played back on the main thread after the job has been completed. `EntityCommandBuffer`'s can also help us avoid unnecessary [sync points](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html#sync-points) by deferring structural changes to a few consolidated points of the frame rather than scattered across the frame.
+使用 `EntityCommandBuffer` 推迟更改在 jobs 中特别有用，因为 jobs 通常不应直接进行[结构更改](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html) (*i.e.* create entities, destroy entities，添加 components，或删除 components）。相反，jobs 应该在 job 完成后记录要在主线程上播放的命令。`EntityCommandBuffer` 还可以通过将结构更改推迟到框架的几个合并点而不是分散在整个框架中来帮助我们避免不必要的[同步点](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/concepts-structural-changes.html#sync-points)。
 
-An `EntityCommandBuffer` has many (but not all) of the same methods as `EntityManager`. The methods include:
+`EntityCommandBuffer` 有许多（但不是全部）与 `EntityManager` 相同的方法。这些方法包括：
 
-|**`EntityCommandBuffer` method**|**Description**|
+|**`EntityCommandBuffer` 方法**|**描述**|
 |---|---|
-| [`CreateEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.CreateEntity.html) | Records a command to create a new entity. Returns a [temporary](#temporary-entities) entity ID. |
-| [`DestroyEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.DestroyEntity.html) | Records a command to destroy an entity. |
-| [`AddComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AddComponent.html) | Records a command to add a component of type T to an entity. |
-| [`RemoveComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.RemoveComponent.html) | Records a command to temove a component of type T from an entity. |
-| [`SetComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.SetComponent.html) | Records a command to set a component value of type T. |
-| [`AppendToBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AppendToBuffer.html) | Records a command that will append an individual value to the end of the entity's existing buffer. |
-| [`AddBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AddBuffer.html) | Returns a `DynamicBuffer` which is stored in the recorded command, and the contents of this buffer will be copied to the entity's actual buffer when it is created in playback. Effectively, writing to the returned buffer allows you to set the initial contents of the component. |
-| [`SetBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.SetBuffer.html)  | Like `AddBuffer()`, but it assumes the entity already has a buffer of the component type. In playback, the entity's already existing buffer content is overwritten by the contents of the returned buffer. |
+| [`CreateEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.CreateEntity.html) | 记录创建新 entity 的命令。返回[临时](#temporary-entities) entity ID。 |
+| [`DestroyEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.DestroyEntity.html) | 记录销毁 entity 的命令。 |
+| [`AddComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AddComponent.html) | 记录将 T 类型的 component 添加到 entity 的命令。 |
+| [`RemoveComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.RemoveComponent.html) | 记录从 entity 移动 T 类型的 component 的命令。 |
+| [`SetComponent<T>()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.SetComponent.html) | 记录设置 T 类型的 component 值的命令。 |
+| [`AppendToBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AppendToBuffer.html) | 记录一个命令，该命令会将单个值附加到 entity 现有缓冲区的末尾。 |
+| [`AddBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.AddBuffer.html) | 返回一个 `DynamicBuffer`，它存储在录制的命令中，并且在播放时创建 entity 时，该缓冲区的内容将被复制到 entity 的实际缓冲区中。实际上，写入返回的缓冲区允许您设置 component 的初始内容。 |
+| [`SetBuffer()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.SetBuffer.html)  | 与 `AddBuffer()` 类似，但它假设 entity 已经具有 component 类型的缓冲区。在播放时，entity 已存在的缓冲区内容将被返回的缓冲区内容覆盖。 |
 
 | &#x1F4DD; NOTE |
 | :- |
-| Some `EntityManager` methods have no `EntityCommandBuffer` equivalent because an equivalent wouldn’t be feasible or make sense. For example, there are no `EntityCommandBuffer` methods for getting component values because *reading* data is not something that can be usefully deferred. |
-| After it has been played back, an `EntityCommandBuffer` instance cannot be used for additional recording. If you need to record more commands, create a new, separate `EntityCommandBuffer` instance. |
+| 某些 `EntityManager` 方法没有 `EntityCommandBuffer` 等效方法，因为等效方法不可行或没有意义。例如，没有用于获取 component 值的 `EntityCommandBuffer` 方法，因为*读取*数据不是可以有效延迟的事情。 |
+| 播放完毕后，`EntityCommandBuffer` 实例不能用于额外录制。如果您需要记录更多命令，请创建一个新的、单独的 `EntityCommandBuffer` 实例。 |
 
 <br>
 
-## Job safety
+## Job 安全
 
-Each `EntityCommandBuffer` has a job safety handle, so the safety checks will throw an exception if you:
+每个 `EntityCommandBuffer` 都有一个 job 安全句柄，因此如果您执行以下操作，安全检查将引发异常：
 
-- ...invoke the `EntityCommandBuffer`'s methods on the main thread while the `EntityCommandBuffer` is still in use by any currently scheduled jobs.
-- ... or schedule a job that accesses an `EntityCommandBuffer` already in use by other currently scheduled jobs (*unless* the new job depends on those other jobs).
+- ...在主线程上调用 `EntityCommandBuffer` 的方法，同时 `EntityCommandBuffer` 仍在由任何当前调度的 jobs 使用。
+- ...或 schedule 一个 job，它访问已被其他当前安排的 jobs 使用的 `EntityCommandBuffer` （*除非*新的 job 取决于其他 jobs）。
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| You might be tempted to share a single `EntityCommandBuffer` instance across multiple jobs, but this is strongly discouraged. There are cases where it will work fine, but in many cases it will not. For example, using the same `EntityCommandBuffer.ParallelWriter` across multiple parallel jobs might lead to an unexpected playback order of the commands. Instead, **it’s virtually always best to create and use one `EntityCommandBuffer` per job**. Don't worry about a performance difference: recording and playing back a set of commands split across multiple `EntityCommandBuffer`'s is not really any more expensive than recording the same set of commands all into one `EntityCommandBuffer`. |
+| 您可能想在多个 jobs 之间共享单个 `EntityCommandBuffer` 实例，但强烈建议不要这样做。在某些情况下它可以正常工作，但在许多情况下却不能。例如，在多个并行 jobs 中使用相同的 `EntityCommandBuffer.ParallelWriter` 可能会导致命令的意外播放顺序。相反，**实际上最好为每个 job 创建和使用一个 `EntityCommandBuffer`**。不必担心性能差异：记录和回放分散在多个 `EntityCommandBuffer` 中的一组命令实际上并不比将同一组命令全部记录到一个 `EntityCommandBuffer` 中更昂贵。 |
 
 <br>
 
-## Temporary entities
+## 临时 entities
 
-When you call the [`CreateEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.CreateEntity.html) or [`Instantiate()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.Instantiate.html) methods of an `EntityCommandBuffer`, no new entity is created until the command is executed in playback, so the entity ID returned by these methods are *temporary* ID's, which have negative index numbers. Subsequent `AddComponent`, `SetComponent`, and `SetBuffer` commands of the same `EntityCommandBuffer` may use these temporary ID's. In playback, any temporary ID's in the recorded commands will be remapped to actual, existing entities.
+当您调用 `EntityCommandBuffer` 的 [`CreateEntity()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.CreateEntity.html) 或 [`Instantiate()`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.Instantiate.html) 方法时，在播放中执行该命令之前不会创建新的 entity，因此这些方法返回的 entity ID 是“临时”ID，其索引号为负。相同 `EntityCommandBuffer` 的后续 `AddComponent`、`SetComponent` 和 `SetBuffer` 命令可以使用这些临时 ID。在播放时，录制命令中的任何临时 ID 将被重新映射到实际的现有 entities。
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| Because a temporary entity ID has no meaning outside of the `EntityCommandBuffer` instance from which it was created, it should *only* be used in subsequent method calls of the same `EntityCommandBuffer` instance. Do not, for example, use a temporary ID in recording a command of a different `EntityCommandBuffer` instance. |
+| 由于临时 entity ID 在创建它的 `EntityCommandBuffer` 实例之外没有任何意义，因此它应该“仅”在同一 `EntityCommandBuffer` 实例的后续方法调用中使用。例如，请勿使用临时 ID 来记录不同 `EntityCommandBuffer` 实例的命令。 |
 
 <br>
 
 ## EntityCommandBuffer.ParallelWriter
 
-To safely record commands from a parallel job, we need an [`EntityCommandBuffer.ParallelWriter`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.ParallelWriter.html), which is a wrapper around an underlying `EntityCommandBuffer`.
+为了安全地记录来自并行 job 的命令，我们需要一个 [`EntityCommandBuffer.ParallelWriter`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBuffer.ParallelWriter.html)，它是底层 `EntityCommandBuffer` 的包装器。
 
-A `ParallelWriter` has most of the same methods as an `EntityCommandBuffer` itself, but the `ParallelWriter` methods all take an additional 'sort key' argument for the sake of determinism:
+`ParallelWriter` 具有与 `EntityCommandBuffer` 本身相同的大部分方法，但为了确定性，`ParallelWriter` 方法都采用额外的“排序键”参数：
 
-When an `EntityCommandBuffer.ParallelWriter` records commands in a parallel job, the order of commands recorded from different threads depends upon thread scheduling, making the order non-deterministic. This isn't ideal because:
+当 `EntityCommandBuffer.ParallelWriter` 在并行 job 中记录命令时，从不同线程记录的命令的顺序取决于线程调度，使得顺序不确定。这并不理想，因为：
 
-- Deterministic code is generally easier to debug.
-- Some netcode solutions depend upon determinism to produce consistent results across different machines. 
+- 确定性代码通常更容易调试。
+- 一些Netcode解决方案依赖于确定性来在不同的机器上产生一致的结果。
 
-While the recording order of the commands cannot be deterministic, the *playback order* can be deterministic with a simple trick:
+虽然命令的记录顺序无法确定，但*播放顺序*可以通过一个简单的技巧来确定：
 
-1. Each command records a 'sort key' integer passed as the first argument to each command method.
-1. The `Playback()` method sorts the commands by their sort keys before executing the commands.
+1. 每个命令都会记录一个“排序键”整数，作为每个命令方法的第一个参数传递。
+1. `Playback()` 方法在执行命令之前按排序键对命令进行排序。
 
-As long as the used sort keys map deterministically to each recorded command, the sort makes the playback order deterministic.
+只要使用的排序键确定地映射到每个记录的命令，排序就会使播放顺序确定。
 
-So in an `IJobEntity`, the sort key we generally want to use is the [`ChunkIndexInQuery`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ChunkIndexInQuery.html), which is a unique value for every chunk. Because the sort is stable and because all entities of an individual chunk are processed together in a single thread, this index value is suitable as a sort key for the recorded commands. In an `IJobChunk`, we can use the equivalent `unfilteredChunkIndex` parameter of the `Execute` method.
+因此，在 `IJobEntity` 中，我们通常要使用的排序键是 [`ChunkIndexInQuery`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.ChunkIndexInQuery.html)，它是每个 chunk 的唯一值。由于排序是稳定的，并且单个 chunk 的所有 entities 都在单个线程中一起处理，因此该索引值适合作为记录命令的排序键。在 `IJobChunk` 中，我们可以使用 `Execute` 方法的等效 `unfilteredChunkIndex` 参数。
 
 <br>
 
-## Multi-playback
+## 多重播放
 
-If an `EntityCommandBuffer` is created with the `PlaybackPolicy.MultiPlayback` option, it's `Playback` method can be called more than once. Otherwise, calling `Playback` more than once will throw an exception. Multi-playback is mainly useful when you want to repeatedly spawn a set of entities.
+如果使用 `PlaybackPolicy.MultiPlayback` 选项创建 `EntityCommandBuffer`，则可以多次调用它的 `Playback` 方法。否则，多次调用 `Playback` 将引发异常。当您想要重复生成一组 entities 时，多重播放主要有用。
 
 
 <br>
 
 ## EntityCommandBufferSystem
 
-An [`EntityCommandBufferSystem`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBufferSystem.html) is a system that provides a convenient way to defer `EntityCommandBuffer` playback. An `EntityCommandBuffer` instance created from an `EntityCommandBufferSystem` will be played back and disposed the next time the `EntityCommandBufferSystem` updates.
+[`EntityCommandBufferSystem`](https://docs.unity3d.com/Packages/com.unity.entities@latest?subfolder=/api/Unity.Entities.EntityCommandBufferSystem.html) 是一个 system，它提供了一种推迟 `EntityCommandBuffer` 播放的便捷方法。从 `EntityCommandBufferSystem` 创建的 `EntityCommandBuffer` 实例将在下次 `EntityCommandBufferSystem` 更新时播放并处置。
 
-You rarely need to create any `EntityCommandBufferSystem`'s yourself because the automatic bootstrapping process puts these five into the default world:
+您很少需要自己创建任何 `EntityCommandBufferSystem`，因为自动引导过程会将这五个放入默认的 world 中：
 
 - `BeginInitializationEntityCommandBufferSystem`
 - `EndInitializationEntityCommandBufferSystem`
@@ -88,8 +88,8 @@ You rarely need to create any `EntityCommandBufferSystem`'s yourself because the
 - `EndSimulationEntityCommandBufferSystem`
 - `BeginPresentationEntityCommandBufferSystem`
 
-The `EndSimulationEntityCommandBufferSystem`, for example, is updated at the end of the `SimulationSystemGroup`. (Notice there's no *EndPresentationEntityCommandBufferSystem* at the end of the frame, but you can use `BeginInitializationEntityCommandBufferSystem` instead: the end of one frame and the beginning of the next are logically the same point in time).
+例如，`EndSimulationEntityCommandBufferSystem` 在 `SimulationSystemGroup` 末尾更新。（请注意，帧末尾没有 *EndPresentationEntityCommandBufferSystem*，但您可以使用 `BeginInitializationEntityCommandBufferSystem` 代替：一帧的结束和下一帧的开始在逻辑上是相同的时间点）。
 
-| &#x26A0; IMPORTANT |
+| ⚠ IMPORTANT |
 | :- |
-| Do not manually play back and dispose an `EntityCommandBuffer` instance created by an `EntityCommandBufferSystem`: the `EntityCommandBufferSystem` will both play back and dispose the instance for you. |
+| 不要手动回放和处置由 `EntityCommandBufferSystem` 创建的 `EntityCommandBuffer` 实例：`EntityCommandBufferSystem` 将为您回放和处置该实例。 |

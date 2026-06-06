@@ -17,25 +17,25 @@ namespace GravityWell
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.Enabled = false;  // we want this system to update only once
+            state.Enabled = false;  // 我们希望这个 system 仅更新一次
             var config = SystemAPI.GetSingleton<Config>();
-            
-            // spawn the balls
+
+            // 产生球
             state.EntityManager.Instantiate(config.BallPrefab, config.BallCount, Allocator.Temp);
 
-            // spread out the balls in a grid so they don't spawn on top of each other
+            // 将球分散在网格中，这样它们就不会在彼此的顶部生成
             const float spacing = 3;
             const float maxRowSize = 100;
             float minX = -maxRowSize / 2.0f;
             float x = minX;
             float y = 0;
-            foreach (var ballTransform in 
+            foreach (var ballTransform in
                      SystemAPI.Query<RefRW<LocalTransform>>()
                          .WithAll<Ball>())
             {
                 ballTransform.ValueRW.Position = new float3(x, y, 0);
                 x += spacing;
-                if (x > maxRowSize) // cap number of balls in each row of the grid 
+                if (x > maxRowSize) // 限制网格中每行的球数
                 {
                     x = minX;
                     y += spacing;

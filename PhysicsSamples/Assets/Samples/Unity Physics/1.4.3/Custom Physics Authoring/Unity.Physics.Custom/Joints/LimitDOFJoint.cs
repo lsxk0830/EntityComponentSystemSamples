@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
-    // This Joint allows you to lock one or more of the 6 degrees of freedom of a constrained body.
-    // This is achieved by combining the appropriate lower level 'constraint atoms' to form the higher level Joint.
-    // In this case Linear and Angular constraint atoms are combined.
-    // One use-case for this Joint could be to restrict a 3d simulation to a 2d plane.
+    // 此 Joint 允许您锁定受约束体的 6 个自由度中的一个或多个。
+    // 这是通过组合适当的较低级别的“constraint 原子”以形成较高级别的 Joint 来实现的。
+    // 在这种情况下，线性和角度 constraint 原子被组合。
+    // Joint 的一个用例是将 3d 模拟限制在 2d 平面。
     public class LimitDOFJoint : BaseJoint
     {
         public bool3 LockLinearAxes;
@@ -76,7 +76,7 @@ namespace Unity.Physics.Authoring
             else
                 newJointEntities = new NativeList<Entity>(joints.Length, Allocator.Temp);
 
-            // create all new joints
+            // 创建所有新关节
             var multipleJoints = joints.Length > 1;
 
             for (var i = 0; i < joints.Length; ++i)
@@ -92,7 +92,7 @@ namespace Unity.Physics.Authoring
 
             if (multipleJoints)
             {
-                // set companion buffers for new joints
+                // 为新关节设置伴随缓冲区
                 for (var i = 0; i < joints.Length; ++i)
                 {
                     var companions = AddBuffer<PhysicsJointCompanion>(newJointEntities[i]);

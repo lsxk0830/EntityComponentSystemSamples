@@ -49,8 +49,8 @@ namespace Boids
             }
 
             ecb.Playback(state.EntityManager);
-            // TODO: all Prefabs are currently forced to TransformUsageFlags.Dynamic by default, which means boids get a LocalTransform
-            // they don't need. As a workaround, remove the component at spawn-time.
+            // TODO: 默认情况下，所有 Prefabs 当前都强制为 TransformUsageFlags.Dynamic，这意味着 boids 获得 LocalTransform
+            // 他们不需要。作为解决方法，请在生成时删除 component。
             state.EntityManager.RemoveComponent<LocalTransform>(m_BoidQuery);
         }
     }

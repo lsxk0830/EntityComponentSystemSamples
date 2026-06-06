@@ -7,9 +7,9 @@ namespace Tutorials.Jobs.Step2
 {
     public class FindNearest : MonoBehaviour
     {
-        // The size of our arrays does not need to vary, so rather than create
-        // new arrays every field, we'll create the arrays in Awake() and store them
-        // in these fields.
+        // 我们的数组的大小不需要改变，所以而不是创建
+        // 每个字段都有新数组，我们将在 Awake() 中创建数组并存储它们
+        // 在这些领域。
         NativeArray<float3> TargetPositions;
         NativeArray<float3> SeekerPositions;
         NativeArray<float3> NearestTargetPositions;
@@ -17,15 +17,15 @@ namespace Tutorials.Jobs.Step2
         public void Start()
         {
             Spawner spawner = Object.FindFirstObjectByType<Spawner>();
-            // We use the Persistent allocator because these arrays must
-            // exist for the run of the program.
+            // 我们使用持久分配器，因为这些数组必须
+            // 存在于程序的 run 中。
             TargetPositions = new NativeArray<float3>(spawner.NumTargets, Allocator.Persistent);
             SeekerPositions = new NativeArray<float3>(spawner.NumSeekers, Allocator.Persistent);
             NearestTargetPositions = new NativeArray<float3>(spawner.NumSeekers, Allocator.Persistent);
         }
 
-        // We are responsible for disposing of our allocations
-        // when we no longer need them.
+        // 我们负责处置我们的分配
+        // 当我们不再需要它们时。
         public void OnDestroy()
         {
             TargetPositions.Dispose();
@@ -35,21 +35,21 @@ namespace Tutorials.Jobs.Step2
 
         public void Update()
         {
-            // Copy every target transform to a NativeArray.
+            // 将每个目标转换复制到 NativeArray。
             for (int i = 0; i < TargetPositions.Length; i++)
             {
-                // Vector3 is implicitly converted to float3
+                // Vector3 隐式转换为 float3
                 TargetPositions[i] = Spawner.TargetTransforms[i].localPosition;
             }
 
-            // Copy every seeker transform to a NativeArray.
+            // 将每个导引头变换复制到 NativeArray。
             for (int i = 0; i < SeekerPositions.Length; i++)
             {
-                // Vector3 is implicitly converted to float3
+                // Vector3 隐式转换为 float3
                 SeekerPositions[i] = Spawner.SeekerTransforms[i].localPosition;
             }
 
-            // To schedule a job, we first need to create an instance and populate its fields.
+            // 对于 schedule 和 job，我们首先需要创建一个实例并填充其字段。
             FindNearestJob findJob = new FindNearestJob
             {
                 TargetPositions = TargetPositions,
@@ -60,15 +60,15 @@ namespace Tutorials.Jobs.Step2
             // Schedule() puts the job instance on the job queue.
             JobHandle findHandle = findJob.Schedule();
 
-            // The Complete method will not return until the job represented by
-            // the handle finishes execution. Effectively, the main thread waits
-            // here until the job is done.
+            // Complete 方法将不会返回，直到 job 表示
+            // 句柄完成执行。实际上，主线程等待
+            // 直到 job 完成。
             findHandle.Complete();
 
-            // Draw a debug line from each seeker to its nearest target.
+            // 从每个导引头到最近的目标绘制一条调试线。
             for (int i = 0; i < SeekerPositions.Length; i++)
             {
-                // float3 is implicitly converted to Vector3
+                // float3 隐式转换为 Vector3
                 Debug.DrawLine(SeekerPositions[i], NearestTargetPositions[i]);
             }
         }

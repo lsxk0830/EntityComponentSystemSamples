@@ -16,7 +16,7 @@ namespace HelloCube.CustomTransforms
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            float rotation = SystemAPI.Time.DeltaTime * 180f; // Half a rotation every second (in degrees)
+            float rotation = SystemAPI.Time.DeltaTime * 180f; // 每秒旋转半圈（以度为单位）
             float elapsedTime = (float) SystemAPI.Time.ElapsedTime;
             float xPosition = math.sin(elapsedTime) * 2f - 1f;
             float scale = math.sin(elapsedTime * 2f) + 1f;

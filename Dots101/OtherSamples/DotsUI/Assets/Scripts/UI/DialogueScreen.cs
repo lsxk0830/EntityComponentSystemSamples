@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.DotsUISample
 {
-    //  displays Wizardo's dialogue
+    //  显示 Wizardo 的对话
     public class DialogueScreen : UIScreen
     {
         Label m_DialogueLabel;
@@ -27,11 +27,11 @@ namespace Unity.DotsUISample
             screen.m_DialogueLabel = screen.RootElement.Q<Label>("dialogue__text-label");
             screen.m_AcceptButton = screen.RootElement.Q<Button>("dialogue__accept-button");
             screen.m_CloseButton = screen.RootElement.Q<Button>("dialogue__close-button");
-            
+
             screen.m_AcceptButton.clicked += screen.NextLine;
             screen.m_CloseButton.clicked += screen.Close;
             screen.RootElement.style.display = DisplayStyle.None;
-            
+
             return screen;
         }
 
@@ -52,7 +52,7 @@ namespace Unity.DotsUISample
                 isDone = true;
                 return;
             }
-            m_AcceptButton.text = (m_DialogueLineIdx == m_Dialogue.Lines.Length - 1) ? "FINISH" : "NEXT";    
+            m_AcceptButton.text = (m_DialogueLineIdx == m_Dialogue.Lines.Length - 1) ? "FINISH" : "NEXT";
             m_DialogueLabel.text = m_Dialogue.Lines[m_DialogueLineIdx];
         }
 

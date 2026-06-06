@@ -1,25 +1,25 @@
-# HelloNetcode Thin Client Sample
+# HelloNetcode Thin Client 示例
 
-A thin client is a stripped down client which only sends input to the server and does not run anything else. It receives ghost snapshot updates from the server but discards them (no processing done). Thus it does not spawn anything.
+精简的 client 是一个精简的 client，它仅将输入发送到 server，而不是 run 任何其他内容。它从 server 接收 ghost snapshot 更新，但丢弃它们（未完成处理）。因此它不会产生任何东西。
 
-Thin clients are only supported in the editor and make it easier to develop multiplayer features in the editor with simulated extra clients so you don't need to build and launch them as a standalone. You can set the amount of thin clients you want in the _Playmode Tools_ found in the _Multiplayer_ menu.
+Thin clients 仅在编辑器中受支持，并且可以通过模拟额外的 clients 在编辑器中更轻松地开发多人游戏功能，因此您无需将它们作为独立版本构建和启动。您可以在 _ 多人游戏 _ 菜单中的 _ 游戏模式工具 _ 中设置所需的薄 clients 数量。
 
-See
+看
 
-* _Thin Clients_ in the [Client Server Worlds](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/client-server-worlds.html) section
-* _Automatic command input setup using IInputComponentData_ section in the [Command Stream](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/command-stream.html) section
+* [Client Server Worlds](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/client-server-worlds.html) 部分中的 _ 瘦客户端 _
+* _ 使用 [Command Stream](https://docs.unity3d.com/Packages/com.unity.netcode@latest?subfolder=/manual/command-stream.html) 部分中的 IInputComponentData_ 部分自动命令输入设置
 
-## Requirements
+## 要求
 
-Connection needs to be in game already and re-uses the spawn player sample so you don't need to spawn anything (just set up new inputs)
+连接需要已经在游戏中并重新使用生成玩家示例，因此您不需要生成任何内容（只需设置新输入）
 
 * GoInGame
 * SpawnPlayer
 
-## Sample description
+## 示例描述
 
-This sample shows how to add thin client random input generation to a project when using the [__IInputComponentData__](xref:Unity.NetCode.IInputComponentData) component for input handling.
+此示例演示了在使用 [__IInputComponentData__](xref:Unity.NetCode.IInputComponentData) component 进行输入处理时，如何将精简 client 随机输入生成添加到项目中。
 
-To implement the input handling of a thin client you need to manually create a dummy player entity to contain the input logic. The dummy entity needs to have the bare minimum functionality for it to work properly, that's the input component/buffer and have the command target and ghost owner components configured for the thin clients own player (`CreateThinClientPlayer` function in the sample).
+要实现瘦 client 的输入处理，您需要手动创建一个虚拟播放器 entity 来包含输入逻辑。虚拟 entity 需要具有最低限度的功能才能正常工作，即输入 component/缓冲区，并具有命令目标和 ghost 所有者 components 为瘦 clients 自己的播放器配置（示例中的 `CreateThinClientPlayer` 函数）。
 
-In this sample the random inputs just move the player around and make it jump at regular intervals. It has no idea about other players or its surroundings. How the random input is generated is then of course dependent on the game being developed. You just have to keep in mind you have no up to date game data available as ghost snapshots are not being processed and thus can't depend on that state.
+在此示例中，随机输入只是移动玩家并使其定期跳跃。它不知道其他玩家或其周围环境。如何生成随机输入当然取决于正在开发的游戏。您只需记住，您没有可用的最新游戏数据，因为 ghost snapshots 未被处理，因此不能依赖于该状态。

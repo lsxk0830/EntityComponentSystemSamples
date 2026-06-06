@@ -18,13 +18,13 @@ namespace Streaming.SceneManagement.SceneState
             {
                 foreach (var sceneAsset in authoring.sceneAssets)
                 {
-                    // We want to create a dependency to the scene in case the scene gets deleted
-                    // This needs to be outside the authoring.scene != null check in case the asset file gets deleted and then restored.
+                    // 我们希望创建对 scene 的依赖关系，以防 scene 被删除
+                    // 这需要在 authoring.scene!= null 检查之外，以防资产文件被删除然后恢复。
                     DependsOn(sceneAsset);
 
                     if (sceneAsset != null)
                     {
-                        // Store the information needed to load/unload the scenes and to show the current state in the UI
+                        // 存储加载/卸载 scenes 所需的信息并在 UI 中显示当前状态
                         var entity = CreateAdditionalEntity(TransformUsageFlags.Dynamic, false, sceneAsset.name);
                         AddComponent(entity, new SceneReference
                         {
@@ -42,21 +42,21 @@ namespace Streaming.SceneManagement.SceneState
 
     public enum LoadingAction
     {
-        None = 0, // No action required
-        LoadAll = 1, // Loads the scene and section entities and the entities in each section
-        LoadMeta = 2, // Loads the scene and section entities but not the entities in each section
-        UnloadEntities = 4, // Unloads the entities in each section, but it keeps loaded the scene and section entities
-        UnloadAll = 8 // Unloads the scene and section entities as well as the content of each section
+        None = 0, // 无需采取任何行动
+        LoadAll = 1, // 加载每个部分中的 scene 和部分 entities 和 entities
+        LoadMeta = 2, // 加载 scene 和部分 entities，但不加载每个部分中的 entities
+        UnloadEntities = 4, // 卸载每个部分中的 entities，但保持加载 scene 和部分 entities
+        UnloadAll = 8 // 卸载 scene 和部分 entities 以及每个部分的内容
     }
 
     public struct SceneReference : IComponentData
     {
-        public FixedString128Bytes SceneName; // Name of the scene (To display it in the UI)
-        public EntitySceneReference SceneAsset; // Reference to the scene (Used for streaming in the scene)
-        public SceneSystem.SceneStreamingState StreamingState; // Current state of the loading scene
-        public LoadingAction LoadingAction; // Action requested from the UI
+        public FixedString128Bytes SceneName; // scene 的名称（在 UI 中显示）
+        public EntitySceneReference SceneAsset; // 参考 scene（用于 scene 中的流式传输）
+        public SceneSystem.SceneStreamingState StreamingState; // 当前加载状态 scene
+        public LoadingAction LoadingAction; // 请求 UI 采取行动
 
-        // Entity representing the scene once the scene is loaded (even while the sections are not loaded).
+        // 一旦加载了 scene（即使未加载这些部分），Entity 表示 scene。
         public Entity EntityScene;
     }
 }

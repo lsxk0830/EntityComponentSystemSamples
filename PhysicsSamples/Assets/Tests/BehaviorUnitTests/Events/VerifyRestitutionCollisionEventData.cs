@@ -1,7 +1,7 @@
-// This test verifies the CollisionEventData struct and also that the impulse accumulation for collision events
-// involving a fast contact point (such as a sphere bouncing) is correct. When substepping>1, a bounce contact will happen
-// during a single substep, and the impulse should be accumulated correctly across multiple substeps of the same frame.
-// The test will fail if the impulse is zero. Test is hardcoded for a sphere with a single contact point
+// 此测试验证 CollisionEventData 结构以及碰撞事件的脉冲累积
+// 涉及快速接触点（例如球体弹跳）是正确的。当 substepping>1 时，会发生弹跳接触
+// 在单个子步期间，脉冲应该在同一帧的多个子步中正确累积。
+// 如果脉冲为零，测试将失败。针对具有单个接触点的球体进行硬编码测试
 using System;
 using Unity.Collections;
 using Unity.Entities;
@@ -48,7 +48,7 @@ namespace Unity.Physics.Tests
 
             public void Execute(CollisionEvent collisionEvent)
             {
-                // Verify all data in the provided event struct.
+                // 验证提供的事件结构中的所有数据。
                 CollisionEvent.Details details = collisionEvent.CalculateDetails(ref World);
                 Assert.AreNotEqual(collisionEvent.BodyIndexA, collisionEvent.BodyIndexB);
                 Assert.AreEqual(collisionEvent.ColliderKeyA.Value, ColliderKey.Empty.Value);
@@ -59,7 +59,7 @@ namespace Unity.Physics.Tests
                 Assert.AreApproximatelyEqual(collisionEvent.Normal.y, 1.0f, 0.01f);
                 Assert.AreApproximatelyEqual(collisionEvent.Normal.z, 0.0f, 0.01f);
 
-                // Sphere collider specific check:
+                // 球体 collider 具体检查：
                 Assert.IsTrue(details.EstimatedContactPointPositions.Length == 1);
 
                 // Impulse=zero would indicate there is a problem with the impulse accumulation in the contact jacobian

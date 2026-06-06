@@ -64,7 +64,7 @@ namespace Samples.HelloNetcode.Hybrid
 
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-            // FIXME: make sure locomotionData is read-only
+            // FIXME: 确保 locomotionData 是只读的
             var locoData = m_controller.GetPlayableData<LocomotionAnimationData>();
             var blendedClipLength = CalculateWeights(m_positions, m_clipLengths, m_weights, locoData.Direction);
             for (var i = 0; i < m_clips.Length; i++)
@@ -74,7 +74,7 @@ namespace Samples.HelloNetcode.Hybrid
                 m_clips[i].SetSpeed(m_clipLengths[i] / blendedClipLength);
                 m_clips[i].SetTime(locoData.Phase * m_clipLengths[i]);
             }
-            // Update aim
+            // 更新目标
             float aimPitchFraction = locoData.aimPitch / 180.0f;
             m_clipAim.SetTime(aimPitchFraction * m_clipAim.GetDuration());
 
@@ -106,7 +106,7 @@ namespace Samples.HelloNetcode.Hybrid
             //m_clipAim.Pause();
             m_clipAim.SetDuration(aimClip.length);
 
-            // Setup other additive mixer
+            // 设置其他添加剂混合器
             var additiveMixer = AnimationLayerMixerPlayable.Create(graph);
             var locoMixerPort = additiveMixer.AddInput(m_mixer, 0);
             additiveMixer.SetInputWeight(locoMixerPort, 1);
@@ -123,13 +123,13 @@ namespace Samples.HelloNetcode.Hybrid
         {
             var count = positionArray.Length;
 
-            // Initialize all weights to 0
+            // 将所有权重初始化为 0
             for (var i = 0; i < weightArray.Length; i++)
             {
                 weightArray[i] = 0f;
             }
 
-            // Handle fallback
+            // 处理后备
             if (count < 2)
             {
                 if (count == 1)
@@ -140,10 +140,10 @@ namespace Samples.HelloNetcode.Hybrid
                 return 1;
             }
 
-            // Handle special case when sampled ecactly in the middle
+            // 处理中间精确采样时的特殊情况
             if (math.all(blendPosition == float2.zero))
             {
-                // If we have a center motion, give that one all the weight
+                // 如果我们有一个中心运动，则赋予它所有的权重
                 for (var i = 0; i < count; i++)
                 {
                     if (math.all(positionArray[i] == float2.zero))
@@ -153,7 +153,7 @@ namespace Samples.HelloNetcode.Hybrid
                     }
                 }
 
-                // Otherwise divide weight evenly
+                // 否则平均分配重量
                 float sharedWeight = 1.0f / count;
                 float avgCenterLen = 0;
                 for (var i = 0; i < count; i++)
@@ -206,7 +206,7 @@ namespace Samples.HelloNetcode.Hybrid
 
             if (indexA < 0 || indexB < 0)
             {
-                // Fallback if sampling point is not inside a triangle
+                // 如果采样点不在三角形内则回退
                 centerWeight = 1;
             }
             else
@@ -214,16 +214,16 @@ namespace Samples.HelloNetcode.Hybrid
                 var a = positionArray[indexA];
                 var b = positionArray[indexB];
 
-                // Calculate weights using barycentric coordinates
-                // (formulas from http://en.wikipedia.org/wiki/Barycentric_coordinate_system_%28mathematics%29 )
-                float det = b.y * a.x - b.x * a.y; // Simplified from: (b.y-0)*(a.x-0) + (0-b.x)*(a.y-0);
+                // 使用重心坐标计算权重
+                // （公式来自 http://en.wikipedia.org/wiki/Barycentric_coordinate_system_%28mathematics%29 ）
+                float det = b.y * a.x - b.x * a.y; // 简化自：(b.y-0)*(a.x-0) + (0-b.x)*(a.y-0)；
 
-                // TODO: Is x and y used correctly below??
-                float wA = (b.y * blendPosition.x - b.x * blendPosition.y) / det; // Simplified from: ((b.y-0)*(l.x-0) + (0-b.x)*(l.y-0)) / det;
-                float wB = (a.x * blendPosition.y - a.y * blendPosition.x) / det; // Simplified from: ((0-a.y)*(l.x-0) + (a.x-0)*(l.y-0)) / det;
+                // TODO: 下面的 x 和 y 使用正确吗？
+                float wA = (b.y * blendPosition.x - b.x * blendPosition.y) / det; // 简化自：((b.y-0)*(l.x-0) + (0-b.x)*(l.y-0)) / det;
+                float wB = (a.x * blendPosition.y - a.y * blendPosition.x) / det; // 简化自：((0-a.y)*(l.x-0) + (a.x-0)*(l.y-0)) / det;
                 centerWeight = 1 - wA - wB;
 
-                // Clamp to be inside triangle
+                // 夹住三角形内部
                 if (centerWeight < 0)
                 {
                     centerWeight = 0;
@@ -238,7 +238,7 @@ namespace Samples.HelloNetcode.Hybrid
                     wB = 0;
                 }
 
-                // Give weight to the two vertices on the periphery that are closest
+                // 将权重赋予最接近的外围两个顶点
                 weightArray[indexA] = wA;
                 weightArray[indexB] = wB;
 
@@ -252,7 +252,7 @@ namespace Samples.HelloNetcode.Hybrid
             }
             else
             {
-                // Give weight to all children when input is in the center
+                // 当输入位于中心时，赋予所有子级权重
                 float sharedWeight = 1.0f / count;
                 for (var i = 0; i < count; i++)
                 {
@@ -279,7 +279,7 @@ namespace Samples.HelloNetcode.Hybrid
         {
             var behaviourPlayable = ScriptPlayable<RunGhostPlayableBehaviour>.Create(graph);
             var behaviour = behaviourPlayable.GetBehaviour();
-            // This registers the behaviour for receiving PreparePredictedData, skip this if predicted data is updated by a system (PrepareFrame is still called)
+            // 这注册了接收 PreparePredictedData 的行为，如果 predicted 数据由 system 更新（PrepareFrame 仍然被调用），则跳过此操作
             behaviours.Add(behaviour);
 
             behaviour.Initialize(controller, graph, behaviourPlayable, BlendSpaceNodes, AimClip);

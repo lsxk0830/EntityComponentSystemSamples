@@ -14,7 +14,7 @@ namespace Unity.Physics.Authoring
 
     public class BallAndSocketJoint : BaseJoint
     {
-        // Editor only settings
+        // 仅 Editor 设置
         [HideInInspector]
         public bool EditPivots;
 
@@ -97,7 +97,7 @@ namespace Unity.Physics.Authoring
             else
                 newJointEntities = new NativeList<Entity>(joints.Length, Allocator.Temp);
 
-            // create all new joints
+            // 创建所有新关节
             var multipleJoints = joints.Length > 1;
 
             var entity = GetEntity(TransformUsageFlags.Dynamic);
@@ -123,7 +123,7 @@ namespace Unity.Physics.Authoring
 
             if (multipleJoints)
             {
-                // set companion buffers for new joints
+                // 为新关节设置伴随缓冲区
                 for (var i = 0; i < joints.Length; ++i)
                 {
                     var companions = AddBuffer<PhysicsJointCompanion>(newJointEntities[i]);

@@ -26,14 +26,14 @@ namespace Unity.Physics.Authoring
 
         public override void Bake(PhysicsBodyAuthoring authoring)
         {
-            // Priority is to Legacy Components. Ignore if baked by Legacy.
+            // 优先考虑旧版 Components。如果由 Legacy 烘焙，请忽略。
             if (GetComponent<Rigidbody>()  || GetComponent<UnityEngine.Collider>())
             {
                 return;
             }
 
             var entity = GetEntity(TransformUsageFlags.Dynamic);
-            // To process later in the Baking System
+            // 稍后在 Baking System 中进行处理
             AddComponent(entity, new PhysicsBodyAuthoringData
             {
                 IsDynamic = (authoring.MotionType == BodyMotionType.Dynamic),
@@ -55,7 +55,7 @@ namespace Unity.Physics.Authoring
             if (!customTags.Equals(CustomPhysicsBodyTags.Nothing))
                 AddComponent(entity, new PhysicsCustomTags { Value = customTags.Value });
 
-            // Check that there is at least one collider in the hierarchy to add these three
+            // 检查层次结构中至少有一个 collider 以添加这三个
             GetComponentsInChildren(colliderComponents);
             GetComponentsInChildren(physicsShapeComponents);
             if (colliderComponents.Count > 0 || physicsShapeComponents.Count > 0)
@@ -88,7 +88,7 @@ namespace Unity.Physics.Authoring
 
             if (authoring.MotionType == BodyMotionType.Dynamic)
             {
-                // TODO make these optional in editor?
+                // TODO 在编辑器中将这些设置为可选吗？
                 AddComponent(entity, new PhysicsDamping
                 {
                     Linear = authoring.LinearDamping,
@@ -135,7 +135,7 @@ namespace Unity.Physics.Authoring
         {
             var entityManager = state.EntityManager;
 
-            // Fill in the mass properties based on custom mass properties for bodies without colliders
+            // 根据没有 colliders 的实体的自定义质量属性填写质量属性
             foreach (var(physicsMass, bodyData, entity) in
                      SystemAPI.Query<RefRW<PhysicsMass>, RefRO<PhysicsBodyAuthoringData>>()
                          .WithNone<PhysicsCollider>()
@@ -145,7 +145,7 @@ namespace Unity.Physics.Authoring
                 physicsMass.ValueRW = CreatePhysicsMass(entityManager, entity, bodyData.ValueRO, MassProperties.UnitSphere);
             }
 
-            // Fill in the mass properties based on collider and custom mass properties if provided.
+            // 根据 collider 和自定义质量属性（如果提供）填写质量属性。
             foreach (var(physicsMass, bodyData, collider, entity) in
                      SystemAPI.Query<RefRW<PhysicsMass>, RefRO<PhysicsBodyAuthoringData>, RefRO<PhysicsCollider>>()
                          .WithEntityAccess()
@@ -162,8 +162,8 @@ namespace Unity.Physics.Authoring
             var massProperties = inMassProperties;
             var scale = 1f;
 
-            // Scale the provided mass properties by the LocalTransform.Scale value to create the correct
-            // initial mass distribution for the rigid body.
+            // 按 LocalTransform.Scale 值缩放提供的质量属性以创建正确的质量属性
+            // 刚体的初始质量分布。
             if (entityManager.HasComponent<LocalTransform>(entity))
             {
                 var localTransform = entityManager.GetComponentData<LocalTransform>(entity);
@@ -172,26 +172,26 @@ namespace Unity.Physics.Authoring
                 massProperties.Scale(scale);
             }
 
-            // Override the mass properties with user-provided values if specified
+            // 如果指定，则使用用户提供的值覆盖质量属性
             if (inBodyData.OverrideDefaultMassDistribution)
             {
                 massProperties.MassDistribution = inBodyData.CustomMassDistribution;
                 if (hasCollider)
                 {
-                    // Increase the angular expansion factor to account for the shift in center of mass
+                    // 增加角膨胀系数以解决质心的移动
                     massProperties.AngularExpansionFactor += math.length(massProperties.MassDistribution.Transform.pos -
                         inBodyData.CustomMassDistribution.Transform.pos);
                 }
             }
 
-            // Create the physics mass properties. Among others, this scales the unit mass inertia tensor
-            // by the scalar mass of the rigid body.
+            // 创建物理质量属性。其中，这可以缩放单位质量惯性张量
+            // 由刚体的标量质量。
             var physicsMass = inBodyData.IsDynamic ?
                 PhysicsMass.CreateDynamic(massProperties, inBodyData.Mass) :
                 PhysicsMass.CreateKinematic(massProperties);
 
-            // Now, apply inverse scale to the final, baked physics mass properties in order to prevent invalid simulated mass properties
-            // caused by runtime scaling of the mass properties later on while building the physics world.
+            // 现在，将反比例应用于最终的烘焙物理质量属性，以防止无效的模拟质量属性
+            // 由稍后构建物理 world 时质量属性的运行时缩放引起。
             physicsMass = physicsMass.ApplyScale(math.rcp(scale));
 
             return physicsMass;

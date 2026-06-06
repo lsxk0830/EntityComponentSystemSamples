@@ -117,7 +117,7 @@ namespace Unity.Physics.Tests.Authoring
         {
             CreateHierarchy(Array.Empty<Type>(), Array.Empty<Type>(), new[] { bodyType });
 
-            // conversion presumed to create PhysicsVelocity under default conditions
+            // 默认条件下假定转换创建 PhysicsVelocity
             TestConvertedData<PhysicsVelocity>(v => Assert.That(v, Is.EqualTo(default(PhysicsVelocity))));
         }
 
@@ -127,8 +127,8 @@ namespace Unity.Physics.Tests.Authoring
             CreateHierarchy(Array.Empty<Type>(), Array.Empty<Type>(), new[] { typeof(PhysicsBodyAuthoring) });
             Child.GetComponent<PhysicsBodyAuthoring>().enabled = false;
 
-            // conversion presumed to create PhysicsVelocity under default conditions
-            // covered by corresponding test ConversionSystems_WhenGOHasBody_GOIsActive_BodyIsConverted
+            // 默认条件下假定转换创建 PhysicsVelocity
+            // 相应测试覆盖 ConversionSystems_WhenGOHasBody_GOIsActive_BodyIsConverted
             VerifyNoDataProduced<PhysicsVelocity>();
         }
 
@@ -147,8 +147,8 @@ namespace Unity.Physics.Tests.Authoring
             var numInactiveNodes = Root.GetComponentsInChildren<Transform>(true).Count(t => t.gameObject.activeSelf);
             Assume.That(numInactiveNodes, Is.EqualTo(2));
 
-            // conversion presumed to create PhysicsVelocity under default conditions
-            // covered by corresponding test ConversionSystems_WhenGOHasBody_GOIsActive_BodyIsConverted
+            // 默认条件下假定转换创建 PhysicsVelocity
+            // 相应测试覆盖 ConversionSystems_WhenGOHasBody_GOIsActive_BodyIsConverted
             VerifyNoDataProduced<PhysicsVelocity>();
         }
 
@@ -162,8 +162,8 @@ namespace Unity.Physics.Tests.Authoring
             };
         }
 
-        // Make sure we obtain the user-specified mass properties after baking and in simulation for a physics body
-        // when scaling the game object at edit-time.
+        // 确保我们在 baking 和物理体模拟中获得用户指定的质量属性
+        // 在编辑时缩放游戏对象时。
         [Test]
         public void ConversionSystems_WithDifferentScales_EditTimeMassIsPreserved([Values] bool massOverride, [Values] bool withCollider, [ValueSource(nameof(GetDifferentScales))] Vector3 scale)
         {
@@ -186,15 +186,15 @@ namespace Unity.Physics.Tests.Authoring
                 var boxColliderSize = new float3(3, 4, 5);
                 boxCollider.SetBox(new BoxGeometry { Size = boxColliderSize, Orientation = quaternion.identity});
 
-                // We expect the mass properties to correspond to a scaled version of the box based on the provided scale.
+                // 我们期望质量属性与基于提供的比例的盒子的缩放版本相对应。
                 automaticMassProperties = MassProperties.CreateBox(boxColliderSize * scale);
             }
             else
             {
-                // We expect the mass properties to correspond to a scaled version of the default unit sphere mass properties.
+                // 我们期望质量属性对应于默认单位球体质量属性的缩放版本。
 
-                // Special case: Without a collider, we use default mass properties. In this case, when a non-uniform scale is
-                // present, we don't bake it into the collider and consequently don't scale the mass properties either.
+                // 特殊情况：没有 collider，我们使用默认质量属性。在这种情况下，当尺度不均匀时
+                // 目前，我们不将其烘焙到 collider 中，因此也不缩放质量属性。
                 var radius = 1f;
                 if (!float4x4.Scale(scale).HasNonUniformScale())
                 {
@@ -218,7 +218,7 @@ namespace Unity.Physics.Tests.Authoring
                 expectedInertiaRot = automaticMassProperties.MassDistribution.Transform.rot;
             }
 
-            // scale the object
+            // 缩放对象
             Root.transform.localScale = scale;
 
             TestExpectedMass(expectedMass, expectedCOM, expectedInertia, expectedInertiaRot);

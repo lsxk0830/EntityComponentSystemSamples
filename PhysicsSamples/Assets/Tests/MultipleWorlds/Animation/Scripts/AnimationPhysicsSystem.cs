@@ -5,7 +5,7 @@ using static Unity.Physics.Systems.PhysicsWorldExporter;
 
 namespace Unity.Physics.Tests
 {
-    // A system which performs the whole physics pipeline on animated bodies
+    // system 在动画物体上执行整个物理管道
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateAfter(typeof(DriveAnimationBodySystem))]
     public partial struct AnimationPhysicsSystem : ISystem, ISystemStartStop
@@ -44,25 +44,25 @@ namespace Unity.Physics.Tests
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Make sure dependencies are complete, we'll run everything immediately
+            // 确保依赖关系完整，我们将立即 run 一切
             state.CompleteDependency();
 
             float timeStep = SystemAPI.Time.DeltaTime;
 
-            // Tweak if you want a different simulation for this world
+            // 如果您想要对此 world 进行不同的模拟，请进行调整
             PhysicsStep stepComponent = PhysicsStep.Default;
             if (SystemAPI.HasSingleton<PhysicsStep>())
             {
                 stepComponent = SystemAPI.GetSingleton<PhysicsStep>();
             }
 
-            // Build PhysicsWorld immediately
+            // 立即构建 PhysicsWorld
             PhysicsWorldBuilder.BuildPhysicsWorldImmediate(ref state, ref PhysicsData, timeStep, stepComponent.Gravity, state.LastSystemVersion);
 
-            // Early out if world is static
+            // 如果 world 是静态的，请尽早退出
             if (PhysicsData.PhysicsWorld.NumDynamicBodies == 0) return;
 
-            // Run simulation on main thread
+            // 在主线程上运行模拟
             m_Stepper.StepImmediate(stepComponent.SimulationType, ref PhysicsData.PhysicsWorld,
                 new SimulationStepInput()
                 {
@@ -76,7 +76,7 @@ namespace Unity.Physics.Tests
                     HaveStaticBodiesChanged = PhysicsData.HaveStaticBodiesChanged
                 });
 
-            // Export physics world only (don't copy CollisionWorld)
+            // 仅导出物理 world（不要复制 CollisionWorld）
             ExportPhysicsWorldImmediate(ref state, ref m_ExportPhysicsWorldTypeHandles, in PhysicsData.PhysicsWorld, PhysicsData.DynamicEntityGroup);
         }
     }

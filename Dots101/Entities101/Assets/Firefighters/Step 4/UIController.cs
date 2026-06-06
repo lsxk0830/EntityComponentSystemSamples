@@ -6,8 +6,8 @@ public class UIController : MonoBehaviour
     private Label dousedLabel;
     private Button repositionButton;
 
-    private bool reposition = false; 
-    
+    private bool reposition = false;
+
     private void OnEnable()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;

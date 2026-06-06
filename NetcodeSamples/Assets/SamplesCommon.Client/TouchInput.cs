@@ -77,7 +77,7 @@ namespace Unity.NetCode.Samples.Common
         }
         public void OnDrag(PointerEventData eventData)
         {
-            // Only handle the drag logic on the left/right sticks (this is also called when slightly dragging on a button)
+            // 仅处理左/右摇杆上的拖动逻辑（当稍微拖动按钮时也会调用此逻辑）
             if (Stick == StickCode.NumSticks)
                 return;
 

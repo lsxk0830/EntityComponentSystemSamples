@@ -7,9 +7,9 @@ using Unity.Transforms;
 namespace Samples.HelloNetcode
 {
     /// <summary>
-    /// Run this system after collecting input but before Animator.Update is called.
-    /// As Animator.Update is invoked right after SimulationSystemGroup,
-    /// we inject our selves right after this system group runs.
+    /// 在收集输入之后但在调用 Animator.Update 之前运行此 system。
+    /// 由于 Animator.Update 在 SimulationSystemGroup 之后立即调用，
+    /// 我们在 system 组运行后立即注入自己。
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
