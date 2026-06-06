@@ -1,6 +1,8 @@
 
 *此仓库中的示例项目使用 Unity 6.2 和 `Entities`、`Netcode`、`Physics` 和 `Entities.Graphics` packages 的 1.4 版本。*
 
+# [DOTS知识架构图](./DOTS知识架构图.md)
+
 # DOTS 示例
 
 DOTS package 示例项目包含许多小示例，涵盖了 packages 中的大部分功能：
@@ -70,5 +72,4 @@ Unity Learn 上的附加 Entities 材料：
 - [Burst 手册和 API 参考](https://docs.unity3d.com/Packages/com.unity.burst@latest/)
 - 【数学手册及 API 参考】(https://docs.unity3d.com/Packages/com.unity.mathematics@latest/)
 - [Job system 手册](https://docs.unity3d.com/Manual/JobSystem.html)
-
 
