@@ -6,14 +6,14 @@
 
 entity 是 GameObject 的轻量级非托管替代方案。Entities 在很多方面类似于 GameObjects，并且可以起到类似的作用，但它们有关键的区别：
 
-* 与 GameObject 不同，entity 不是托管对象，而只是一个唯一标识符号。
-* entity 的 components 通常是结构体值。
-* entity 的 components 没有 MonoBehaviour“事件函数”（e.g.OnUpdate、OnStart）的等效项。
-* 尽管可以给 entity component 类型提供方法，但通常不鼓励这样做。
-* 单个 entity 只能有一个任何给定类型 *e.g 的 component。* 单个 entity 不能有两个 *Foo* 类型的 components。
-* entity 没有内置的养育概念。相反，标准父 component 包含对另一个 entity 的引用，从而允许形成 entity 转换层次结构。
+* 与 GameObject 不同，entity 不是托管对象，而只是一个**唯一标识符号**
+* entity 的 components 通常是结构体值
+* entity 的 components 没有 MonoBehaviour“事件函数”（e.g.OnUpdate、OnStart）的等效项
+* 尽管可以给 entity component 类型提供方法，但通常不鼓励这样做
+* 单个 entity 只能有一个任何给定类型 *e.g 的 component。* 单个 entity 不能有两个 *Foo* 类型的 components
+* entity 没有内置的养育概念。相反，标准父 component 包含对另一个 entity 的引用，从而允许形成 entity 转换层次结构
 
-基本 component 类型是通过创建实现 IComponentData 的结构来定义的。
+基本 component 类型是通过创建实现 IComponentData 的结构来定义的
 
 ```java
 // an entity component type with two fields
