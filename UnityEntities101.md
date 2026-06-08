@@ -1,34 +1,30 @@
-最好使用菜单栏中的此选项查看本文档：*视图 → 文本宽度 → 宽*
-
-# Unity Entities 101
-
-# Entities 和 components
+# Entities 和 Components
 
 entity 是 GameObject 的轻量级非托管替代方案。Entities 在很多方面类似于 GameObjects，并且可以起到类似的作用，但它们有关键的区别：
 
 * 与 GameObject 不同，entity 不是托管对象，而只是一个**唯一标识符号**
 * entity 的 components 通常是结构体值
-* entity 的 components 没有 MonoBehaviour“事件函数”（e.g.OnUpdate、OnStart）的等效项
+* entity 的 components 没有 MonoBehaviour“事件函数”（Update、Start）
 * 尽管可以给 entity component 类型提供方法，但通常不鼓励这样做
-* 单个 entity 只能有一个任何给定类型 *e.g 的 component。* 单个 entity 不能有两个 *Foo* 类型的 components
-* entity 没有内置的养育概念。相反，标准父 component 包含对另一个 entity 的引用，从而允许形成 entity 转换层次结构
+* 一个实体（Entity）对于同一种组件类型只能拥有一个组件；例如，同一个实体不能同时拥有两个类型都为 Foo 的组件
+* 实体没有内置的父子关系机制。取而代之的是，Parent 组件保存对父实体的引用，以此建立实体的 Transform 层级结构
 
-基本 component 类型是通过创建实现 IComponentData 的结构来定义的
+基本 component 类型是通过创建实现 IComponentData 来定义的
 
-```java
-// an entity component type with two fields
+```c#
+// 具有两个字段的实体组件类型
 public struct Health : IComponentData
 {
-public int HitPoints;
-public float ArmourRating:
+    public int HitPoints;
+    public float ArmourRating;
 }
 ```
 
 IComponentData 结构应该是非托管的，因此它不能包含任何托管字段类型。具体来说，允许的字段类型有：
 
-* 位块传输类型
-* 布尔值
-* 字符
+* Blittable types（）
+* bool（布尔值）
+* char（字符）
 * BlobAssetReference\<T\>，对 Blob 数据结构的引用
 * Collections.FixedString，固定大小的字符缓冲区
 * Collections.FixedList
@@ -37,9 +33,9 @@ IComponentData 结构应该是非托管的，因此它不能包含任何托管�
 
 ## Entity Worlds 和 EntityManagers
 
-World 是 entities 的集​​合。entity 的 ID 编号仅在其自己的 world 中是唯一的，*i.e。* entity 与一个 world 中的特定 ID 完全无关 entity 与 ID 相同，不同的是 world。
+World 是 entities 的集合。entity 的 ID 编号仅在其自己的 world 中是唯一的。实体标识符（Entity ID）不是全局唯一的，而是在各自的 World 内唯一。因此，不同 World 中相同 ID 的实体并不表示同一个对象
 
-world 还拥有一组 systems，它们是 run 在主线程上的代码单元，通常每帧一次。world 的 entities 通常只能由 world 的 systems 和由那些 systems 调度的 jobs 访问（但这不是强制限制）。
+一个 World 还管理着一组系统（System），它们是运行在主线程上的逻辑单元，通常会在每一帧执行一次。World 中的实体一般只由该 World 的Systems及其所调度的Jobs访问（但这只是约定俗成的使用方式，而非强制规定）
 
 world 中的 entities 是通过 world 的 EntityManager 来创建、销毁和修改的，其方法包括：
 
@@ -57,42 +53,55 @@ world 中的 entities 是通过 world 的 EntityManager 来创建、销毁和修
 archetype 表示 world 中 component 类型的特定唯一组合：world 中的所有 entities 与一组特定的 component 类型一起存储在同一个中 archetype。例如：
 
 * 所有 world 的 entities 与 component 类型 A、B 和 C 一起存储在一个 archetype 中，
-* ...仅具有 component 类型 A 和 B（但不是 C）的 entities 一起存储在第二个 archetype 中，
-* ...并且所有具有 component 类型 B 和 D 的 entities 都存储在第三个 archetype 中。
+* 具有 component 类型 A 和 B（但不是 C）的 entities 一起存储在第二个 archetype 中，
+* 具有 component 类型 B 和 D 的 entities 都存储在第三个 archetype 中。
 
-实际上，添加或删除 entity 的 components 会更改 entity 所属的 archetype，这需要 EntityManager 实际上将 entity 移动到新的 archetype。
+当向实体添加或从实体移除组件时，EntityManager 会将实体迁移到合适的 Archetype。例如，假设某个实体具有 X、Y、Z 三种组件类型。当移除 Y 组件后，EntityManager 会将该实体迁移到包含 X 和 Z 组件类型的 Archetype，并复制对应的 X 和 Z 组件数据。如果该 Archetype 在当前 World 中尚不存在，EntityManager 会创建它。
 
-当您从 entity 添加或删除 components 时，EntityManager 会将 entity 移动到相应的 archetype。例如，如果 entity 具有 component 类型 X、Y 和 Z，并且您删除其 Y component，则 EntityManager 将 entity 移动到具有 component 的 archetype 类型 X 和 Z，复制 X 和 Z 值。如果 world 中不存在这样的 archetype，则 EntityManager 创建它。
+**警告：频繁地将大量实体在不同 Archetype 之间迁移可能会产生较高的性能开销。**
 
-**警告**：在 archetypes 之间频繁移动许多 entities 的成本加起来可能会很大。
+Archetype 会在创建或修改实体时由 EntityManager 自动创建，因此开发者无需手动管理 Archetype 的创建。
 
-Archetypes 是在您创建和修改 entities 时由 EntityManager 创建的，因此您不必担心显式创建 archetypes。
-
-即使从 archetype 中删除所有 entities，archetype 也不会被销毁，直到其 world 被销毁。
+即使**一个 Archetype 中已经没有任何实体存在，该 Archetype 仍会继续保留，直到其所在的 World 被销毁时才会被释放**。
 
 ## Chunks
 
-archetype 的 entities 存储在属于 archetype 的 16KiB 内存块中，称为 *chunks*。每个 chunk 最多存储 128 个 entities。（在 archetype 中，每个 entity 所需的空间超过 16KiB / 128，每个 chunk 的 entities 的最大数量将会更低）。
+Archetype 中的实体存储在属于该 Archetype 的 16KiB 内存块中，这些内存块称为 Chunk（数据块）。每个 Chunk 最多可存储 128 个实体。（如果单个实体所需的存储空间超过 16KiB / 128，那么每个 Chunk 能容纳的实体数量将少于 128 个。）
 
-每种类型的 entity ID 和 components 存储在 chunk 内各自单独的数组中。例如，在具有 component 类型 A 和 B 的 entities 的 archetype 中，每个 chunk 将存储三个数组：
+实体 ID 以及各类型组件的数据会分别存储在 Chunk 内各自独立的数组中。
 
-* entity ID 的一个数组
-* ...A components 的第二个数组
-* ...还有 B components 的第三个数组。
+例如，对于包含组件类型 A 和 B 的实体所对应的 Archetype，每个 Chunk 会维护三个数组：
 
-chunk 中第一个 entity 的 ID 和 components 存储在这些数组的索引 0 处，第二个 entity 存储在索引 1 处，第三个 entity 存储在索引 2 处，依此类推。
+```
+Chunk
+┌──────────────────────────────┐
+│ Entity IDs │ [E1][E2][E3]... │
+├──────────────────────────────┤
+│ A          │ [A1][A2][A3]... │
+├──────────────────────────────┤
+│ B          │ [B1][B2][B3]... │
+└──────────────────────────────┘
+```
 
-chunk 的数组始终保持紧密排列：
+- 一个用于存储实体 ID 的数组
+- 一个用于存储 A 组件的数组
+- 一个用于存储 B 组件的数组
 
-* 当新的 entity 添加到 chunk 时，它存储在数组的第一个空闲索引中。
-* 当 entity 从 chunk 中删除时（发生这种情况是因为 entity 正在被销毁，或者因为它正在被移动到另一个 archetype），chunk 中的最后一个 entity 会被移动以填充间隙中。
+Chunk 中第一个实体的 ID 和组件数据存储在这些数组的索引 0 位置；第二个实体存储在索引 1；第三个实体存储在索引 2，以此类推。
 
-chunks 的创建和销毁由 EntityManager 处理：
+Chunk 内的数组始终保持紧凑排列：
 
-* 仅当 entity 添加到已存在的 chunks 已满的 archetype 时，EntityManager 才会创建新的 chunk。
-* 当 chunk 的最后一个 entity 被删除时，EntityManager 仅销毁 chunk。
+- 当一个新实体被添加到 Chunk 时，它会存放到数组中的第一个空闲索引位置
+- 当一个实体从 Chunk 中移除时（无论是因为实体被销毁，还是因为它被移动到另一个 Archetype），Chunk 中最后一个实体会被移动过来填补空缺的位置
 
-在 chunk 内添加、删除或移动 entities 的任何 EntityManager 操作称为结构更改。此类更改只能在主线程上进行，而不能在 jobs 中进行（尽管我们稍后将讨论，可以使用 EntityCommandBuffer 作为解决方法）。
+Chunk 的创建与销毁由 EntityManager 负责管理：
+
+- 只有当向某个 Archetype 添加实体，而该 Archetype 现有的所有 Chunk 都已满时，EntityManager 才会创建新的 Chunk。
+- **只有当 Chunk 中最后一个实体被移除时，EntityManager 才会销毁该 Chunk**。
+
+任何会在 Chunk 中添加、移除或移动实体的 EntityManager 操作，都被称为结构性变更（Structural Change）。
+
+这类变更只能在主线程（Main Thread）上执行，不能在 Job 中直接进行（不过正如后面将会介绍的那样，可以通过 EntityCommandBuffer 作为一种变通方案来实现）。
 
 ## 查询
 
