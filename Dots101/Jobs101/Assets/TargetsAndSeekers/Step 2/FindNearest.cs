@@ -15,15 +15,13 @@ namespace Tutorials.Jobs.Step2
         public void Start()
         {
             Spawner spawner = Object.FindFirstObjectByType<Spawner>();
-            // 我们使用持久分配器，因为这些数组必须
-            // 存在于程序的 run 中。
+            // 我们使用持久分配器，因为这些数组必须存在于程序的 run 中。
             TargetPositions = new NativeArray<float3>(spawner.NumTargets, Allocator.Persistent);
             SeekerPositions = new NativeArray<float3>(spawner.NumSeekers, Allocator.Persistent);
             NearestTargetPositions = new NativeArray<float3>(spawner.NumSeekers, Allocator.Persistent);
         }
 
-        // 我们负责处置我们的分配
-        // 当我们不再需要它们时。
+        // 当我们不再需要它们时，我们负责处置我们的分配
         public void OnDestroy()
         {
             TargetPositions.Dispose();

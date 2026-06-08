@@ -215,7 +215,7 @@ public struct MyJob : IJobParallelFor
 * 搜索者（蓝色立方体）和目标（红色立方体）各自在 2D 平面上沿随机方向缓慢移动。
 * 从每个搜索器到最近的目标绘制一条白色调试线。
 
-<img src=".\Texture\JobSystem101\image4.gif" align="left" />
+<img src=".\Texture\JobSystem101\find_target.gif" align="left" />
 
 我们将针对这个问题提出四种解决方案：
 
@@ -235,7 +235,7 @@ public struct MyJob : IJobParallelFor
 
 以下是具有 1000 个追寻者和 1000 个目标的典型框架的概况：
 
-<img src=".\Texture\JobSystem101\image2.png" align="left" />
+<img src=".\Texture\JobSystem101\step1_profile.png" align="left" />
 
 每个追寻者需要约 0.3 毫秒来更新，总共花费超过 330 毫秒。
 
@@ -298,21 +298,21 @@ findHandle.Complete();
 
 以下是具有 1000 个追寻者和 1000 个目标的典型框架的概况，没有使用 Burst 编译 job：
 
-<img src=".\Texture\JobSystem101\image8.png" align="left" />
+<img src=".\Texture\JobSystem101\step2_profile_no_burst.png" align="left" />
 
 \~30ms 肯定比我们之前看到的 \~330ms 好，但接下来让我们通过在 job 结构体上添加 \[BurstCompile\] 属性来启用 Burst 编译。还要确保在菜单栏中启用了 Burst 编译：
 
-<img src=".\Texture\JobSystem101\image9.png" align="left" />
+<img src=".\Texture\JobSystem101\enable_burst.png" align="left" />
 
 这是启用 Burst 后得到的结果：
 
-<img src=".\Texture\JobSystem101\image7.png" align="left" />
+<img src=".\Texture\JobSystem101\step2_profile.png" align="left" />
 
 在~1.5ms 时，我们完全在 60fps 的 16.6ms 预算之内。
 
 由于我们现在有这么多的空间，让我们尝试增加到 10,000 个搜索者和 10,000 个目标：
 
-<img src=".\Texture\JobSystem101\image1.png" align="left" />
+<img src=".\Texture\JobSystem101\step2_profile_10000.png" align="left" />
 
 追寻者和目标增加 10 倍会导致 run 时间增加 70 倍，但考虑到每个追寻者都会检查其与每个目标的距离，这是预期的。
 
@@ -320,7 +320,7 @@ findHandle.Complete();
 
 ## 解决方案 3 \-并行 job
 
-* FindNearestJob 现在实现 IJobParallelFor 而不是 IJob。
+* FindNearestJob.cs 现在实现 IJobParallelFor 而不是 IJob。
 * FindNearest 中的 Schedule() 调用现在采用两个 int 参数：索引计数和批量大小。
 
 对于处理数组或列表的 job，通常可以通过将索引拆分为子范围来并行化工作。例如，数组的一半可以在一个线程上处理，而另一半则同时在另一个线程上处理。
@@ -328,38 +328,36 @@ findHandle.Complete();
 我们可以使用 IJobParallelFor 方便地创建这样的 jobs，其 Schedule() 方法接受两个 int 参数：
 
 * 索引计数：正在处理的数组或列表的大小
-* 批量大小：子范围的大小，a.k.a。批次
+* 批量大小：子范围的大小，a.k.a.批次
 
-例如，如果 job 的索引计数为 100，其批次大小为 40，则 job 会分为三个批次：第一个覆盖索引 0 到 39；第二个覆盖索引 0 到 39。第二覆盖索引 40 至 79；第三个覆盖索引 80 到 99\。
+例如，如果 job 的索引计数为 100，其批次大小为 40，则 job 会分为三个批次：第一个覆盖索引 0 到 39；第二覆盖索引 40 至 79；第三个覆盖索引 80 到 99。
 
-工作线程将这些批次单独从队列中拉出，因此单个 job 的批次可以在不同线程上同时处理。
+工作线程将这些批次单独从队列中拉出，因此单个 job 的批次可以在不同线程上同时处理.
 
 IJobParallelFor 的 Execute() 方法采用索引参数，并为每个索引调用一次，从 0 到索引计数：
 
-```java
+```c#
 public struct FindNearestJob : IJobParallelFor
 {
-[ReadOnly] public NativeArray<float3> TargetPositions;
-[ReadOnly] public NativeArray<float3> SeekerPositions;
-public NativeArray<float3> NearestTargetPositions;
+    [ReadOnly] public NativeArray<float3> TargetPositions;
+    [ReadOnly] public NativeArray<float3> SeekerPositions;
+    public NativeArray<float3> NearestTargetPositions;
 
-// Each Execute call processes only an individual index.
-public void Execute(int index)
-{
-// ...
-}
+    // 每个Execute调用只处理一个单独的索引
+    public void Execute(int index)
+    {
+    	// ...
+    }
 }
 
-// This job processes every seeker, so the
-// seeker array length is used as the index count.
-// A batch size of 100 is semi-arbitrarily chosen here
-// simply because it's not too big but not too small.
+// 这个 Job 会处理每一个 Seeker，因此使用 Seeker 数组的长度作为索引总数（Index Count）
+// 这里选择批处理大小（Batch Size）为 100，主要是一个比较随意的取值，只是因为它既不会太大，也不会太小
 JobHandle findHandle = findJob.Schedule(SeekerPositions.Length, 100);
 ```
 
 具有 10,000 个追寻者和 10,000 个目标的典型框架的轮廓：
 
-<img src=".\Texture\JobSystem101\image3.png" align="left" />
+<img src=".\Texture\JobSystem101\step3_profile.png" align="left" />
 
 由于工作分散在 16 个内核上，CPU 总共需要约 260 毫秒的时间，但从开始到结束的经过时间不到 17 毫秒。
 
@@ -417,18 +415,47 @@ jobs 的顺序是：SegmentSort \-\> SegmentSortMerge \-\> FindNearestJob。
 
 对于此解决方案，以下是具有 10,000 个追寻者和 10,000 个目标的典型框架的概况：
 
-<img src=".\Texture\JobSystem101\image5.png" align="left" />现在，FindNearestJob 总共只需要 7.5 毫秒的 CPU 时间和从开始到结束的 0.5 毫秒的经过时间。
+<img src=".\Texture\JobSystem101\step4_profile.png" align="left" />现在，FindNearestJob 总共只需要 7.5 毫秒的 CPU 时间和从开始到结束的 0.5 毫秒的经过时间。
 
 放大后，我们可以看到 SegmentSort 和 SegmentSortMerge jobs：
 
-<img src=".\Texture\JobSystem101\image6.png" align="left" />
+<img src=".\Texture\JobSystem101\step4_profile_sort.png" align="left" />
 
 SegmentSort 从开始到结束的时间不到 0.1ms，单线程 SegmentSortMerge 需要约 0.5ms。与 FindNearestJob 的巨大改进相比，额外的排序步骤非常值得额外的成本。
 
-现在大部分帧时间都被 GameObjects 的低效率所消耗，这可以通过用 entities 替换 GameObjects 来解决。
+现在大部分帧时间都被 GameObjects 的低效率所消耗，这可以通过用 entities 替换 GameObjects 来解决
+
+------
+
+## 对比表
+
+这个示例的核心问题是：每个 Seeker 都要在所有 Target 中找到距离最近的一个。最朴素的写法需要对每个 Seeker 遍历全部 Target，因此计算量大致是 `Seekers * Targets`。后续几个 Step 的优化方向可以分成两类：
+
+- Step 2 和 Step 3 主要优化执行方式：让同样的计算跑在更适合 CPU 的数据结构、Burst 编译代码和多线程 Job 上。
+- Step 4 开始优化算法本身：通过排序和提前退出，减少每个 Seeker 实际需要检查的 Target 数量。
+
+|  步骤  | 实现方式            | 核心变化                                                     | 典型耗时                                                     | 为什么能降低 ms                                              |
+| :----: | ------------------- | :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Step 1 | 无 Jobs             | 每个 Seeker 的 `Update()` 自己遍历全部 Target                | 1000 x 1000 时约 330ms                                       | 所有查找都在主线程执行，并且核心循环频繁访问 `Transform` 等托管对象，CPU 难以高效批量执行。 |
+| Step 2 | 单线程 Job + Burst  | 把查找搬到单个 `IJob`，数据放入 `NativeArray<float3>`，用 Burst 编译 | 不开 Burst 约 30ms，开 Burst 约 1.5ms                        | 算法仍是全量遍历，但核心循环脱离 GameObject/Transform，使用连续的原生数组和 `Unity.Mathematics`，Burst 能生成更紧凑、更高效的机器码。 |
+| Step 3 | Parallel Job        | 把 `IJob` 改成 `IJobParallelFor`，按 Seeker 拆分批次并行执行 | 10000 x 10000 时总 CPU 约 260ms，墙钟时间低于 17ms           | 每个 Seeker 的最近目标查找互不依赖，可以分给多个 worker 线程同时做。总计算量没有减少，但等待结果的实际时间下降。 |
+| Step 4 | Parallel Job + Sort | Target 按 X 坐标排序，查找时二分定位并向两侧剪枝搜索         | `FindNearestJob` 总 CPU 约 7.5ms，墙钟约 0.5ms，排序额外约 0.5ms | 不再总是检查所有 Target。排序后可以利用 X 轴距离判断后续目标不可能更近，从而提前退出，距离计算次数大幅减少。 |
+
+------
+
+## 总结
+
+四个 Step 的优化路径可以概括为：
+
+- Step 1：朴素主线程实现，简单但所有压力都在主线程和托管对象访问上。
+- Step 2：把核心循环搬进 Burst Job，让数据更连续、代码更接近原生数值计算。
+- Step 3：把每个 Seeker 的独立查找分发到多个线程，降低墙钟时间。
+- Step 4：通过排序和剪枝减少实际比较次数，从算法层面降低工作量。
+
+所以，ms 降低并不是单一原因造成的，而是逐层叠加的结果：先减少托管和主线程开销，再利用 Burst 优化 CPU 指令，再利用多核并行，最后减少算法本身需要做的计算。
 
 # 其他资源
 
-* [收藏 package 备忘单](https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/EntitiesSamples/Docs/cheatsheet/collections.md)
+* [收藏 package 备忘单](./EntitiesSamples/Docs/cheatsheet/collections.md)
 * [博客文章：改进 Job System 性能第 1 部分](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-1)
 * [博客文章：改进 Job System 性能第 2 部分](https://blog.unity.com/engine-platform/improving-job-system-performance-2022-2-part-2)

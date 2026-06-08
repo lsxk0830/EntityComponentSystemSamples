@@ -50,6 +50,8 @@ namespace Tutorials.Jobs.Step3
             // 对于 SeekerPositions 数组的每个元素都会调用一次 Execute，
             // 每个索引从 0 到（但不包括）数组的长度。
             // 执行调用将被分成 100 个批次。
+            // 这个 Job 会处理每一个 Seeker，因此使用 Seeker 数组的长度作为索引总数（Index Count）
+            // 这里选择批处理大小（Batch Size）为 100，主要是一个比较随意的取值，只是因为它既不会太大，也不会太小
             JobHandle findHandle = findJob.Schedule(SeekerPositions.Length, 100);
 
             findHandle.Complete();
