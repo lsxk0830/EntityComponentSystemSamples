@@ -105,46 +105,61 @@ Chunk 的创建与销毁由 EntityManager 负责管理：
 
 ## 查询
 
-EntityQuery 有效地查找具有指定的 component 类型集的所有 entities。例如，如果 query 查找具有 component 类型 A 和 B 的所有 entities，则 query 将收集包括 A 和 B 的所有 archetypes 的 chunks，无论其他任何 component 可能具有 archetypes 类型。这样的 query 会将 entities 与 component 类型 A 和 B 相匹配，但 query 也会将 entities 与 component 类型 A、B 和 C 相匹配。
+EntityQuery 能够高效地筛选出满足指定组件条件的实体。例如，当一个查询要求实体同时具有组件类型 A 和 B 时，系统会遍历所有包含 A 和 B 组件的 Archetype，并收集这些 Archetype 中的 Chunk，而不考虑这些 Archetype 是否还包含其他组件类型。因此，该查询既能匹配组件集合为 {A, B} 的实体，也能匹配组件集合为 {A, B, C}、{A, B, D} 等包含 A 和 B 的实体。
 
-**注意**：与 query 匹配的 archetypes 将被缓存，直到下次将新的 archetype 添加到 world 为止。由于 world 中的现有 archetypes 集往往会在程序生命周期的早期稳定下来，因此这种缓存通常有助于使查询成本降低得多。
+> 注意：EntityQuery 所匹配的 Archetype 会被缓存，并持续复用，直到 World 中新增了新的 Archetype。
+>
+> 由于在大多数情况下，World 中的 Archetype 类型会在程序生命周期的早期基本确定下来，因此这种缓存机制通常可以大幅提高查询性能并减少查询成本
 
-query 还可以指定要从匹配的 archetypes 中排除的 component 类型。例如，如果 query 查找“所有具有 component 类型 A 和 B 但*不*具有 component 类型 C 的 entities”，则 query 会将 entities 与 component 匹配类型 A 和 B，但不匹配 entities 与 component 类型 A、B 和 C。
+EntityQuery 不仅可以指定必须包含的组件类型，还可以指定必须排除的组件类型。
+
+例如，若一个查询定义为“包含 A 和 B 组件，但不包含 C 组件”，则它会匹配组件集合为 {A, B} 的实体，而不会匹配组件集合为 {A, B, C} 的实体。
 
 ## Entity ID 的
 
-entity ID 由结构体 Entity 表示，它由两个 int 组成：*index* 和 *version*。
+实体标识符（Entity ID）由 `Entity` 结构体表示，其中包含两个整数字段：`Index` 和 `Version`。为了根据 Entity ID 快速定位实体，EntityManager 会维护一个实体元数据表。`Index` 用于指定实体在该元数据表中的位置。每个表项记录了：
 
-为了通过 ID 查找 entities，world 的 EntityManager 维护了一个 entity 元数据数组。entity 的索引表示其在此元数据数组中的槽，该槽存储指向存储 entity 的 chunk 的指针，以及 chunk 内 entity 的索引。当特定索引不存在 entity 时，该索引处的 chunk 指针为空。例如，当前不存在索引为 1、2、5 的 entities，因此这些槽中的 chunk 指针均为空：
+- 实体所在 Chunk 的引用（或指针）；
+- 实体在该 Chunk 中的索引。
 
-![][图片 1]
+如果某个 Index 当前没有对应的实体存在，则该表项中的 Chunk 引用为空（null）。例如，在下图所示的情况下，索引为 1、2 和 5 的实体已经不存在，因此对应表项中的 Chunk 引用均为空。
 
-entity 版本号允许 entity 索引在 entity 被销毁后重用：当 entity 被销毁时，存储在其索引中的版本号会递增，因此如果 ID 的版本号与存储在 entity 中的版本号不匹配索引，那么 ID 必须引用已被销毁或可能从未存在过的 entity。
+<img src=".\Texture\Entities101\EntityID.png" align="left" />
+
+Version 字段的作用是支持 Entity Index 的复用。当一个实体被销毁后，EntityManager 会将该索引对应的版本号加 1。这样一来，即使之后有新的实体复用了同一个 Index，也能够通过 Version 区分新旧实体。
+
+如果某个 Entity 的 Version 与元数据表中该 Index 当前记录的 Version 不一致，则说明该 Entity 引用已经失效，它要么指向一个已被销毁的实体，要么从未对应过任何有效实体。
 
 ## 标签 components
 
-没有字段的 IComponentData 结构称为标记 component。虽然标签 components 不存储任何数据，但它们仍然可以像任何其他 component 类型一样从 entities 中添加和删除，这对于查询很有用。例如，如果我们所有代表怪物的 entities 都有怪物标签 component，则怪物 component 类型的 query 将匹配所有怪物 entities。
+没有任何成员字段的 `IComponentData` 组件被称为标签组件（Tag Component）。
 
-```java
-// a tag component
+标签组件不携带数据，其作用主要是标记实体的身份或状态。尽管如此，它们仍然属于组件，因此可以像普通组件一样被添加到或移除出实体。
+
+标签组件最常见的用途是配合 EntityQuery 进行筛选。
+
+例如，假设所有怪物实体都拥有一个 `Monster` 标签组件，那么通过查询 `Monster` 组件，就可以快速获取所有怪物实体。
+
+```c#
+// 一个Tag组件
 public struct Monster : IComponentData
 {
 }
 ```
 
-## DynamicBuffer components
+## DynamicBuffer 组件
 
-DynamicBuffer 是 component 类型，它是可调整大小的数组。要定义 DynamicBuffer component 类型，请创建一个实现 IBufferElementData 接口的结构体。
+DynamicBuffer 是 component 类型，它是可调整大小的数组。要定义 DynamicBuffer component 类型，请创建一个实现 IBufferElementData 接口的结构体
 
-```java
-// a dynamic buffer component type
+```c#
+// 动态缓冲区组件类型
 public struct Waypoint : IBufferElementData
 {
 	public float3 Value:
 }
 ```
 
-每个 entity 的缓冲区存储了一个 Length、一个 Capacity 和一个指针：
+这个缓冲区（Buffer）会存储三个信息：Length（长度）、Capacity（容量）以及一个指针（Pointer）
 
 * 长度是缓冲区中元素的数量。它从 0 开始，并在您向缓冲区添加值时递增。
 * 容量是缓冲区中的存储量。它开始匹配内部缓冲区容量（默认为 128 / sizeof(T)，但可以通过 IBufferElementData 结构上的 InternalBufferCapacity 属性指定）。设置容量可调整缓冲区的大小。
@@ -165,13 +180,440 @@ EntityManager 具有以下动态缓冲区的关键方法：
 DynamicBuffer\<T\> 表示单个 entity 的类型 T 的动态缓冲区 component。其主要属性和方法包括：
 
 * Length：获取或设置缓冲区的长度。
-* 容量：获取或设置缓冲区的容量。
-* Item\[Int32\]：获取或设置指定索引处的元素。
+* Capacity：获取或设置缓冲区的容量。
+* Item[Int32]：获取或设置指定索引处的元素。
 * Add()：将一个元素添加到缓冲区的末尾，并根据需要调整其大小。
 * Insert()：在指定索引处插入元素，必要时调整大小。
 * RemoveAt()：删除指定索引处的元素。
 
   **注意**：执行任何结构更改操作都会使 DynamicBuffer 无效，这意味着如果随后使用 DynamicBuffer 将引发异常。要在结构更改后再次使用缓冲区，必须重新检索它。
+
+### 总结
+
+### 1. 什么是 DynamicBuffer？
+
+`DynamicBuffer` 是 ECS 中的一种**可变长度数组组件**。
+
+普通 `IComponentData`：
+
+```c#
+public struct Health : IComponentData
+{
+    public int Value;
+}
+```
+
+一个实体只能存储一个 `Health` 值，而 DynamicBuffer：
+
+```c#
+public struct Waypoint : IBufferElementData
+{
+    public float3 Value;
+}
+```
+
+一个实体可以存储任意数量的 `Waypoint`：
+
+```
+Entity
+ └── DynamicBuffer<Waypoint>
+      [P1, P2, P3, P4, ...]
+```
+
+适用于：
+
+- 路径点（Waypoints）
+- 背包物品（Inventory）
+- 技能列表
+- Buff列表
+- 邻接节点
+- 历史记录
+
+------
+
+### 2. 如何定义
+
+定义一个实现 `IBufferElementData` 的结构体：
+
+```c#
+public struct Waypoint : IBufferElementData
+{
+    public float3 Value;
+}
+```
+
+注意：
+
+```
+IComponentData      → 普通组件
+IBufferElementData  → DynamicBuffer元素类型
+```
+
+------
+
+### 3. Buffer内部结构
+
+每个实体的 Buffer 维护：
+
+```
+Length
+Capacity
+Pointer
+```
+
+-  Length：当前元素数量
+
+  ```
+  [P1][P2][P3]
+  
+  Length = 3
+  ```
+
+- Capacity：当前最大可容纳数量
+
+  ```
+  [P1][P2][P3][ ][ ]
+  
+  Length = 3
+  Capacity = 5
+  ```
+
+- Pointer：指向实际数据的位置
+
+  ```
+  Pointer ───► Buffer Data
+  ```
+
+------
+
+### 4. Internal Buffer Capacity
+
+默认情况下：Buffer数据直接存储在Chunk内部
+
+类似：
+
+```
+Chunk
+
+Entity
+ ├── Health
+ ├── Position
+ └── Buffer数据
+```
+
+这样访问最快：
+
+```
+无需额外内存跳转
+Cache友好
+```
+
+```
+InternalBufferCapacity ≈ 128 / sizeof(T)
+```
+
+例如：
+
+```
+struct Waypoint
+{
+    float3 Value;
+}
+sizeof(float3)=12
+
+128 / 12 ≈ 10
+```
+
+那么Chunk内大约可直接存：
+
+```
+10个Waypoint
+```
+
+------
+
+### 5. 超出内部容量时会发生什么？
+
+假设：
+
+```
+Internal Capacity = 10
+```
+
+当前：
+
+```
+Length = 10
+```
+
+再添加一个：
+
+```
+buffer.Add(...)
+```
+
+系统会：
+
+1. 在Chunk外部分配更大的数组
+
+   ```
+   Heap Memory
+   
+   [P1][P2]...[P11]
+   ```
+
+2. 复制旧数据
+
+   ```
+   Chunk
+    ↓ Copy
+   External Buffer
+   ```
+
+3. Pointer指向新数组
+
+```
+Pointer ───► External Buffer
+```
+
+此后Buffer数据都在Chunk外部。
+
+------
+
+### 6. 超出外部容量怎么办？
+
+例如：
+
+```
+Capacity = 16
+Length   = 16
+```
+
+继续Add：
+
+```
+分配更大的数组
+复制旧数据
+释放旧数组
+```
+
+类似：List<T>的扩容机制。
+
+------
+
+### 7. 性能影响
+
+最理想情况：Buffer始终在Chunk内部：
+
+```
+✓ 无额外指针
+✓ Cache命中率高
+✓ ECS最快状态
+```
+
+------
+
+超出Internal Capacity：Buffer搬到Chunk外：
+
+```
+Chunk
+  ↓
+Pointer
+  ↓
+External Buffer
+```
+
+代价：
+
+```
+额外一次指针跳转
+内存局部性下降
+Chunk空间浪费
+```
+
+------
+
+#### 优化方案1：增大InternalBufferCapacity
+
+```c#
+[InternalBufferCapacity(32)]
+public struct Waypoint : IBufferElementData
+{
+    public float3 Value;
+}
+```
+
+- 优点：大多数情况不扩容、性能最好
+- 缺点：Chunk占用更多空间
+
+------
+
+#### 优化方案2：设为0
+
+```c#
+[InternalBufferCapacity(0)]
+```
+
+效果：
+
+```
+任何非空Buffer
+都直接存到Chunk外
+```
+
+- 优点：Chunk不浪费空间
+- 缺点：每次访问都要跟随Pointer
+
+------
+
+### 8. EntityManager相关API
+
+- 添加Buffer
+
+  ```
+  entityManager.AddBuffer<Waypoint>(entity);
+  ```
+  返回：
+  
+  ```
+  DynamicBuffer<Waypoint>
+  ```
+  
+- 获取Buffer
+
+  ```
+  var buffer = entityManager.GetBuffer<Waypoint>(entity);
+  ```
+
+- 判断是否存在
+
+  ```
+  entityManager.HasBuffer<Waypoint>(entity);
+  ```
+
+- 删除Buffer
+
+  ```
+  entityManager.RemoveComponent<Waypoint>(entity);
+  ```
+
+------
+
+### 9. DynamicBuffer常用操作
+
+- Add
+
+  ```
+  buffer.Add(new Waypoint());
+  ```
+
+- Insert：指定位置插入
+
+  ```
+  buffer.Insert(2, value);
+  ```
+
+- RemoveAt：删除指定位置
+
+  ```
+  buffer.RemoveAt(2);
+  ```
+
+- 访问元素
+
+  ```
+  var p = buffer[0];
+  buffer[0] = value;
+  ```
+
+- Length
+
+  ```
+  buffer.Length
+  ```
+
+- Capacity
+
+  ```
+  buffer.Capacity
+  ```
+
+------
+
+### 10. 最重要的坑：Structural Change
+
+任何结构性变更都会使 DynamicBuffer 失效。
+
+例如：
+
+```c#
+var buffer = entityManager.GetBuffer<Waypoint>(entity);
+
+entityManager.AddComponent<Tag>(entity);
+```
+
+这里：
+
+```
+AddComponent
+↓
+Structural Change
+↓
+实体迁移Archetype
+↓
+Buffer失效
+```
+
+之后：
+
+```
+buffer.Add(...)
+```
+
+会抛异常。
+
+------
+
+#### 正确做法
+
+结构变更后重新获取：
+
+```
+entityManager.AddComponent<Tag>(entity);
+
+buffer = entityManager.GetBuffer<Waypoint>(entity);
+```
+
+然后再使用。
+
+------
+
+### 一张图记住
+
+```
+DynamicBuffer
+
+Entity
+  │
+  └── Buffer Header
+       ├── Length
+       ├── Capacity
+       └── Pointer
+                │
+                ▼
+         Internal Storage (Chunk内)
+             或
+         External Storage (Chunk外)
+```
+
+### 核心结论
+
+1. **DynamicBuffer = ECS中的动态数组组件。**
+2. **通过实现 `IBufferElementData` 定义。**
+3. **小数据存Chunk内，大数据自动搬到Chunk外。**
+4. **超出Capacity会自动扩容并复制数据。**
+5. **最好不要频繁超过 InternalBufferCapacity。**
+6. **Structural Change 后所有已获取的 DynamicBuffer 都会失效，必须重新获取**
 
 # Systems
 
