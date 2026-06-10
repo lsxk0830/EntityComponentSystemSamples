@@ -9,6 +9,9 @@ namespace HelloCube.MainThread
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            // 如果存在带 ExecuteMainThread 的实体，RotationSystem.OnUpdate() 会运行。
+            // 如果不存在，RotationSystem.OnUpdate() 不会运行。
+            // 系统本身还在，只是每帧更新被跳过
             state.RequireForUpdate<ExecuteMainThread>();
         }
 
