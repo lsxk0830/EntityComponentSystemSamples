@@ -25,9 +25,8 @@ namespace HelloCube.EnableableComponents
             // 切换每个 RotationSpeed 的启用状态
             if (m_Timer < 0)
             {
-                foreach (var rotationSpeedEnabled in
-                         SystemAPI.Query<EnabledRefRW<RotationSpeed>>()
-                             .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+                foreach (var rotationSpeedEnabled in SystemAPI.Query<EnabledRefRW<RotationSpeed>>()
+                             .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)) // 该查询将匹配所有具有 RotationSpeed component 的 entities，无论它们是否启用。
                 {
                     rotationSpeedEnabled.ValueRW = !rotationSpeedEnabled.ValueRO;
                 }
@@ -36,11 +35,9 @@ namespace HelloCube.EnableableComponents
             }
 
             // query 仅匹配启用了 RotationSpeed 的 entities。
-            foreach (var (transform, speed) in
-                     SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotationSpeed>>())
+            foreach (var (transform, speed) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotationSpeed>>())
             {
-                transform.ValueRW = transform.ValueRO.RotateY(
-                    speed.ValueRO.RadiansPerSecond * deltaTime);
+                transform.ValueRW = transform.ValueRO.RotateY(speed.ValueRO.RadiansPerSecond * deltaTime);
             }
         }
     }

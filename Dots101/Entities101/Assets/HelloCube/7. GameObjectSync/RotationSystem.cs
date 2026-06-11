@@ -18,18 +18,14 @@ namespace HelloCube.GameObjectSync
         public void OnUpdate(ref SystemState state)
         {
             var directory = SystemAPI.ManagedAPI.GetSingleton<DirectoryManaged>();
-            if (!directory.RotationToggle.isOn)
-            {
-                return;
-            }
+
+            if (!directory.RotationToggle.isOn) return;
 
             float deltaTime = SystemAPI.Time.DeltaTime;
 
-            foreach (var (transform, speed, go) in
-                     SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotationSpeed>, RotatorGO>())
+            foreach (var (transform, speed, go) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotationSpeed>, RotatorGO>())
             {
-                transform.ValueRW = transform.ValueRO.RotateY(
-                    speed.ValueRO.RadiansPerSecond * deltaTime);
+                transform.ValueRW = transform.ValueRO.RotateY(speed.ValueRO.RadiansPerSecond * deltaTime);
 
                 // 更新关联的 GameObject 的转换以匹配。
                 go.Value.transform.rotation = transform.ValueRO.Rotation;

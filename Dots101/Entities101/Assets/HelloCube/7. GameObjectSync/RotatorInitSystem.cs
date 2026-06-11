@@ -23,12 +23,12 @@ namespace HelloCube.GameObjectSync
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             // 从 prefab 实例化关联的 GameObject。
-            foreach (var (rotationSpeed, entity) in
-                     SystemAPI.Query<RefRO<RotationSpeed>>()
+            foreach (var (rotationSpeed, entity) in SystemAPI.Query<RefRO<RotationSpeed>>()
                          .WithNone<RotatorGO>()
                          .WithEntityAccess())
             {
                 var go = GameObject.Instantiate(directory.RotatorPrefab);
+                go.name = "自定义CubeName";
 
                 // 当我们迭代它们时，我们无法将 components 添加到 entities，因此我们使用 ECB 推迟更改。
                 ecb.AddComponent(entity, new RotatorGO(go));

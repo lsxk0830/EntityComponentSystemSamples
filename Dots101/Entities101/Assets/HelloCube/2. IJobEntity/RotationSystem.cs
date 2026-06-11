@@ -18,9 +18,13 @@ namespace HelloCube.JobEntity
         {
             var job = new RotateAndScaleJob
             {
-                DeltaTime = SystemAPI.Time.DeltaTime, ElapsedTime = (float)SystemAPI.Time.ElapsedTime
+                DeltaTime = SystemAPI.Time.DeltaTime,
+                ElapsedTime = (float)SystemAPI.Time.ElapsedTime
             };
             job.Schedule();
+
+            // 把这个 job 加入当前 System 的 Job 依赖链，并把新的依赖结果保存回 state.Dependency
+            // state.Dependency = job.Schedule(state.Dependency); 
         }
     }
 

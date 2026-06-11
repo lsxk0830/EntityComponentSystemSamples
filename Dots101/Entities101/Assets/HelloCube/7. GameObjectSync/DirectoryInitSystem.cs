@@ -23,10 +23,8 @@ namespace HelloCube.GameObjectSync
             state.Enabled = false;
 
             var directoryObject = GameObject.Find("Directory");
-            if (directoryObject == null)
-            {
-                throw new Exception("GameObject 'Directory' not found.");
-            }
+
+            if (directoryObject == null) throw new Exception("游戏对象 'Directory' 没有找到.");
 
             var directory = directoryObject.GetComponent<Directory>();
 

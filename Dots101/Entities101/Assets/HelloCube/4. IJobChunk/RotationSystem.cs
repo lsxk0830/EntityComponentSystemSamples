@@ -27,10 +27,8 @@ namespace HelloCube.JobChunk
                 DeltaTime = SystemAPI.Time.DeltaTime
             };
 
-            // 与 IJobEntity 不同，IJobChunk 必须手动传递 query。
-            // 此外，IJobChunk 不会隐式传递和分配 state.Dependency JobHandle。
-            // （这种传递和分配 state.Dependency 的模式可确保 entity jobs 调度
-            // 不同的 systems 将根据需要相互依赖。）
+            // 与 IJobEntity 不同，IJobChunk 必须手动传递 query。 此外，IJobChunk 不会隐式传递和分配 state.Dependency JobHandle。
+            // （这种传递和分配 state.Dependency 的模式可确保 entity jobs 调度不同的 systems 将根据需要相互依赖。）
             state.Dependency = job.Schedule(spinningCubesQuery, state.Dependency);
         }
     }
@@ -42,19 +40,15 @@ namespace HelloCube.JobChunk
         [ReadOnly] public ComponentTypeHandle<RotationSpeed> RotationSpeedTypeHandle;
         public float DeltaTime;
 
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
-            in v128 chunkEnabledMask)
+        // useEnabledMask:当前这个 chunk 里，是否需要根据组件的 enabled/disabled 状态来过滤实体
+        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            // 当 entities 中的一个或多个时，useEnableMask 参数为 true
-            // chunk 的 query 的 components 被禁用。
-            // 如果没有一个 query component 类型实现 IEnableableComponent，
-            // 我们可以假设 useEnabledMask 始终为假。
-            // 但是，最好添加此防护检查以防万一
-            // 后来有人更改了 query 或 component 类型。
+            // 我这段代码只支持没有 enabled mask 的情况
             Assert.IsFalse(useEnabledMask);
 
             var transforms = chunk.GetNativeArray(ref TransformTypeHandle);
             var rotationSpeeds = chunk.GetNativeArray(ref RotationSpeedTypeHandle);
+
             for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)
             {
                 transforms[i] = transforms[i].RotateY(rotationSpeeds[i].RadiansPerSecond * DeltaTime);

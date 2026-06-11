@@ -13,9 +13,7 @@ namespace HelloCube.Prefabs
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // 此调用使 system 不会更新，除非 world 中至少存在一个具有 Spawner component 的 entity。
             state.RequireForUpdate<Spawner>();
-
             state.RequireForUpdate<ExecutePrefabs>();
         }
 
@@ -34,8 +32,7 @@ namespace HelloCube.Prefabs
                 // 实例化 entity 会创建具有相同 component 类型和值的副本 entities。
                 var instances = state.EntityManager.Instantiate(prefab, 500, Allocator.Temp);
 
-                // 与新的 Random() 不同，CreateFromIndex() 对随机种子进行哈希处理
-                // 这样相似的种子就不会产生相似的结果。
+                // 与新的 Random() 不同，CreateFromIndex() 对随机种子进行哈希处理，这样相似的种子就不会产生相似的结果。
                 var random = Random.CreateFromIndex(m_UpdateCounter++);
 
                 foreach (var entity in instances)
