@@ -25,6 +25,7 @@ DOTS package 示例项目包含许多小示例，涵盖了 packages 中的大部
 ## Entities 101
 
 - [文档：Unity Entities 101](./UnityEntities101.md)
+- [文档：DOTS 新手开发指南](./DOTS新手开发指南.md)
 - [示例项目：Unity Entities 101](./Dots101/Entities101/)
 - [视频：ECS Entities 和 components](https://youtu.be/jzCEzNoztzM)（10 分钟）
 - [视频：ECS Systems](https://youtu.be/k07I-DpCcvE)（7 分钟）
